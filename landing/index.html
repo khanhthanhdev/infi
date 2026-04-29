@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Infi — Your Personal AI for Smarter Investing
+        </title>
+
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="128x128"
+            href="./assets/icons/128x128.png"
+        />
+
+        <meta
+            name="description"
+            content="Infi is your personal AI-powered agent for stock and portfolio research—built to help you not just analyze investments, but truly understand them. Ask about any stock, sector, or upload your own portfolio, and Infi will generate clear, structured, and well-sourced insights—right on your machine."
+        />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://infi.sh/" />
+        <meta name="theme-color" content="#FAFAFA" />
+
+        <meta
+            property="og:title"
+            content="Infi — Your Personal AI for Smarter Investing"
+        />
+        <meta
+            property="og:description"
+            content="Stock and portfolio research through coding agents. Reports with sources you can click. Your keys, your keychain. Data stays on your machine."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://infi.sh/" />
+        <meta property="og:site_name" content="Infi" />
+        <meta property="og:image" content="./assets/icons/128x128@2x.png" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@puemos" />
+        <meta
+            name="twitter:title"
+            content="Infi — Your Personal AI for Smarter Investing"
+        />
+        <meta
+            name="twitter:description"
+            content="Stock and portfolio research through coding agents. Reports with sources you can click. Your keys, your keychain. Data stays on your machine."
+        />
+
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                "name": "Infi",
+                "applicationCategory": "FinanceApplication",
+                "operatingSystem": "macOS, Linux",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "USD"
+                },
+                "description": "Desktop app for stock and portfolio research through coding agents. Reports with click-through sources. Uses your agent's auth and keychain-stored data-source keys.",
+                "author": {
+                    "@type": "Person",
+                    "name": "puemos",
+                    "url": "https://github.com/puemos"
+                },
+                "url": "https://infi.sh",
+                "downloadUrl": "https://github.com/puemos/infi/releases",
+                "programmingLanguage": ["Rust", "TypeScript"]
+            }
+        </script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="./styles/landing.css" />
+    </head>
+
+    <body class="bg-paper text-ink font-sans antialiased overflow-x-hidden">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- ============ NAV ============ -->
+        <nav
+            aria-label="Main navigation"
+            class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-rule"
+        >
+            <div class="flex items-center justify-between px-5 md:px-8 py-3.5">
+                <a
+                    href="/"
+                    aria-label="Infi home"
+                    class="flex items-center gap-2.5"
+                >
+                    <img
+                        src="./assets/icons/128x128.png"
+                        alt=""
+                        class="h-6 w-6"
+                        decoding="async"
+                    />
+                    <span
+                        class="font-display font-semibold text-[17px] tracking-[-0.01em] text-ink"
+                        >Infi</span
+                    >
+                </a>
+                <div
+                    class="hidden md:flex items-center gap-7 text-[13px] text-muted"
+                >
+                    <a href="#features" class="hover:text-ink transition-colors"
+                        >Features</a
+                    >
+                    <a href="#how" class="hover:text-ink transition-colors"
+                        >How it works</a
+                    >
+                    <a
+                        href="https://github.com/puemos/infi"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:text-ink transition-colors inline-flex items-baseline gap-1"
+                        >GitHub <span aria-hidden="true">↗</span></a
+                    >
+                </div>
+                <a
+                    href="#download"
+                    class="inline-flex items-center gap-2 border border-ink bg-ink text-paper px-3.5 py-2 text-[12.5px] font-medium tracking-[0.01em] hover:bg-paper hover:text-ink transition-colors"
+                    >Download</a
+                >
+            </div>
+        </nav>
+
+        <main id="main-content">
+            <!-- ============ HERO ============ -->
+            <section
+                aria-labelledby="hero-heading"
+                class="border-b border-rule lg:min-h-[78vh] flex items-center"
+            >
+                <div
+                    class="w-full px-5 md:px-8 pt-12 md:pt-16 pb-14 md:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center max-w-7xl mx-auto"
+                >
+                    <!-- text -->
+                    <div class="lg:col-span-7 order-2 lg:order-1">
+                        <div
+                            class="flex items-center gap-2.5 mb-7 font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted"
+                        >
+                            <span
+                                class="block w-2 h-2 bg-violet"
+                                aria-hidden="true"
+                            ></span>
+                            Stock + portfolio research · Coding agents · Local
+                        </div>
+                        <h1
+                            id="hero-heading"
+                            class="font-display font-semibold text-ink tracking-[-0.035em] leading-[0.98] mb-7 max-w-[15ch]"
+                            style="font-size: clamp(44px, 7.6vw, 88px)"
+                        >
+                            Stock and portfolio research through your own agent.
+                        </h1>
+                        <p
+                            class="font-serif text-[18px] md:text-[20px] leading-[1.45] text-ink/85 max-w-[48ch] mb-5"
+                        >
+                            Ask about a ticker or sector, or add a portfolio and
+                            make the agent review what you own. Claude Code,
+                            Codex, Gemini, whatever you already run. The report
+                            is organized, sourced, and stays on your machine.
+                        </p>
+                        <p
+                            class="font-mono text-[11.5px] uppercase tracking-[0.18em] text-muted mb-9"
+                        >
+                            Runs on your agent&rsquo;s auth, your own tokens,
+                            and your machine.
+                        </p>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <a
+                                href="#download"
+                                class="inline-flex items-center gap-2 border border-ink bg-ink text-paper px-5 py-3 text-[13px] font-medium tracking-[0.01em] hover:bg-paper hover:text-ink transition-colors"
+                            >
+                                Download
+                            </a>
+                            <a
+                                href="./example.html"
+                                target="_blank"
+                                rel="noopener"
+                                class="inline-flex items-center gap-2 text-ink px-1 py-3 text-[13px] font-medium tracking-[0.01em] hover:text-violet transition-colors"
+                            >
+                                See an example report
+                                <span aria-hidden="true">→</span>
+                            </a>
+                            <a
+                                href="#how"
+                                class="inline-flex items-center gap-2 text-ink px-1 py-3 text-[13px] font-medium tracking-[0.01em] hover:text-violet transition-colors"
+                            >
+                                See how it works
+                                <span aria-hidden="true">→</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- hero mark -->
+                    <div
+                        class="lg:col-span-5 order-1 lg:order-2 flex justify-center lg:justify-end"
+                    >
+                        <img
+                            src="./assets/icons/icon.png"
+                            alt="The Infi bull"
+                            class="w-[200px] sm:w-[240px] md:w-[300px] lg:w-[340px] h-auto select-none"
+                            draggable="false"
+                            decoding="async"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ AGENTS ROW ============ -->
+            <section
+                aria-label="Compatible AI agents"
+                class="border-b border-rule"
+            >
+                <div
+                    class="px-5 md:px-8 py-6 flex flex-col md:flex-row md:items-center gap-5 md:gap-10 max-w-7xl mx-auto"
+                >
+                    <p class="text-[13px] text-muted md:shrink-0">
+                        Works with coding agents you already run
+                    </p>
+                    <div
+                        class="flex items-center gap-6 md:gap-7 overflow-x-auto scrollbar-hide -mx-5 md:mx-0 px-5 md:px-0"
+                        role="list"
+                    >
+                        <span
+                            class="flex items-center gap-2 shrink-0"
+                            role="listitem"
+                        >
+                            <img
+                                src="./assets/agents/claude.svg"
+                                alt=""
+                                class="h-4 w-auto opacity-70"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                            <span class="text-[12.5px] text-muted"
+                                >Claude Code</span
+                            >
+                        </span>
+                        <span
+                            class="flex items-center gap-2 shrink-0"
+                            role="listitem"
+                        >
+                            <img
+                                src="./assets/agents/codex.svg"
+                                alt=""
+                                class="h-4 w-auto opacity-70"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                            <span class="text-[12.5px] text-muted">Codex</span>
+                        </span>
+                        <span
+                            class="flex items-center gap-2 shrink-0"
+                            role="listitem"
+                        >
+                            <img
+                                src="./assets/agents/gemini.svg"
+                                alt=""
+                                class="h-4 w-auto opacity-70"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                            <span class="text-[12.5px] text-muted"
+                                >Gemini CLI</span
+                            >
+                        </span>
+                        <span
+                            class="flex items-center gap-2 shrink-0"
+                            role="listitem"
+                        >
+                            <img
+                                src="./assets/agents/qwen.svg"
+                                alt=""
+                                class="h-4 w-auto opacity-70"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                            <span class="text-[12.5px] text-muted">Qwen</span>
+                        </span>
+                        <span
+                            class="flex items-center gap-2 shrink-0"
+                            role="listitem"
+                        >
+                            <img
+                                src="./assets/agents/mistral.svg"
+                                alt=""
+                                class="h-4 w-auto opacity-70"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                            <span class="text-[12.5px] text-muted"
+                                >Mistral</span
+                            >
+                        </span>
+                        <span
+                            class="flex items-center gap-2 shrink-0"
+                            role="listitem"
+                        >
+                            <img
+                                src="./assets/agents/kimi.svg"
+                                alt=""
+                                class="h-4 w-auto opacity-70"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                            <span class="text-[12.5px] text-muted">Kimi</span>
+                        </span>
+                        <span
+                            class="flex items-center gap-2 shrink-0"
+                            role="listitem"
+                        >
+                            <img
+                                src="./assets/agents/opencode.svg"
+                                alt=""
+                                class="h-4 w-auto opacity-70"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                            <span class="text-[12.5px] text-muted"
+                                >OpenCode</span
+                            >
+                        </span>
+                        <span class="text-[12px] text-muted/60 shrink-0"
+                            >or a custom binary</span
+                        >
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ PORTFOLIO ============ -->
+            <section aria-label="Portfolio" class="border-b border-rule">
+                <div
+                    class="px-5 md:px-8 pt-14 md:pt-24 pb-14 md:pb-24 max-w-7xl mx-auto"
+                >
+                    <p
+                        class="font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted mb-4 flex items-center gap-2.5"
+                    >
+                        <span
+                            class="block w-2 h-2 bg-violet"
+                            aria-hidden="true"
+                        ></span>
+                        Portfolio
+                    </p>
+                    <div
+                        class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 mb-12 md:mb-16"
+                    >
+                        <h2
+                            class="lg:col-span-5 font-display font-semibold text-ink tracking-[-0.025em] leading-[1.02] max-w-[22ch]"
+                            style="font-size: clamp(30px, 4.4vw, 52px)"
+                        >
+                            Review your portfolio as a whole.
+                        </h2>
+                        <div
+                            class="lg:col-span-7 flex flex-col gap-5 font-serif text-[17px] leading-[1.6] text-ink/85 max-w-[58ch]"
+                        >
+                            <p>
+                                Add the positions you want reviewed. Infi
+                                keeps them on your machine and ties future
+                                reports to that portfolio.
+                            </p>
+                            <p>
+                                Portfolio reports cover material positions,
+                                allocation, risk, and scenario options. The
+                                report stays research-only: no orders, no
+                                position sizing, no broker actions.
+                            </p>
+                        </div>
+                    </div>
+
+                    <figure class="flex flex-col gap-4 mb-6">
+                        <video
+                            class="block w-full h-auto border border-rule select-none"
+                            autoplay
+                            muted
+                            loop
+                            playsinline
+                            controls
+                            preload="metadata"
+                            aria-label="A short walkthrough of the portfolio analysis feature in Infi."
+                        >
+                            <source
+                                src="./assets/screenshots/portfolio-analysis.mp4"
+                                type="video/mp4"
+                            />
+                        </video>
+                        <figcaption
+                            class="font-serif text-[15.5px] leading-[1.55] text-muted"
+                        >
+                            Portfolio analysis walkthrough — from adding
+                            positions to reading the full report.
+                        </figcaption>
+                    </figure>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <figure class="flex flex-col gap-4">
+                            <picture>
+                                <source
+                                    type="image/avif"
+                                    srcset="
+                                        ./assets/screenshots/portfolio-risk.avif
+                                    "
+                                />
+                                <source
+                                    type="image/webp"
+                                    srcset="
+                                        ./assets/screenshots/portfolio-risk.webp
+                                    "
+                                />
+                                <img
+                                    src="./assets/screenshots/portfolio-risk.png"
+                                    alt="The portfolio risk section showing factor exposures and macro sensitivities across holdings."
+                                    loading="lazy"
+                                    decoding="async"
+                                    class="w-full h-auto border border-rule"
+                                />
+                            </picture>
+                            <figcaption
+                                class="font-serif text-[15.5px] leading-[1.55] text-muted"
+                            >
+                                Risk section: factor exposures and macro
+                                sensitivities across the portfolio's holdings.
+                            </figcaption>
+                        </figure>
+
+                        <figure class="flex flex-col gap-4">
+                            <picture>
+                                <source
+                                    type="image/avif"
+                                    srcset="
+                                        ./assets/screenshots/portfolio-rebalancing-scenarios.avif
+                                    "
+                                />
+                                <source
+                                    type="image/webp"
+                                    srcset="
+                                        ./assets/screenshots/portfolio-rebalancing-scenarios.webp
+                                    "
+                                />
+                                <img
+                                    src="./assets/screenshots/portfolio-rebalancing-scenarios.png"
+                                    alt="The rebalancing scenarios section with a table of current vs. suggested allocations."
+                                    loading="lazy"
+                                    decoding="async"
+                                    class="w-full h-auto border border-rule"
+                                />
+                            </picture>
+                            <figcaption
+                                class="font-serif text-[15.5px] leading-[1.55] text-muted"
+                            >
+                                Rebalancing scenarios with current vs. suggested
+                                allocations — informational only, no orders.
+                            </figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ THE REPORT (gallery) ============ -->
+            <section aria-label="Research report" class="border-b border-rule">
+                <div
+                    class="px-5 md:px-8 pt-14 md:pt-24 pb-14 md:pb-24 max-w-7xl mx-auto"
+                >
+                    <p
+                        class="font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted mb-4 flex items-center gap-2.5"
+                    >
+                        <span
+                            class="block w-2 h-2 bg-violet"
+                            aria-hidden="true"
+                        ></span>
+                        Research report
+                    </p>
+                    <h2
+                        class="font-display font-semibold text-ink tracking-[-0.025em] leading-[1.02] max-w-[22ch] mb-12 md:mb-16"
+                        style="font-size: clamp(30px, 4.4vw, 52px)"
+                    >
+                        Research output with sources attached.
+                    </h2>
+
+                    <figure class="flex flex-col gap-4 mb-10 md:mb-14">
+                        <video
+                            class="block w-full h-auto border border-rule select-none"
+                            width="1664"
+                            height="1080"
+                            poster="./assets/screenshots/new-analysis-poster.webp"
+                            autoplay
+                            muted
+                            loop
+                            playsinline
+                            controls
+                            preload="metadata"
+                            aria-label="A short walkthrough of starting a Infi analysis."
+                        >
+                            <source
+                                src="./assets/screenshots/new-analysis.mp4"
+                                type="video/mp4"
+                            />
+                        </video>
+                        <figcaption
+                            class="font-serif text-[15.5px] leading-[1.55] text-muted"
+                        >
+                            Analysis walkthrough — from asking a research
+                            question to reading the full report.
+                        </figcaption>
+                    </figure>
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12"
+                    >
+                        <figure class="flex flex-col gap-4">
+                            <div
+                                class="flex items-baseline gap-3 font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted tabular-nums"
+                            >
+                                <span>01</span>
+                                <span>Scenarios</span>
+                            </div>
+                            <picture>
+                                <source
+                                    type="image/avif"
+                                    srcset="
+                                        ./assets/screenshots/analysis-scenario-matrix.avif
+                                    "
+                                />
+                                <source
+                                    type="image/webp"
+                                    srcset="
+                                        ./assets/screenshots/analysis-scenario-matrix.webp
+                                    "
+                                />
+                                <img
+                                    src="./assets/screenshots/analysis-scenario-matrix.webp"
+                                    alt="The scenario matrix showing base, upside, and downside cases side by side."
+                                    width="2000"
+                                    height="1298"
+                                    loading="lazy"
+                                    decoding="async"
+                                    class="w-full h-auto border border-rule"
+                                />
+                            </picture>
+                            <figcaption
+                                class="font-serif text-[15.5px] leading-[1.55] text-muted max-w-[60ch]"
+                            >
+                                Base, upside, and downside cases for the
+                                research question.
+                            </figcaption>
+                        </figure>
+
+                        <figure class="flex flex-col gap-4">
+                            <div
+                                class="flex items-baseline gap-3 font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted tabular-nums"
+                            >
+                                <span>02</span>
+                                <span>Sources</span>
+                            </div>
+                            <picture>
+                                <source
+                                    type="image/avif"
+                                    srcset="
+                                        ./assets/screenshots/analysis-sources.avif
+                                    "
+                                />
+                                <source
+                                    type="image/webp"
+                                    srcset="
+                                        ./assets/screenshots/analysis-sources.webp
+                                    "
+                                />
+                                <img
+                                    src="./assets/screenshots/analysis-sources.webp"
+                                    alt="The sources panel listing every citation behind the report's claims."
+                                    width="2000"
+                                    height="1298"
+                                    loading="lazy"
+                                    decoding="async"
+                                    class="w-full h-auto border border-rule"
+                                />
+                            </picture>
+                            <figcaption
+                                class="font-serif text-[15.5px] leading-[1.55] text-muted max-w-[60ch]"
+                            >
+                                The report keeps the source list next to the
+                                claims it supports.
+                            </figcaption>
+                        </figure>
+
+                        <figure class="flex flex-col gap-4 md:col-span-2">
+                            <div
+                                class="flex items-baseline gap-3 font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted tabular-nums"
+                            >
+                                <span>03</span>
+                                <span>Final stance</span>
+                            </div>
+                            <picture>
+                                <source
+                                    type="image/avif"
+                                    srcset="
+                                        ./assets/screenshots/analysis-final-stance.avif
+                                    "
+                                />
+                                <source
+                                    type="image/webp"
+                                    srcset="
+                                        ./assets/screenshots/analysis-final-stance.webp
+                                    "
+                                />
+                                <img
+                                    src="./assets/screenshots/analysis-final-stance.webp"
+                                    alt="The final stance block with direction and confidence."
+                                    width="2000"
+                                    height="1298"
+                                    loading="lazy"
+                                    decoding="async"
+                                    class="w-full h-auto border border-rule"
+                                />
+                            </picture>
+                            <figcaption
+                                class="font-serif text-[15.5px] leading-[1.55] text-muted max-w-[60ch]"
+                            >
+                                A final stance with confidence, reasons, and
+                                what would change the view.
+                            </figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ FEATURES ============ -->
+            <section
+                id="features"
+                aria-labelledby="features-heading"
+                class="border-b border-rule"
+            >
+                <div class="px-5 md:px-8 pt-14 md:pt-24 pb-6 max-w-7xl mx-auto">
+                    <h2
+                        id="features-heading"
+                        class="font-display font-semibold text-ink tracking-[-0.025em] leading-[1.02] max-w-[22ch]"
+                        style="font-size: clamp(30px, 4.4vw, 52px)"
+                    >
+                        What each report includes.
+                    </h2>
+                    <p
+                        class="mt-5 font-serif text-[17px] md:text-[18px] leading-[1.5] text-muted max-w-[50ch]"
+                    >
+                        Research is split into sections you can read, check, and
+                        come back to later.
+                    </p>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 border-t border-rule max-w-7xl mx-auto"
+                >
+                    <!-- feature 1 -->
+                    <article
+                        class="p-6 md:p-10 md:border-r border-b border-rule flex flex-col gap-5"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="block w-3 h-3 bg-violet"
+                                aria-hidden="true"
+                            ></span>
+                            <span
+                                class="font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted tabular-nums"
+                                >01 &middot; Evidence</span
+                            >
+                        </div>
+                        <h3
+                            class="font-display font-semibold text-[24px] md:text-[28px] leading-[1.15] tracking-[-0.015em] text-ink"
+                        >
+                            Every claim has a source
+                        </h3>
+                        <p
+                            class="font-serif text-[16px] leading-[1.6] text-muted max-w-[46ch]"
+                        >
+                            Numbers and claims keep their citations, so you can
+                            open the original source from the report.
+                        </p>
+                    </article>
+
+                    <!-- feature 2 -->
+                    <article
+                        class="p-6 md:p-10 border-b border-rule flex flex-col gap-5"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="block w-3 h-3 bg-gold"
+                                aria-hidden="true"
+                            ></span>
+                            <span
+                                class="font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted tabular-nums"
+                                >02 &middot; Stance</span
+                            >
+                        </div>
+                        <h3
+                            class="font-display font-semibold text-[24px] md:text-[28px] leading-[1.15] tracking-[-0.015em] text-ink"
+                        >
+                            A clear final stance
+                        </h3>
+                        <p
+                            class="font-serif text-[16px] leading-[1.6] text-muted max-w-[46ch]"
+                        >
+                            Bullish, bearish, mixed, or neutral &mdash; with
+                            confidence, reasons, and what would change the view.
+                        </p>
+                    </article>
+
+                    <!-- feature 3 -->
+                    <article
+                        class="p-6 md:p-10 md:border-r border-b border-rule flex flex-col gap-5"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="block w-3 h-3 bg-magenta"
+                                aria-hidden="true"
+                            ></span>
+                            <span
+                                class="font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted tabular-nums"
+                                >03 &middot; Scenarios</span
+                            >
+                        </div>
+                        <h3
+                            class="font-display font-semibold text-[24px] md:text-[28px] leading-[1.15] tracking-[-0.015em] text-ink"
+                        >
+                            Scenario cases side by side
+                        </h3>
+                        <p
+                            class="font-serif text-[16px] leading-[1.6] text-muted max-w-[46ch]"
+                        >
+                            Base, upside, and downside cases are stored as
+                            separate sections when the research question calls
+                            for scenario analysis.
+                        </p>
+                    </article>
+
+                    <!-- feature 4 -->
+                    <article
+                        class="p-6 md:p-10 border-b border-rule flex flex-col gap-5"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="block w-3 h-3 bg-plum"
+                                aria-hidden="true"
+                            ></span>
+                            <span
+                                class="font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted tabular-nums"
+                                >04 &middot; Private</span
+                            >
+                        </div>
+                        <h3
+                            class="font-display font-semibold text-[24px] md:text-[28px] leading-[1.15] tracking-[-0.015em] text-ink"
+                        >
+                            Stays on your computer
+                        </h3>
+                        <p
+                            class="font-serif text-[16px] leading-[1.6] text-muted max-w-[46ch]"
+                        >
+                            No account, no telemetry, no cloud sync. Network
+                            calls are your agent&rsquo;s own and any data
+                            providers you add. API keys live in your OS
+                            keychain.
+                        </p>
+                    </article>
+
+                    <!-- feature 5 -->
+                    <article
+                        class="p-6 md:p-10 md:border-r border-b border-rule flex flex-col gap-5"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="block w-3 h-3 bg-violet"
+                                aria-hidden="true"
+                            ></span>
+                            <span
+                                class="font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted tabular-nums"
+                                >05 &middot; Sources</span
+                            >
+                        </div>
+                        <h3
+                            class="font-display font-semibold text-[24px] md:text-[28px] leading-[1.15] tracking-[-0.015em] text-ink"
+                        >
+                            12 financial data providers, built in
+                        </h3>
+                        <p
+                            class="font-serif text-[16px] leading-[1.6] text-muted max-w-[46ch]"
+                        >
+                            SEC filings, market data, news, screeners &mdash;
+                            Alpha Vantage, Polygon, Finnhub, Yahoo Finance,
+                            NewsAPI, and more. Add an API key per provider. Pick
+                            which sources to use each run. Keys stay in your OS
+                            keychain.
+                        </p>
+                    </article>
+
+                    <!-- feature 6 -->
+                    <article
+                        class="p-6 md:p-10 border-b border-rule flex flex-col gap-5"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="block w-3 h-3 bg-gold"
+                                aria-hidden="true"
+                            ></span>
+                            <span
+                                class="font-mono text-[10.5px] uppercase tracking-[0.22em] text-muted tabular-nums"
+                                >06 &middot; Portfolios</span
+                            >
+                        </div>
+                        <h3
+                            class="font-display font-semibold text-[24px] md:text-[28px] leading-[1.15] tracking-[-0.015em] text-ink"
+                        >
+                            Portfolio reviews cover the whole picture
+                        </h3>
+                        <p
+                            class="font-serif text-[16px] leading-[1.6] text-muted max-w-[46ch]"
+                        >
+                            Add a portfolio, then start a review. The report
+                            includes position reviews, allocation notes, risk
+                            notes, and scenario options.
+                        </p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- ============ HOW IT WORKS ============ -->
+            <section
+                id="how"
+                aria-labelledby="how-heading"
+                class="border-b border-rule bg-lavender"
+            >
+                <div
+                    class="px-5 md:px-8 pt-14 md:pt-24 pb-16 md:pb-24 max-w-7xl mx-auto"
+                >
+                    <p
+                        class="font-mono text-[10.5px] uppercase tracking-[0.22em] text-violet mb-4 flex items-center gap-2.5"
+                    >
+                        <span
+                            class="block w-2 h-2 bg-violet"
+                            aria-hidden="true"
+                        ></span>
+                        How it works
+                    </p>
+                    <h2
+                        id="how-heading"
+                        class="font-display font-semibold text-plum tracking-[-0.025em] leading-[1.02] max-w-[22ch] mb-12 md:mb-16"
+                        style="font-size: clamp(30px, 4.4vw, 52px)"
+                    >
+                        Three steps. Then you read.
+                    </h2>
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10"
+                    >
+                        <div class="flex flex-col gap-4">
+                            <div
+                                class="flex items-baseline gap-3 font-mono text-[10.5px] uppercase tracking-[0.22em] text-violet tabular-nums"
+                            >
+                                <span>Step 01</span>
+                            </div>
+                            <h3
+                                class="font-display font-semibold text-[22px] md:text-[24px] leading-[1.15] tracking-[-0.015em] text-plum"
+                            >
+                                Ask or add a portfolio
+                            </h3>
+                            <p
+                                class="font-serif text-[15.5px] leading-[1.6] text-plum/80 max-w-[38ch]"
+                            >
+                                Plain English. &ldquo;Compare NVDA to
+                                AMD.&rdquo; &ldquo;Is the energy sector
+                                overbought?&rdquo; Or add a portfolio and ask
+                                where the risk points are.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col gap-4">
+                            <div
+                                class="flex items-baseline gap-3 font-mono text-[10.5px] uppercase tracking-[0.22em] text-violet tabular-nums"
+                            >
+                                <span>Step 02</span>
+                            </div>
+                            <h3
+                                class="font-display font-semibold text-[22px] md:text-[24px] leading-[1.15] tracking-[-0.015em] text-plum"
+                            >
+                                Pick your agent
+                            </h3>
+                            <p
+                                class="font-serif text-[15.5px] leading-[1.6] text-plum/80 max-w-[38ch]"
+                            >
+                                Infi detects coding agents on your machine
+                                &mdash; Claude Code, Codex, Gemini, OpenCode, or
+                                your own agent. It uses the agent&rsquo;s own
+                                auth.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col gap-4">
+                            <div
+                                class="flex items-baseline gap-3 font-mono text-[10.5px] uppercase tracking-[0.22em] text-violet tabular-nums"
+                            >
+                                <span>Step 03</span>
+                            </div>
+                            <h3
+                                class="font-display font-semibold text-[22px] md:text-[24px] leading-[1.15] tracking-[-0.015em] text-plum"
+                            >
+                                Read the report
+                            </h3>
+                            <p
+                                class="font-serif text-[15.5px] leading-[1.6] text-plum/80 max-w-[38ch]"
+                            >
+                                Thesis, key numbers, risks, scenarios, stance,
+                                and portfolio-specific position, allocation, and
+                                risk sections when a portfolio is attached.
+                                Saved on your machine.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ DOWNLOAD ============ -->
+            <section
+                id="download"
+                aria-labelledby="download-heading"
+                class="border-b border-rule"
+            >
+                <div
+                    class="px-5 md:px-8 pt-16 md:pt-28 pb-20 md:pb-28 max-w-3xl mx-auto text-center"
+                >
+                    <img
+                        src="./assets/icons/128x128.png"
+                        alt=""
+                        class="w-16 h-16 mx-auto mb-6"
+                        decoding="async"
+                    />
+                    <h2
+                        id="download-heading"
+                        class="font-display font-semibold text-ink tracking-[-0.035em] leading-[0.98] mb-5"
+                        style="font-size: clamp(40px, 6.6vw, 80px)"
+                    >
+                        Get Infi
+                    </h2>
+                    <p
+                        class="font-serif text-[18px] md:text-[20px] leading-[1.45] text-muted max-w-[38ch] mx-auto mb-4"
+                    >
+                        Free and open source.
+                    </p>
+                    <p
+                        class="font-mono text-[11px] uppercase tracking-[0.18em] text-muted/80 mb-12"
+                    >
+                        macOS (Apple Silicon &amp; Intel) &middot; Linux x86_64
+                        &middot; Windows not yet
+                    </p>
+
+                    <div
+                        id="install-block"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Copy install command to clipboard"
+                        class="relative group cursor-pointer select-none text-left bg-ink text-paper px-5 md:px-7 py-5 font-mono text-[13px] md:text-[14px] flex items-center justify-between gap-4 mb-8"
+                    >
+                        <div
+                            class="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide"
+                        >
+                            <span
+                                class="text-gold select-none"
+                                aria-hidden="true"
+                                >$</span
+                            >
+                            <span class="whitespace-nowrap"
+                                >brew install --cask puemos/tap/infi</span
+                            >
+                        </div>
+                        <span
+                            aria-hidden="true"
+                            class="font-mono text-[11px] uppercase tracking-[0.2em] text-paper/50 group-hover:text-gold transition-colors shrink-0"
+                            >Copy</span
+                        >
+                        <span
+                            id="copy-feedback"
+                            class="absolute -top-8 left-1/2 -translate-x-1/2 bg-violet text-paper font-mono text-[10px] uppercase tracking-[0.2em] px-2 py-1 opacity-0 transition-opacity whitespace-nowrap pointer-events-none"
+                            >Copied</span
+                        >
+                    </div>
+
+                    <div
+                        class="flex flex-col sm:flex-row justify-center gap-3 mb-8"
+                    >
+                        <a
+                            href="https://github.com/puemos/infi/releases"
+                            class="inline-flex items-center justify-center gap-2 border border-rule bg-transparent text-ink hover:border-violet hover:text-violet px-5 py-3 text-[13px] font-medium tracking-[0.01em] transition-colors"
+                        >
+                            Download for macOS
+                        </a>
+                        <a
+                            href="https://github.com/puemos/infi/releases"
+                            class="inline-flex items-center justify-center gap-2 border border-rule bg-transparent text-ink hover:border-violet hover:text-violet px-5 py-3 text-[13px] font-medium tracking-[0.01em] transition-colors"
+                        >
+                            Download for Linux
+                        </a>
+                    </div>
+
+                    <p class="text-[13px] text-muted">
+                        Or from source &mdash;
+                        <code class="font-mono text-ink ml-1"
+                            >git clone &amp;&amp; cargo run</code
+                        >
+                    </p>
+                </div>
+            </section>
+
+            <!-- ============ FOOTER ============ -->
+            <footer
+                role="contentinfo"
+                aria-label="Footer"
+                class="px-5 md:px-8 py-8 max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-5"
+            >
+                <div class="flex items-center gap-2.5">
+                    <img
+                        src="./assets/icons/128x128.png"
+                        alt=""
+                        class="h-5 w-5"
+                        decoding="async"
+                    />
+                    <span
+                        class="font-display font-semibold text-[15px] tracking-[-0.01em] text-ink"
+                        >Infi</span
+                    >
+                    <span class="text-[13px] text-muted ml-2">&copy; 2026</span>
+                </div>
+                <nav
+                    class="flex items-center gap-6 text-[13px] text-muted"
+                    aria-label="Footer links"
+                >
+                    <a
+                        href="https://github.com/puemos/infi/blob/main/docs/README.md"
+                        class="hover:text-ink transition-colors"
+                        >Docs</a
+                    >
+                    <a
+                        href="https://github.com/puemos/infi/releases"
+                        class="hover:text-ink transition-colors"
+                        >Releases</a
+                    >
+                    <a
+                        href="https://github.com/puemos/infi"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:text-ink transition-colors"
+                        >GitHub</a
+                    >
+                </nav>
+                <p class="text-[12px] text-muted">
+                    MIT &middot; Research tool, not financial advice.
+                </p>
+            </footer>
+        </main>
+
+        <script>
+            (function () {
+                const block = document.getElementById("install-block");
+                const feedback = document.getElementById("copy-feedback");
+                if (!block || !feedback) return;
+                const cmd = "brew install --cask puemos/tap/infi";
+                let hideTimer = null;
+
+                function showCopied() {
+                    feedback.classList.remove("opacity-0");
+                    feedback.classList.add("opacity-100");
+                    if (hideTimer) clearTimeout(hideTimer);
+                    hideTimer = setTimeout(function () {
+                        feedback.classList.remove("opacity-100");
+                        feedback.classList.add("opacity-0");
+                    }, 1600);
+                }
+
+                async function copy() {
+                    try {
+                        if (navigator.clipboard && window.isSecureContext) {
+                            await navigator.clipboard.writeText(cmd);
+                        } else {
+                            const ta = document.createElement("textarea");
+                            ta.value = cmd;
+                            ta.setAttribute("readonly", "");
+                            ta.style.position = "fixed";
+                            ta.style.opacity = "0";
+                            document.body.appendChild(ta);
+                            ta.select();
+                            document.execCommand("copy");
+                            document.body.removeChild(ta);
+                        }
+                        showCopied();
+                    } catch (err) {
+                        console.error("Copy failed", err);
+                    }
+                }
+
+                block.addEventListener("click", copy);
+                block.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        copy();
+                    }
+                });
+            })();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,6 @@
+.DS_Store
+target/
+frontend/node_modules/
+frontend/dist/
+frontend/dist-viewer/
+gen/

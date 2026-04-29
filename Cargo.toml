@@ -1,0 +1,93 @@
+[package]
+name = "infi"
+version = "0.5.7"
+edition = "2024"
+rust-version = "1.85"
+default-run = "infi"
+license = "MIT OR Apache-2.0"
+description = "Infi is an ACP-powered local stock market analysis workbench."
+repository = "https://github.com/puemos/infi"
+keywords = ["stocks", "analysis", "ai", "acp", "tauri"]
+categories = ["finance", "gui"]
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+# Tauri IPC commands are required to be async even when they don't await.
+unused_async = "allow"
+# ACP client returns non-Send futures by design.
+future_not_send = "allow"
+# Very noisy and rarely useful in application code.
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+struct_excessive_bools = "allow"
+# Large modules are tracked for splitting in a dedicated phase.
+too_many_lines = "allow"
+# Float equality is fine in tests and for literal sentinel comparisons here.
+float_cmp = "allow"
+# Explicit casts between integer/float widths are used intentionally in DB code.
+cast_possible_truncation = "allow"
+cast_possible_wrap = "allow"
+cast_sign_loss = "allow"
+cast_precision_loss = "allow"
+cast_lossless = "allow"
+# Cosmetic backtick-in-doc lint is very noisy and not worth gating on.
+doc_markdown = "allow"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+agent-client-protocol = "0.10"
+anyhow = "1.0"
+async-trait = "0.1"
+chrono = { version = "0.4", features = ["clock"] }
+clap = { version = "4.4", features = ["derive"] }
+dirs = "5"
+env_logger = "0.11"
+handlebars = "6.3"
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+log = "0.4"
+pmcp = "1.8.6"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+scraper = "0.20"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tauri = { version = "2.9.5", features = [] }
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-dialog = "2"
+tempfile = "3"
+thiserror = "2"
+tokio = { version = "1", features = [
+    "io-util",
+    "macros",
+    "process",
+    "rt",
+    "rt-multi-thread",
+    "signal",
+    "sync",
+    "time",
+] }
+tokio-util = { version = "0.7", features = ["compat"] }
+unicode-normalization = "0.1"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+uuid = { version = "1", features = ["v4"] }
+fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }
+
+[lib]
+name = "infi"
+path = "src/lib.rs"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+
+[[bin]]
+name = "infi"
+path = "src/main.rs"
