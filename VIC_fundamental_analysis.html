@@ -1,0 +1,205 @@
+
+<h2 class="sr-only">Phân tích fundamental VinGroup (VIC) - Dashboard tài chính 2023-2025</h2>
+
+<div style="padding: 1rem 0;">
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 1.5rem;">
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 4px;">Doanh thu 2025</p>
+    <p style="font-size: 22px; font-weight: 500; margin: 0; color: var(--color-text-primary);">332.770</p>
+    <p style="font-size: 12px; color: var(--color-text-success); margin: 4px 0 0;">+76% so với 2024</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 4px;">LNST 2025</p>
+    <p style="font-size: 22px; font-weight: 500; margin: 0; color: var(--color-text-primary);">11.146</p>
+    <p style="font-size: 12px; color: var(--color-text-success); margin: 4px 0 0;">+111% so với 2024</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 4px;">Tổng tài sản</p>
+    <p style="font-size: 22px; font-weight: 500; margin: 0; color: var(--color-text-primary);">1,12 triệu</p>
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 4px 0 0;">tỷ VND (31/12/2025)</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 4px;">P/E (TTM)</p>
+    <p style="font-size: 22px; font-weight: 500; margin: 0; color: var(--color-text-primary);">~140x</p>
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 4px 0 0;">Định giá cao</p>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1.5rem;">
+  <div>
+    <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 8px;">Doanh thu thuần (tỷ VND)</p>
+    <div style="position: relative; height: 220px;">
+      <canvas id="revenueChart" role="img" aria-label="Biểu đồ doanh thu VinGroup 2023-2025">2023: 161.452 | 2024: 192.182 | 2025: 332.770 tỷ VND</canvas>
+    </div>
+  </div>
+  <div>
+    <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 8px;">Lợi nhuận sau thuế (tỷ VND)</p>
+    <div style="position: relative; height: 220px;">
+      <canvas id="profitChart" role="img" aria-label="Biểu đồ lợi nhuận VinGroup 2023-2025">2023: 2.053 | 2024: 5.251 | 2025: 11.146 tỷ VND</canvas>
+    </div>
+  </div>
+</div>
+
+<div style="margin-bottom: 1.5rem;">
+  <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 8px;">Cơ cấu doanh thu 2025 theo mảng kinh doanh</p>
+  <div style="position: relative; height: 200px;">
+    <canvas id="segmentChart" role="img" aria-label="Cơ cấu doanh thu VinGroup theo mảng kinh doanh 2025">BĐS Vinhomes: 141.812 tỷ | VinFast: tăng 2x | Vinpearl & khác: còn lại</canvas>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 1.5rem;">
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+    <p style="font-size: 13px; font-weight: 500; margin: 0 0 10px; color: var(--color-text-primary);">Chỉ số tài chính chính</p>
+    <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+      <tr style="border-bottom: 0.5px solid var(--color-border-tertiary);">
+        <td style="padding: 6px 0; color: var(--color-text-secondary);">P/E</td>
+        <td style="text-align: right; padding: 6px 0; color: var(--color-text-primary); font-weight: 500;">~140x</td>
+      </tr>
+      <tr style="border-bottom: 0.5px solid var(--color-border-tertiary);">
+        <td style="padding: 6px 0; color: var(--color-text-secondary);">P/B</td>
+        <td style="text-align: right; padding: 6px 0; color: var(--color-text-primary); font-weight: 500;">7.87x</td>
+      </tr>
+      <tr style="border-bottom: 0.5px solid var(--color-border-tertiary);">
+        <td style="padding: 6px 0; color: var(--color-text-secondary);">ROE</td>
+        <td style="text-align: right; padding: 6px 0; color: var(--color-text-primary); font-weight: 500;">~5.4%</td>
+      </tr>
+      <tr style="border-bottom: 0.5px solid var(--color-border-tertiary);">
+        <td style="padding: 6px 0; color: var(--color-text-secondary);">Biên LN gộp 2024</td>
+        <td style="text-align: right; padding: 6px 0; color: var(--color-text-primary); font-weight: 500;">24.1%</td>
+      </tr>
+      <tr style="border-bottom: 0.5px solid var(--color-border-tertiary);">
+        <td style="padding: 6px 0; color: var(--color-text-secondary);">EBITDA 2024</td>
+        <td style="text-align: right; padding: 6px 0; color: var(--color-text-primary); font-weight: 500;">65.743 tỷ</td>
+      </tr>
+      <tr>
+        <td style="padding: 6px 0; color: var(--color-text-secondary);">D/E ratio</td>
+        <td style="text-align: right; padding: 6px 0; color: var(--color-text-danger); font-weight: 500;">~201%</td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+    <p style="font-size: 13px; font-weight: 500; margin: 0 0 10px; color: var(--color-text-primary);">Điểm mạnh</p>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; gap: 8px; align-items: flex-start;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #1D9E75; margin-top: 5px; flex-shrink: 0;"></div>
+        <span style="font-size: 13px; color: var(--color-text-primary);">Doanh thu 2025 kỷ lục +76%, vượt kế hoạch</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: flex-start;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #1D9E75; margin-top: 5px; flex-shrink: 0;"></div>
+        <span style="font-size: 13px; color: var(--color-text-primary);">VinFast số 1 Việt Nam, 196.919 xe bàn giao 2025</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: flex-start;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #1D9E75; margin-top: 5px; flex-shrink: 0;"></div>
+        <span style="font-size: 13px; color: var(--color-text-primary);">Vinhomes doanh số 205.300 tỷ, gấp đôi 2024</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: flex-start;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #1D9E75; margin-top: 5px; flex-shrink: 0;"></div>
+        <span style="font-size: 13px; color: var(--color-text-primary);">Hệ sinh thái đa ngành, tự hỗ trợ lẫn nhau</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+    <p style="font-size: 13px; font-weight: 500; margin: 0 0 10px; color: var(--color-text-primary);">Rủi ro & thách thức</p>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; gap: 8px; align-items: flex-start;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #E24B4A; margin-top: 5px; flex-shrink: 0;"></div>
+        <span style="font-size: 13px; color: var(--color-text-primary);">Nợ vay lớn: D/E ~201%, chi phí tài chính tăng cao</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: flex-start;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #E24B4A; margin-top: 5px; flex-shrink: 0;"></div>
+        <span style="font-size: 13px; color: var(--color-text-primary);">VinFast lỗ gộp -19.623 tỷ năm 2024</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: flex-start;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #E24B4A; margin-top: 5px; flex-shrink: 0;"></div>
+        <span style="font-size: 13px; color: var(--color-text-primary);">Biên LN ròng thấp (~1-4%), phụ thuộc BĐS</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: flex-start;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #E24B4A; margin-top: 5px; flex-shrink: 0;"></div>
+        <span style="font-size: 13px; color: var(--color-text-primary);">P/E ~140x — định giá cao, rủi ro điều chỉnh</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+const textColor = isDark ? '#b0b0b0' : '#888780';
+
+new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2023', '2024', '2025'],
+    datasets: [{
+      label: 'Doanh thu (tỷ VND)',
+      data: [161452, 192182, 332770],
+      backgroundColor: ['#B5D4F4', '#378ADD', '#185FA5'],
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: v => v.raw.toLocaleString() + ' tỷ' } } },
+    scales: {
+      x: { ticks: { color: textColor, font: { size: 12 } }, grid: { display: false } },
+      y: { ticks: { color: textColor, font: { size: 11 }, callback: v => (v/1000).toFixed(0) + 'k' }, grid: { color: gridColor } }
+    }
+  }
+});
+
+new Chart(document.getElementById('profitChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2023', '2024', '2025'],
+    datasets: [{
+      label: 'LNST (tỷ VND)',
+      data: [2053, 5251, 11146],
+      backgroundColor: ['#9FE1CB', '#1D9E75', '#085041'],
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: v => v.raw.toLocaleString() + ' tỷ' } } },
+    scales: {
+      x: { ticks: { color: textColor, font: { size: 12 } }, grid: { display: false } },
+      y: { ticks: { color: textColor, font: { size: 11 }, callback: v => v.toLocaleString() }, grid: { color: gridColor } }
+    }
+  }
+});
+
+new Chart(document.getElementById('segmentChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Bất động sản\n(Vinhomes)', 'Công nghiệp\n(VinFast)', 'Khách sạn &\ndu lịch', 'Bán lẻ &\nkhác'],
+    datasets: [{
+      label: '2023',
+      data: [88000, 28078, 4788, 40586],
+      backgroundColor: '#B5D4F4',
+      borderRadius: 3
+    }, {
+      label: '2024',
+      data: [112000, 53130, 8546, 18506],
+      backgroundColor: '#185FA5',
+      borderRadius: 3
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 12 }, boxWidth: 12, boxHeight: 12 } },
+      tooltip: { callbacks: { label: v => v.dataset.label + ': ' + v.raw.toLocaleString() + ' tỷ (ước tính)' } }
+    },
+    scales: {
+      x: { ticks: { color: textColor, font: { size: 11 } }, grid: { display: false } },
+      y: { ticks: { color: textColor, font: { size: 11 }, callback: v => (v/1000).toFixed(0) + 'k' }, grid: { color: gridColor } }
+    }
+  }
+});
+</script>
