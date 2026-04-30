@@ -64,8 +64,8 @@ API keys stored in OS keychain. Providers without keys are excluded.
 ## Development
 
 ```bash
-cd frontend && pnpm install && pnpm dev   # dev server
-cd frontend && pnpm build                  # build frontend
+cd frontend && bun install && bun run dev  # dev server
+cd frontend && bun run build               # build frontend
 cargo run                                  # run app
 cargo test                                 # tests
 cargo clippy --all-targets --all-features # lint

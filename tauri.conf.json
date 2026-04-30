@@ -5,11 +5,11 @@
   "identifier": "dev.puemos.infi",
   "build": {
     "beforeDevCommand": {
-      "script": "pnpm dev --host 127.0.0.1",
+      "script": "bun run dev --host 127.0.0.1",
       "cwd": "frontend"
     },
     "beforeBuildCommand": {
-      "script": "pnpm build",
+      "script": "bun run build",
       "cwd": "frontend"
     },
     "devUrl": "http://127.0.0.1:5173",

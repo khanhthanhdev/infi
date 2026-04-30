@@ -6,9 +6,9 @@ Infi is a Rust/Tauri desktop app with a Vite React frontend. Rust application co
 
 ## Build, Test, and Development Commands
 
-- `cd frontend && pnpm install`: install frontend dependencies.
-- `cd frontend && pnpm dev`: run the Vite dev server on its default port.
-- `cd frontend && pnpm build`: type-check and build the frontend.
+- `cd frontend && bun install`: install frontend dependencies.
+- `cd frontend && bun run dev`: run the Vite dev server on its default port.
+- `cd frontend && bun run build`: type-check and build the frontend.
 - `cargo run`: run the Tauri desktop app.
 - `cargo check`: validate Rust compilation.
 - `cargo test`: run Rust tests.
@@ -21,8 +21,8 @@ Before committing, all checks must pass with **zero warnings**:
 
 **Frontend:**
 ```bash
-cd frontend && pnpm check:ci   # Biome lint + format (must pass cleanly)
-cd frontend && pnpm build      # TypeScript type-check (no errors)
+cd frontend && bun run check:ci   # Biome lint + format (must pass cleanly)
+cd frontend && bun run build      # TypeScript type-check (no errors)
 ```
 
 **Rust:**
@@ -56,11 +56,11 @@ The frontend uses an editorial design language. Keep new surfaces consistent wit
 - **Actions**: primary action is solid foreground (`border border-foreground bg-foreground text-background`) with a hover inversion; secondary/tertiary actions are text-style (icon + label in muted foreground, hover to foreground) separated by a vertical hairline. Reserve `variant="destructive"` for confirm steps, not triggers — delete triggers hover to `text-destructive` on bare text.
 - **Inputs**: bare, with hairline top/bottom borders on editorial surfaces (composer) and standard bordered inputs elsewhere. No `shadow-xs`.
 - **Exception — live agent output**: `ProgressTimeline`, `AgentTimeline`, `ToolCallCard`, and `MarkdownMessage` are log/terminal surfaces. They keep a monospace, chat-style identity and are deliberately *not* in the editorial grammar. Do not force editorial headers onto them.
-- **Validation**: check UI changes with `cd frontend && pnpm build`, and when layout or stickiness changes, do a `cargo run` smoke test — the sticky section nav and group headers scroll inside the `TabsContent` container, not `window`.
+- **Validation**: check UI changes with `cd frontend && bun run build`, and when layout or stickiness changes, do a `cargo run` smoke test — the sticky section nav and group headers scroll inside the `TabsContent` container, not `window`.
 
 ## Testing Guidelines
 
-The current test coverage is Rust-focused. Add unit tests near the code under `#[cfg(test)] mod tests`, following the pattern in `src/infra/db/mod.rs`. Prefer deterministic tests using temporary directories or in-memory state rather than the user app data directory. There is no frontend test runner configured yet, so validate UI-facing changes with `cd frontend && pnpm build` and, when relevant, a manual `cargo run` smoke test.
+The current test coverage is Rust-focused. Add unit tests near the code under `#[cfg(test)] mod tests`, following the pattern in `src/infra/db/mod.rs`. Prefer deterministic tests using temporary directories or in-memory state rather than the user app data directory. There is no frontend test runner configured yet, so validate UI-facing changes with `cd frontend && bun run build` and, when relevant, a manual `cargo run` smoke test.
 
 ## Commit & Pull Request Guidelines
 

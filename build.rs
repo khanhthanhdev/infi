@@ -6,7 +6,7 @@ fn main() {
     // via `include_str!`. If the frontend hasn't been built yet (e.g. a plain
     // `cargo check` in a fresh clone), write a minimal placeholder so the
     // Rust crate compiles. Real builds go through Tauri's beforeBuildCommand,
-    // which runs `pnpm build` and produces the real template.
+    // which runs `bun run build` and produces the real template.
     let target = Path::new("frontend/dist-viewer/viewer.html");
     if !target.exists() {
         if let Some(parent) = target.parent() {
@@ -15,7 +15,7 @@ fn main() {
         let placeholder = "<!doctype html><meta charset=\"utf-8\"><title>Infi report</title>\
                <script>window.__INFI_REPORT__ = \"__INFI_REPORT_JSON__\";\
                document.body && (document.body.textContent = \
-               'Viewer template was not built. Run `pnpm build:viewer` in frontend/.');\
+               'Viewer template was not built. Run `bun run build:viewer` in frontend/.');\
                </script>";
         let _ = fs::write(target, placeholder);
     }

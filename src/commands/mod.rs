@@ -24,7 +24,7 @@ use tokio::sync::mpsc;
 use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
 
-/// Standalone viewer HTML, built by `pnpm build:viewer` and embedded at compile time.
+/// Standalone viewer HTML, built by `bun run build:viewer` and embedded at compile time.
 /// A sentinel string inside the template is replaced at export time with the
 /// report JSON for the analysis being exported.
 const STANDALONE_VIEWER_HTML: &str = include_str!("../../frontend/dist-viewer/viewer.html");
@@ -216,7 +216,7 @@ pub struct ExportedHtml {
 fn build_standalone_html(report: &AnalysisReport) -> Result<String, CommandError> {
     if !STANDALONE_VIEWER_HTML.contains(REPORT_PLACEHOLDER) {
         return Err(
-            "viewer template is missing the report placeholder; run `pnpm build:viewer`".into(),
+            "viewer template is missing the report placeholder; run `bun run build:viewer`".into(),
         );
     }
     let json = serde_json::to_string(report)?;

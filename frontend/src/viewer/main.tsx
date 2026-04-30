@@ -7,7 +7,7 @@ import { ViewerPage } from "./ViewerPage";
 
 /**
  * Placeholder replaced at export time by the Rust `export_analysis_html`
- * command. If this file is opened via `pnpm dev` (the template is unbuilt),
+ * command. If this file is opened via `bun run dev` (the template is unbuilt),
  * the literal string survives and we fall through to the empty state.
  */
 declare global {
