@@ -1,6 +1,6 @@
 {
   "name": "infi-frontend",
-  "version": "0.5.7",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
