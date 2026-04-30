@@ -8,8 +8,14 @@ import {
   formatProjectionTargetLabel,
   projectionUsesPercentPoints,
 } from "./projection-format";
+import {
+  projectionSelection,
+  type ReportSelection,
+  type SelectionProps,
+  scenarioSelection,
+} from "./selection";
 
-interface ProjectionViewProps {
+interface ProjectionViewProps extends SelectionProps {
   projections: Projection[];
   entityMap: Map<string, Entity>;
   sourceMap: Map<string, Source>;
@@ -19,6 +25,8 @@ export const ProjectionView = memo(function ProjectionView({
   projections,
   entityMap,
   sourceMap,
+  selectedId,
+  onSelect,
 }: ProjectionViewProps) {
   if (projections.length === 0) return null;
 
@@ -31,6 +39,8 @@ export const ProjectionView = memo(function ProjectionView({
           entity={entityMap.get(projection.entity_id) ?? null}
           sourceMap={sourceMap}
           isFirst={index === 0}
+          selectedId={selectedId}
+          onSelect={onSelect}
         />
       ))}
     </div>
@@ -42,17 +52,27 @@ function ProjectionCard({
   entity,
   sourceMap,
   isFirst,
+  selectedId,
+  onSelect,
 }: {
   projection: Projection;
   entity: Entity | null;
   sourceMap: Map<string, Source>;
   isFirst: boolean;
+  selectedId?: string | null;
+  onSelect?: (selection: ReportSelection) => void;
 }) {
   const orderedScenarios = orderScenarios(projection.scenarios);
   const label = entity?.symbol || entity?.name || projection.entity_id;
 
   return (
-    <article className={cn("space-y-10", !isFirst && "border-t border-border pt-12")}>
+    <article
+      className={cn(
+        "report-card-tint report-tone-info space-y-10 px-4 py-5",
+        !isFirst && "border-t border-border pt-12",
+        selectedId === `projection:${projection.id}` && "report-selected",
+      )}
+    >
       <header className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-14">
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -72,10 +92,20 @@ function ProjectionCard({
             <span className="text-muted-foreground">Methodology · </span>
             {projection.methodology}
           </p>
+          <button
+            type="button"
+            onClick={() => onSelect?.(projectionSelection(projection))}
+            className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Inspect projection
+          </button>
         </div>
         <aside className="space-y-2 lg:border-l lg:border-border lg:pl-6">
           <Eyebrow>Confidence</Eyebrow>
-          <ConfidenceRail confidence={projection.confidence} accentClass="bg-foreground/70" />
+          <ConfidenceRail
+            confidence={projection.confidence}
+            accentClass="bg-[var(--report-accent)]"
+          />
         </aside>
       </header>
 
@@ -90,6 +120,8 @@ function ProjectionCard({
             projection={projection}
             scenario={scenario}
             indexLabel={String(i + 1).padStart(2, "0")}
+            selected={selectedId === `scenario:${projection.id}:${scenario.label}`}
+            onSelect={onSelect}
           />
         ))}
       </div>
@@ -335,16 +367,28 @@ function ScenarioColumn({
   projection,
   scenario,
   indexLabel,
+  selected,
+  onSelect,
 }: {
   projection: Projection;
   scenario: ProjectionScenario;
   indexLabel: string;
+  selected?: boolean;
+  onSelect?: (selection: ReportSelection) => void;
 }) {
   const accent = scenarioAccent(scenario.label);
   const movement = formatProjectionMovement(projection, scenario);
 
   return (
-    <div className="flex flex-col gap-4 px-0 py-6 md:px-6 md:first:pl-0 md:last:pr-0">
+    <button
+      type="button"
+      onClick={() => onSelect?.(scenarioSelection(projection, scenario))}
+      className={cn(
+        "report-row-tint flex flex-col gap-4 px-0 py-6 text-left transition-colors md:px-6 md:first:pl-0 md:last:pr-0",
+        scenarioTone(scenario.label),
+        selected && "report-selected",
+      )}
+    >
       <div className="space-y-2">
         <div className="flex items-baseline gap-2">
           <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
@@ -377,7 +421,7 @@ function ScenarioColumn({
       {scenario.risks.length > 0 && (
         <ScenarioList label="Risks" items={scenario.risks} markerClass="bg-muted-foreground/50" />
       )}
-    </div>
+    </button>
   );
 }
 
@@ -452,22 +496,33 @@ function scenarioAccent(label: string): {
   switch (label.toLowerCase()) {
     case "bull":
       return {
-        fill: "fill-emerald-600 dark:fill-emerald-400",
-        text: "text-emerald-700 dark:text-emerald-400",
-        bar: "bg-emerald-600 dark:bg-emerald-400",
+        fill: "fill-[var(--accent-green)]",
+        text: "text-[var(--accent-green)]",
+        bar: "bg-[var(--accent-green)]",
       };
     case "bear":
       return {
-        fill: "fill-red-600 dark:fill-red-400",
-        text: "text-red-700 dark:text-red-400",
-        bar: "bg-red-600 dark:bg-red-400",
+        fill: "fill-[var(--accent-red)]",
+        text: "text-[var(--accent-red)]",
+        bar: "bg-[var(--accent-red)]",
       };
     default:
       return {
-        fill: "fill-foreground",
-        text: "text-foreground",
-        bar: "bg-foreground/70",
+        fill: "fill-[var(--accent-blue)]",
+        text: "text-[var(--accent-blue)]",
+        bar: "bg-[var(--accent-blue)]",
       };
+  }
+}
+
+function scenarioTone(label: string): string {
+  switch (label.toLowerCase()) {
+    case "bull":
+      return "report-tone-positive";
+    case "bear":
+      return "report-tone-negative";
+    default:
+      return "report-tone-info";
   }
 }
 

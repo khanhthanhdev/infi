@@ -1325,6 +1325,10 @@ impl Database {
                 ArtifactKind::MetricTable
                     | ArtifactKind::ComparisonMatrix
                     | ArtifactKind::ScenarioMatrix
+                    | ArtifactKind::KpiGrid
+                    | ArtifactKind::FinancialStatement
+                    | ArtifactKind::RatioSnapshot
+                    | ArtifactKind::FactorList
             ) && (artifact.columns.is_empty() || artifact.rows.is_empty())
             {
                 errors.push(format!(
@@ -1334,7 +1338,10 @@ impl Database {
             }
             if matches!(
                 artifact.kind,
-                ArtifactKind::BarChart | ArtifactKind::LineChart | ArtifactKind::AreaChart
+                ArtifactKind::BarChart
+                    | ArtifactKind::LineChart
+                    | ArtifactKind::AreaChart
+                    | ArtifactKind::GroupedBarChart
             ) && !artifact
                 .series
                 .iter()

@@ -81,7 +81,7 @@ fn agent_definitions() -> Vec<Box<dyn AgentDefinition>> {
         .or_else(|| std::env::var("INFI_CUSTOM_AGENT").ok());
 
     if let Some(command) = custom_command {
-            let args = if config.custom_agent_args.is_empty() {
+        let args = if config.custom_agent_args.is_empty() {
             std::env::var("INFI_CUSTOM_AGENT_ARGS")
                 .map(|raw| raw.split_whitespace().map(str::to_string).collect())
                 .unwrap_or_default()

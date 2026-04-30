@@ -346,6 +346,11 @@ export type ArtifactKind =
   | "bar_chart"
   | "line_chart"
   | "area_chart"
+  | "kpi_grid"
+  | "financial_statement"
+  | "grouped_bar_chart"
+  | "ratio_snapshot"
+  | "factor_list"
   | "other";
 
 export interface ArtifactColumn {

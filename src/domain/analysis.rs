@@ -240,6 +240,11 @@ pub enum ArtifactKind {
     BarChart,
     LineChart,
     AreaChart,
+    KpiGrid,
+    FinancialStatement,
+    GroupedBarChart,
+    RatioSnapshot,
+    FactorList,
     #[default]
     Other,
 }
@@ -253,6 +258,11 @@ impl fmt::Display for ArtifactKind {
             Self::BarChart => "bar_chart",
             Self::LineChart => "line_chart",
             Self::AreaChart => "area_chart",
+            Self::KpiGrid => "kpi_grid",
+            Self::FinancialStatement => "financial_statement",
+            Self::GroupedBarChart => "grouped_bar_chart",
+            Self::RatioSnapshot => "ratio_snapshot",
+            Self::FactorList => "factor_list",
             Self::Other => "other",
         };
         write!(f, "{value}")
@@ -270,6 +280,11 @@ impl FromStr for ArtifactKind {
             "bar_chart" => Ok(Self::BarChart),
             "line_chart" => Ok(Self::LineChart),
             "area_chart" => Ok(Self::AreaChart),
+            "kpi_grid" => Ok(Self::KpiGrid),
+            "financial_statement" => Ok(Self::FinancialStatement),
+            "grouped_bar_chart" => Ok(Self::GroupedBarChart),
+            "ratio_snapshot" => Ok(Self::RatioSnapshot),
+            "factor_list" => Ok(Self::FactorList),
             _ => Ok(Self::Other),
         }
     }

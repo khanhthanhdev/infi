@@ -28,7 +28,7 @@ use uuid::Uuid;
 /// A sentinel string inside the template is replaced at export time with the
 /// report JSON for the analysis being exported.
 const STANDALONE_VIEWER_HTML: &str = include_str!("../../frontend/dist-viewer/viewer.html");
-const REPORT_PLACEHOLDER: &str = "\"__INFI_REPORT_JSON__\"";
+const REPORT_PLACEHOLDER: &str = "`__INFI_REPORT_JSON__`";
 
 pub use crate::infra::progress::{FrontendPlan, FrontendPlanEntry, ProgressEventPayload};
 
@@ -1335,8 +1335,7 @@ mod tests {
     #[test]
     fn standalone_html_escapes_script_close_and_html_comment() {
         let mut report = sample_report("Sample");
-        report.analysis.user_prompt =
-            "INFIPAYLOAD </script><!-- and </Script> noise".to_string();
+        report.analysis.user_prompt = "INFIPAYLOAD </script><!-- and </Script> noise".to_string();
         let html = build_standalone_html(&report).expect("build");
 
         // The viewer template legitimately contains </script> tags and HTML

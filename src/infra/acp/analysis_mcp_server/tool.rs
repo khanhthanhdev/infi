@@ -526,13 +526,13 @@ pub fn create_submit_structured_artifact_tool(config: Arc<ServerConfig>) -> impl
             Ok(json!({ "status": "ok", "artifact_id": artifact.id }))
         })
     })
-    .with_description("Submit a source-backed table, comparison matrix, scenario matrix, or lightweight chart for the report. Use area_chart for growth curves and margin-expansion trends that benefit from a filled visual.")
+    .with_description("Submit a source-backed table, comparison matrix, scenario matrix, fundamental-analysis dashboard, or lightweight chart for the report. For single-equity fundamental work, prefer kpi_grid, financial_statement, grouped_bar_chart, ratio_snapshot, and factor_list when the sourced data supports them. Use area_chart for growth curves and margin-expansion trends that benefit from a filled visual.")
     .with_schema(json!({
         "type": "object",
         "required": ["kind", "title", "summary", "columns", "rows", "evidence_ids"],
         "properties": {
             "id": { "type": "string" },
-            "kind": { "type": "string", "enum": ["metric_table", "comparison_matrix", "scenario_matrix", "bar_chart", "line_chart", "area_chart"] },
+            "kind": { "type": "string", "enum": ["metric_table", "comparison_matrix", "scenario_matrix", "bar_chart", "line_chart", "area_chart", "kpi_grid", "financial_statement", "grouped_bar_chart", "ratio_snapshot", "factor_list"] },
             "title": { "type": "string" },
             "summary": { "type": "string" },
             "columns": {

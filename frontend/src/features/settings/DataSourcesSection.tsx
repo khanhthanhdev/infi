@@ -148,8 +148,8 @@ export function DataSourcesSection() {
       />
       <p className="max-w-[60ch] text-[14px] leading-[1.6] text-muted-foreground">
         Enable the providers the agent may call during a research run. Paid-tier keys live in your
-        OS keychain — Infi never writes them to disk. Disable a provider globally here, or flip
-        it off for a single run from the composer.
+        OS keychain — Infi never writes them to disk. Disable a provider globally here, or flip it
+        off for a single run from the composer.
       </p>
       {error && <div className="text-sm text-destructive">{error}</div>}
       {!sources ? (

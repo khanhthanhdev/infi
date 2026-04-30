@@ -62,7 +62,7 @@ impl InfiClient {
     }
 
     fn tool_name_from_title(title: &str) -> Option<&'static str> {
-            INFI_TOOLS
+        INFI_TOOLS
             .iter()
             .find(|tool| title.contains(*tool))
             .copied()

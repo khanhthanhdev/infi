@@ -216,7 +216,7 @@ export function App() {
         )}
         <div className="min-h-0 flex-1 overflow-hidden">
           {view === "new-analysis" && <ResearchPage agents={agents} />}
-          {view === "analysis" && <AnalysisPage />}
+          {view === "analysis" && <AnalysisPage agents={agents} />}
           {view === "portfolio" && (
             <PortfolioPage agents={agents} onSelectAnalysis={selectAnalysis} />
           )}

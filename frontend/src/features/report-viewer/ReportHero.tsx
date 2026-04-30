@@ -16,7 +16,9 @@ export const ReportHero = memo(function ReportHero({ report, onSwitchRun }: Repo
   const activeRunId = report.analysis.active_run_id;
 
   return (
-    <header className="space-y-10">
+    <header
+      className={`report-hero-panel ${heroTone(stance?.stance ?? "")} space-y-10 px-4 pt-5 pb-6`}
+    >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <Eyebrow>Final stance</Eyebrow>
         <Dot />
@@ -111,26 +113,41 @@ function StatFooter({
   return (
     <div className="border-t border-border pt-5">
       <dl className="grid grid-cols-2 gap-y-4 sm:grid-cols-3 lg:grid-cols-6">
-        <Stat label="Entities" value={entities} />
-        <Stat label="Sources" value={sources} />
-        <Stat label="Artifacts" value={artifacts} />
-        <Stat label="Analysis blocks" value={blocks} />
-        <Stat label="Data points" value={metrics} />
-        <Stat label="Projections" value={projections} />
+        <Stat label="Entities" value={entities} tone="report-tone-neutral" />
+        <Stat label="Sources" value={sources} tone="report-tone-neutral" />
+        <Stat label="Artifacts" value={artifacts} tone="report-tone-neutral" />
+        <Stat label="Analysis blocks" value={blocks} tone="report-tone-info" />
+        <Stat label="Data points" value={metrics} tone="report-tone-info" />
+        <Stat label="Projections" value={projections} tone="report-tone-info" />
       </dl>
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({ label, value, tone }: { label: string; value: number; tone: string }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className={`report-stat ${tone} flex flex-col gap-1 px-3 py-3`}>
       <dt>
         <Eyebrow>{label}</Eyebrow>
       </dt>
       <dd className="font-mono text-2xl font-medium tabular-nums text-foreground">{value}</dd>
     </div>
   );
+}
+
+function heroTone(stance: string): string {
+  switch (stance) {
+    case "bullish":
+      return "report-tone-positive";
+    case "bearish":
+      return "report-tone-negative";
+    case "mixed":
+      return "report-tone-warning";
+    case "neutral":
+      return "report-tone-neutral";
+    default:
+      return "report-tone-info";
+  }
 }
 
 function RunSwitcher({

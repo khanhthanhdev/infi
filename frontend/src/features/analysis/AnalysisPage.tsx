@@ -16,6 +16,7 @@ import { ReportContent } from "@/features/report-viewer/ReportContent";
 import { ReportShell, type ReportShellAnalysis } from "@/features/report-viewer/ReportShell";
 import { getTimelineBlocks } from "@/features/run-analysis/progress";
 import { TimelineErrorBlock } from "@/features/run-analysis/TimelineErrorBlock";
+import { useRunAnalysis } from "@/features/run-analysis/useRunAnalysis";
 import {
   exportAnalysisHtml,
   exportAnalysisMarkdown,
@@ -25,18 +26,28 @@ import {
 } from "@/shared/api/commands";
 import { useAnalyses, useDeleteAnalysis } from "@/shared/api/queries";
 import { addRun, addRunProgress, setRunProgress, setState, useAppStore } from "@/store";
-import type { ProgressItem, RunState } from "@/types";
+import type { AgentCandidate, ProgressItem, RunState } from "@/types";
 
-export function AnalysisPage() {
+interface AnalysisPageProps {
+  agents: AgentCandidate[];
+}
+
+export function AnalysisPage({ agents }: AnalysisPageProps) {
   const selectedAnalysisId = useAppStore((state) => state.selectedAnalysisId);
   const report = useAppStore((state) => state.selectedReport);
   const activeRuns = useAppStore((state) => state.activeRuns);
   const subTab = useAppStore((state) => state.analysisSubTab);
+  const agentId = useAppStore((state) => state.agentId);
   const [copyState, setCopyState] = useState<string | null>(null);
   const [exportState, setExportState] = useState<string | null>(null);
 
   const { data: analyses = [] } = useAnalyses();
   const deleteAnalysisMutation = useDeleteAnalysis();
+  const { startWithAnalysisId } = useRunAnalysis({
+    agentId,
+    agents,
+    canRun: agents.some((agent) => agent.available),
+  });
 
   const selectedAnalysis = useMemo(
     () => analyses.find((analysis) => analysis.id === selectedAnalysisId) ?? null,
@@ -229,7 +240,11 @@ export function AnalysisPage() {
         }
       >
         <TabsContent value="report" className="mt-0 outline-none">
-          <ReportContent />
+          <ReportContent
+            onAskFollowUp={
+              report ? (prompt) => startWithAnalysisId(report.analysis.id, prompt) : undefined
+            }
+          />
         </TabsContent>
         <TabsContent
           value="agent"

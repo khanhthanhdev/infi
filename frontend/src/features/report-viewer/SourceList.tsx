@@ -3,12 +3,17 @@ import { memo } from "react";
 import { Eyebrow, FreshnessChip } from "@/components/ui/editorial";
 import { cn } from "@/lib/utils";
 import type { Source } from "@/types";
+import { type SelectionProps, sourceSelection } from "./selection";
 
-interface SourceListProps {
+interface SourceListProps extends SelectionProps {
   sources: Source[];
 }
 
-export const SourceList = memo(function SourceList({ sources }: SourceListProps) {
+export const SourceList = memo(function SourceList({
+  sources,
+  selectedId,
+  onSelect,
+}: SourceListProps) {
   if (sources.length === 0) return null;
 
   const sorted = [...sources].sort(
@@ -18,13 +23,29 @@ export const SourceList = memo(function SourceList({ sources }: SourceListProps)
   return (
     <div className="divide-y divide-border border-y border-border">
       {sorted.map((source, index) => (
-        <SourceRow key={source.id} source={source} index={index} />
+        <SourceRow
+          key={source.id}
+          source={source}
+          index={index}
+          selected={selectedId === `source:${source.id}`}
+          onSelect={onSelect}
+        />
       ))}
     </div>
   );
 });
 
-function SourceRow({ source, index }: { source: Source; index: number }) {
+function SourceRow({
+  source,
+  index,
+  selected,
+  onSelect,
+}: {
+  source: Source;
+  index: number;
+  selected?: boolean;
+  onSelect?: (selection: ReturnType<typeof sourceSelection>) => void;
+}) {
   const content = (
     <>
       <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
@@ -74,7 +95,11 @@ function SourceRow({ source, index }: { source: Source; index: number }) {
     </>
   );
 
-  const baseClass = "group flex items-start gap-4 px-1 py-4 transition-colors";
+  const baseClass = cn(
+    "report-row-tint group flex items-start gap-4 px-3 py-4 text-left transition-colors",
+    reliabilityTone(source.reliability),
+    selected && "report-selected",
+  );
 
   if (source.url) {
     return (
@@ -82,13 +107,18 @@ function SourceRow({ source, index }: { source: Source; index: number }) {
         href={source.url}
         target="_blank"
         rel="noreferrer"
-        className={cn(baseClass, "hover:bg-muted/40")}
+        onClick={() => onSelect?.(sourceSelection(source))}
+        className={baseClass}
       >
         {content}
       </a>
     );
   }
-  return <div className={baseClass}>{content}</div>;
+  return (
+    <button type="button" onClick={() => onSelect?.(sourceSelection(source))} className={baseClass}>
+      {content}
+    </button>
+  );
 }
 
 export function ReliabilityPill({ reliability }: { reliability: Source["reliability"] }) {
@@ -119,13 +149,26 @@ function reliabilityRank(reliability: Source["reliability"]) {
 function reliabilityAccent(reliability: Source["reliability"]) {
   switch (reliability) {
     case "primary":
-      return { dot: "bg-foreground" };
+      return { dot: "bg-[var(--accent-blue)]" };
     case "high":
-      return { dot: "bg-foreground/70" };
+      return { dot: "bg-[var(--accent-gray)]" };
     case "medium":
-      return { dot: "bg-foreground/40" };
+      return { dot: "bg-[var(--accent-yellow)]" };
     default:
-      return { dot: "bg-foreground/20" };
+      return { dot: "bg-[var(--accent-gray)]" };
+  }
+}
+
+function reliabilityTone(reliability: Source["reliability"]) {
+  switch (reliability) {
+    case "primary":
+      return "report-tone-info";
+    case "high":
+      return "report-tone-neutral";
+    case "medium":
+      return "report-tone-warning";
+    default:
+      return "report-tone-negative";
   }
 }
 

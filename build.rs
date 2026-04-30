@@ -12,7 +12,7 @@ fn main() {
         if let Some(parent) = target.parent() {
             let _ = fs::create_dir_all(parent);
         }
-           let placeholder = "<!doctype html><meta charset=\"utf-8\"><title>Infi report</title>\
+        let placeholder = "<!doctype html><meta charset=\"utf-8\"><title>Infi report</title>\
                <script>window.__INFI_REPORT__ = \"__INFI_REPORT_JSON__\";\
                document.body && (document.body.textContent = \
                'Viewer template was not built. Run `pnpm build:viewer` in frontend/.');\

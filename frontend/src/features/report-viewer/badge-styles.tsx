@@ -25,34 +25,34 @@ export function getStanceAccent(stance: string): StanceAccent {
   switch (stance) {
     case "bullish":
       return {
-        tick: "bg-emerald-600 dark:bg-emerald-400",
-        text: "text-emerald-700 dark:text-emerald-400",
-        rule: "bg-emerald-600/80 dark:bg-emerald-400/80",
-        dot: "bg-emerald-600 dark:bg-emerald-400",
+        tick: "bg-[var(--accent-green)]",
+        text: "text-[var(--accent-green)]",
+        rule: "bg-[var(--accent-green)]",
+        dot: "bg-[var(--accent-green)]",
         label: "Bullish",
       };
     case "bearish":
       return {
-        tick: "bg-red-600 dark:bg-red-400",
-        text: "text-red-700 dark:text-red-400",
-        rule: "bg-red-600/80 dark:bg-red-400/80",
-        dot: "bg-red-600 dark:bg-red-400",
+        tick: "bg-[var(--accent-red)]",
+        text: "text-[var(--accent-red)]",
+        rule: "bg-[var(--accent-red)]",
+        dot: "bg-[var(--accent-red)]",
         label: "Bearish",
       };
     case "mixed":
       return {
-        tick: "bg-amber-500 dark:bg-amber-400",
-        text: "text-amber-700 dark:text-amber-400",
-        rule: "bg-amber-500/80 dark:bg-amber-400/80",
-        dot: "bg-amber-500 dark:bg-amber-400",
+        tick: "bg-[var(--accent-orange)]",
+        text: "text-[var(--accent-orange)]",
+        rule: "bg-[var(--accent-orange)]",
+        dot: "bg-[var(--accent-orange)]",
         label: "Mixed",
       };
     case "neutral":
       return {
-        tick: "bg-zinc-500 dark:bg-zinc-400",
-        text: "text-zinc-700 dark:text-zinc-300",
-        rule: "bg-zinc-500/70 dark:bg-zinc-400/70",
-        dot: "bg-zinc-500 dark:bg-zinc-400",
+        tick: "bg-[var(--accent-gray)]",
+        text: "text-[var(--accent-gray)]",
+        rule: "bg-[var(--accent-gray)]",
+        dot: "bg-[var(--accent-gray)]",
         label: "Neutral",
       };
     default:

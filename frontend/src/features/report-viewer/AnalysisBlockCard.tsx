@@ -6,30 +6,46 @@ import { cn } from "@/lib/utils";
 import type { AnalysisBlock, Source } from "@/types";
 import { ConfidenceBadge } from "./badge-styles";
 import { reportMarkdownComponents } from "./markdown-components";
+import { blockSelection, type SelectionProps } from "./selection";
 
-interface AnalysisBlockCardProps {
+interface AnalysisBlockCardProps extends SelectionProps {
   block: AnalysisBlock;
   sourceMap?: Map<string, Source>;
   isFirstInGroup?: boolean;
 }
 
-export function AnalysisBlockCard({ block, sourceMap, isFirstInGroup }: AnalysisBlockCardProps) {
+export function AnalysisBlockCard({
+  block,
+  sourceMap,
+  isFirstInGroup,
+  selectedId,
+  onSelect,
+}: AnalysisBlockCardProps) {
   return (
     <article
       className={cn(
-        "grid gap-6 py-8 md:grid-cols-[180px_minmax(0,1fr)] md:gap-10",
+        "report-card-tint grid gap-6 px-4 py-8 transition-colors md:grid-cols-[180px_minmax(0,1fr)] md:gap-10",
+        importanceTone(block.importance),
         !isFirstInGroup && "border-t border-border",
+        selectedId === `analysis_block:${block.id}` && "report-selected",
       )}
     >
       <header className="flex flex-col gap-2 md:sticky md:top-28 md:self-start">
         <div className="flex items-center gap-2">
           <ImportanceGlyph importance={block.importance} />
-          <Eyebrow>{String(block.importance)}</Eyebrow>
+          <Eyebrow className="text-[var(--report-accent)]">{String(block.importance)}</Eyebrow>
         </div>
         <h3 className="text-[17px] font-semibold leading-snug tracking-tight text-foreground">
           {block.title}
         </h3>
         <ConfidenceBadge confidence={block.confidence} />
+        <button
+          type="button"
+          onClick={() => onSelect?.(blockSelection(block))}
+          className="w-fit font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-[var(--report-accent)]"
+        >
+          Inspect
+        </button>
       </header>
 
       <div className="min-w-0 space-y-5">
@@ -49,11 +65,22 @@ export function AnalysisBlockCard({ block, sourceMap, isFirstInGroup }: Analysis
 function ImportanceGlyph({ importance }: { importance: string }) {
   const cls =
     importance === "high"
-      ? "bg-foreground"
+      ? "bg-[var(--accent-red)]"
       : importance === "medium"
-        ? "bg-foreground/50"
-        : "bg-foreground/20";
+        ? "bg-[var(--accent-orange)]"
+        : "bg-[var(--accent-teal)]";
   return <span className={cn("h-2 w-2 shrink-0 rounded-full", cls)} aria-hidden />;
+}
+
+function importanceTone(importance: string): string {
+  switch (importance) {
+    case "high":
+      return "report-tone-negative";
+    case "medium":
+      return "report-tone-warning";
+    default:
+      return "report-tone-neutral";
+  }
 }
 
 function EvidenceRow({ ids, sourceMap }: { ids: string[]; sourceMap?: Map<string, Source> }) {

@@ -1,9 +1,11 @@
 import { memo } from "react";
 import { Eyebrow, FreshnessChip } from "@/components/ui/editorial";
+import { cn } from "@/lib/utils";
 import type { Entity, MetricSnapshot, Source } from "@/types";
 import { MetricDelta } from "./MetricDelta";
+import { metricSelection, type SelectionProps } from "./selection";
 
-interface MetricListProps {
+interface MetricListProps extends SelectionProps {
   metrics: MetricSnapshot[];
   entityMap: Map<string, Entity>;
   sourceMap: Map<string, Source>;
@@ -13,6 +15,8 @@ export const MetricList = memo(function MetricList({
   metrics,
   entityMap,
   sourceMap,
+  selectedId,
+  onSelect,
 }: MetricListProps) {
   if (metrics.length === 0) return null;
 
@@ -22,9 +26,15 @@ export const MetricList = memo(function MetricList({
         const entity = metric.entity_id ? entityMap.get(metric.entity_id) : null;
         const source = sourceMap.get(metric.source_id);
         return (
-          <div
+          <button
+            type="button"
             key={metric.id}
-            className="grid grid-cols-[3ch_minmax(0,1fr)_auto] items-baseline gap-4 px-1 py-3"
+            onClick={() => onSelect?.(metricSelection(metric, source))}
+            className={cn(
+              "report-row-tint grid w-full grid-cols-[3ch_minmax(0,1fr)_auto] items-baseline gap-4 px-3 py-3 text-left transition-colors",
+              metricTone(metric.change_pct),
+              selectedId === `metric:${metric.id}` && "report-selected",
+            )}
           >
             <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
               {String(index + 1).padStart(2, "0")}
@@ -70,12 +80,17 @@ export const MetricList = memo(function MetricList({
               })()}
               <MetricDelta changePct={metric.change_pct} priorValue={metric.prior_value} />
             </div>
-          </div>
+          </button>
         );
       })}
     </div>
   );
 });
+
+function metricTone(changePct: number | null): string {
+  if (changePct == null || changePct === 0) return "report-tone-neutral";
+  return changePct > 0 ? "report-tone-positive" : "report-tone-negative";
+}
 
 function formatMetric(metric: string) {
   return metric.replace(/_/g, " ");

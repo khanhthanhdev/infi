@@ -18,13 +18,20 @@ import { AnalysisSection } from "./AnalysisSection";
 import { ArgumentSpine } from "./ArgumentSpine";
 import { MetricList } from "./MetricList";
 import { ProjectionView } from "./ProjectionView";
+import { ReportContextTray } from "./ReportContextTray";
 import { ReportHero } from "./ReportHero";
 import { SourceList } from "./SourceList";
 import { StructuredArtifactView } from "./StructuredArtifactView";
+import type { ReportSelection } from "./selection";
 
-export function ReportContent() {
+interface ReportContentProps {
+  onAskFollowUp?: (prompt: string) => void;
+}
+
+export function ReportContent({ onAskFollowUp }: ReportContentProps = {}) {
   const report = useAppStore((state) => state.selectedReport);
   const selectedAnalysisId = useAppStore((state) => state.selectedAnalysisId);
+  const [selection, setSelection] = useState<ReportSelection | null>(null);
   const sourceMap = useMemo(
     () =>
       report
@@ -94,214 +101,257 @@ export function ReportContent() {
   };
 
   const firstSectionKey = firstSection(sectionFlags);
-  const firstHeaderClass = (key: SectionKey) =>
-    key === firstSectionKey ? "border-t-0 pt-8" : undefined;
+  const sectionHeaderClass = (key: SectionKey) =>
+    [sectionTone(key), "report-section-heading", key === firstSectionKey ? "border-t-0 pt-8" : ""]
+      .filter(Boolean)
+      .join(" ");
+
+  const selectedId = selection?.id ?? null;
 
   return (
-    <article className="mx-auto max-w-5xl px-8 pb-32">
-      <div className="pt-10 pb-14">
-        <ReportHero report={report} onSwitchRun={switchRun} />
-      </div>
+    <div className="report-surface mx-auto grid max-w-7xl gap-8 px-8 pb-32 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <article className="min-w-0">
+        <div className="pt-10 pb-14">
+          <ReportHero report={report} onSwitchRun={switchRun} />
+        </div>
 
-      <StaleStanceBanner report={report} />
+        <StaleStanceBanner report={report} />
 
-      {report.final_stance && (
-        <section className="pb-14">
-          <ArgumentSpine stance={report.final_stance} />
-        </section>
-      )}
+        {report.final_stance && (
+          <section className="pb-14">
+            <ArgumentSpine stance={report.final_stance} />
+          </section>
+        )}
 
-      {plan?.decision_criteria?.length ? (
-        <section className="pb-12">
-          <DecisionCriteria criteria={plan.decision_criteria} />
-        </section>
-      ) : null}
+        {plan?.decision_criteria?.length ? (
+          <section className="pb-12">
+            <DecisionCriteria criteria={plan.decision_criteria} />
+          </section>
+        ) : null}
 
-      {(hasProjections ||
-        hasPortfolioOutcomes ||
-        hasMetrics ||
-        hasEvidence ||
-        hasAnalysis ||
-        hasSources) && <SectionJumpNav {...sectionFlags} />}
+        {(hasProjections ||
+          hasPortfolioOutcomes ||
+          hasMetrics ||
+          hasEvidence ||
+          hasAnalysis ||
+          hasSources) && <SectionJumpNav {...sectionFlags} />}
 
-      {hasPortfolioOutcomes && (
-        <section className="space-y-8 pb-16">
-          <SectionHeader
-            number={sectionNumber(sectionFlags, "outcomes")}
-            label="Outcomes"
-            title="Scenarios and model"
-            id="outcomes"
-            className={firstHeaderClass("outcomes")}
-          />
-          <PortfolioOutcomesView
-            scenarios={report.portfolio_scenario_analyses}
-            models={report.portfolio_expected_return_models}
-          />
-        </section>
-      )}
+        {hasPortfolioOutcomes && (
+          <section className="space-y-8 pb-16">
+            <SectionHeader
+              number={sectionNumber(sectionFlags, "outcomes")}
+              label="Outcomes"
+              title="Scenarios and model"
+              id="outcomes"
+              className={sectionHeaderClass("outcomes")}
+            />
+            <PortfolioOutcomesView
+              scenarios={report.portfolio_scenario_analyses}
+              models={report.portfolio_expected_return_models}
+            />
+          </section>
+        )}
 
-      {hasProjections && (
-        <section className="space-y-8 pb-16">
-          <SectionHeader
-            number={sectionNumber(sectionFlags, "projections")}
-            label="Projection"
-            title="Forward view"
-            meta={
-              <span className="font-mono tabular-nums">
-                {report.projections.length.toString().padStart(2, "0")}{" "}
-                {report.projections.length === 1 ? "target" : "targets"}
-              </span>
-            }
-            id="projections"
-            className={firstHeaderClass("projections")}
-          />
-          <ProjectionView
-            projections={report.projections}
-            entityMap={entityMap}
-            sourceMap={sourceMap}
-          />
-        </section>
-      )}
+        {hasProjections && (
+          <section className="space-y-8 pb-16">
+            <SectionHeader
+              number={sectionNumber(sectionFlags, "projections")}
+              label="Projection"
+              title="Forward view"
+              meta={
+                <span className="font-mono tabular-nums">
+                  {report.projections.length.toString().padStart(2, "0")}{" "}
+                  {report.projections.length === 1 ? "target" : "targets"}
+                </span>
+              }
+              id="projections"
+              className={sectionHeaderClass("projections")}
+            />
+            <ProjectionView
+              projections={report.projections}
+              entityMap={entityMap}
+              sourceMap={sourceMap}
+              selectedId={selectedId}
+              onSelect={setSelection}
+            />
+          </section>
+        )}
 
-      {hasHoldingReviews && (
-        <section className="space-y-8 pb-16">
-          <SectionHeader
-            number={sectionNumber(sectionFlags, "holdings")}
-            label="Holdings"
-            title="Position-by-position review"
-            meta={
-              <span className="font-mono tabular-nums">
-                {report.holding_reviews.length.toString().padStart(2, "0")} reviewed
-              </span>
-            }
-            id="holdings"
-            className={firstHeaderClass("holdings")}
-          />
-          <HoldingReviewList reviews={report.holding_reviews} entityMap={entityMap} />
-        </section>
-      )}
+        {hasHoldingReviews && (
+          <section className="space-y-8 pb-16">
+            <SectionHeader
+              number={sectionNumber(sectionFlags, "holdings")}
+              label="Holdings"
+              title="Position-by-position review"
+              meta={
+                <span className="font-mono tabular-nums">
+                  {report.holding_reviews.length.toString().padStart(2, "0")} reviewed
+                </span>
+              }
+              id="holdings"
+              className={sectionHeaderClass("holdings")}
+            />
+            <HoldingReviewList reviews={report.holding_reviews} entityMap={entityMap} />
+          </section>
+        )}
 
-      {hasAllocation && (
-        <section className="space-y-8 pb-16">
-          <SectionHeader
-            number={sectionNumber(sectionFlags, "allocation")}
-            label="Allocation"
-            title="Portfolio composition"
-            id="allocation"
-            className={firstHeaderClass("allocation")}
-          />
-          {report.allocation_reviews.map((review) => (
-            <AllocationReviewView key={review.id} review={review} />
-          ))}
-        </section>
-      )}
-
-      {hasPortfolioRisk && (
-        <section className="space-y-8 pb-16">
-          <SectionHeader
-            number={sectionNumber(sectionFlags, "risk")}
-            label="Risk"
-            title="Portfolio risk"
-            id="risk"
-            className={firstHeaderClass("risk")}
-          />
-          {report.portfolio_risks.map((risk) => (
-            <PortfolioRiskView key={risk.id} risk={risk} />
-          ))}
-        </section>
-      )}
-
-      {hasRebalancing && (
-        <section className="space-y-8 pb-16">
-          <SectionHeader
-            number={sectionNumber(sectionFlags, "rebalancing")}
-            label="Rebalancing"
-            title="Rebalancing scenarios"
-            id="rebalancing"
-            className={firstHeaderClass("rebalancing")}
-          />
-          {report.rebalancing_suggestions.map((suggestion) => (
-            <RebalancingView key={suggestion.id} suggestion={suggestion} />
-          ))}
-        </section>
-      )}
-
-      {hasMetrics && (
-        <section className="space-y-8 pb-16">
-          <SectionHeader
-            number={sectionNumber(sectionFlags, "metrics")}
-            label="Metrics"
-            title="Data points"
-            meta={
-              <span className="font-mono tabular-nums">
-                {report.metrics.length.toString().padStart(2, "0")} tracked
-              </span>
-            }
-            id="metrics"
-            className={firstHeaderClass("metrics")}
-          />
-          <MetricList metrics={report.metrics} entityMap={entityMap} sourceMap={sourceMap} />
-        </section>
-      )}
-
-      {hasEvidence && (
-        <section className="space-y-2 pb-16">
-          <SectionHeader
-            number={sectionNumber(sectionFlags, "evidence")}
-            label="Evidence"
-            title="Structured evidence"
-            meta={
-              <span className="font-mono tabular-nums">
-                {report.artifacts.length.toString().padStart(2, "0")} artifacts
-              </span>
-            }
-            id="evidence"
-            className={firstHeaderClass("evidence")}
-          />
-          <div>
-            {report.artifacts.map((artifact, index) => (
-              <StructuredArtifactView key={artifact.id} artifact={artifact} isFirst={index === 0} />
+        {hasAllocation && (
+          <section className="space-y-8 pb-16">
+            <SectionHeader
+              number={sectionNumber(sectionFlags, "allocation")}
+              label="Allocation"
+              title="Portfolio composition"
+              id="allocation"
+              className={sectionHeaderClass("allocation")}
+            />
+            {report.allocation_reviews.map((review) => (
+              <AllocationReviewView key={review.id} review={review} />
             ))}
-          </div>
-        </section>
-      )}
+          </section>
+        )}
 
-      {hasAnalysis && (
-        <section className="space-y-8 pb-16">
-          <SectionHeader
-            number={sectionNumber(sectionFlags, "analysis")}
-            label="Analysis"
-            title="The deeper read"
-            meta={
-              <span className="font-mono tabular-nums">
-                {report.blocks.length.toString().padStart(2, "0")} blocks
-              </span>
-            }
-            id="analysis"
-            className={firstHeaderClass("analysis")}
-          />
-          <AnalysisSection blocks={report.blocks} sourceMap={sourceMap} />
-        </section>
-      )}
+        {hasPortfolioRisk && (
+          <section className="space-y-8 pb-16">
+            <SectionHeader
+              number={sectionNumber(sectionFlags, "risk")}
+              label="Risk"
+              title="Portfolio risk"
+              id="risk"
+              className={sectionHeaderClass("risk")}
+            />
+            {report.portfolio_risks.map((risk) => (
+              <PortfolioRiskView key={risk.id} risk={risk} />
+            ))}
+          </section>
+        )}
 
-      {hasSources && (
-        <section className="space-y-8 pb-16">
-          <SectionHeader
-            number={sectionNumber(sectionFlags, "sources")}
-            label="Sources"
-            title="Bibliography"
-            meta={
-              <span className="font-mono tabular-nums">
-                {report.sources.length.toString().padStart(2, "0")} cited
-              </span>
-            }
-            id="sources"
-            className={firstHeaderClass("sources")}
+        {hasRebalancing && (
+          <section className="space-y-8 pb-16">
+            <SectionHeader
+              number={sectionNumber(sectionFlags, "rebalancing")}
+              label="Rebalancing"
+              title="Rebalancing scenarios"
+              id="rebalancing"
+              className={sectionHeaderClass("rebalancing")}
+            />
+            {report.rebalancing_suggestions.map((suggestion) => (
+              <RebalancingView key={suggestion.id} suggestion={suggestion} />
+            ))}
+          </section>
+        )}
+
+        {hasMetrics && (
+          <section className="space-y-8 pb-16">
+            <SectionHeader
+              number={sectionNumber(sectionFlags, "metrics")}
+              label="Metrics"
+              title="Data points"
+              meta={
+                <span className="font-mono tabular-nums">
+                  {report.metrics.length.toString().padStart(2, "0")} tracked
+                </span>
+              }
+              id="metrics"
+              className={sectionHeaderClass("metrics")}
+            />
+            <MetricList
+              metrics={report.metrics}
+              entityMap={entityMap}
+              sourceMap={sourceMap}
+              selectedId={selectedId}
+              onSelect={setSelection}
+            />
+          </section>
+        )}
+
+        {hasEvidence && (
+          <section className="space-y-2 pb-16">
+            <SectionHeader
+              number={sectionNumber(sectionFlags, "evidence")}
+              label="Evidence"
+              title="Structured evidence"
+              meta={
+                <span className="font-mono tabular-nums">
+                  {report.artifacts.length.toString().padStart(2, "0")} artifacts
+                </span>
+              }
+              id="evidence"
+              className={sectionHeaderClass("evidence")}
+            />
+            <div>
+              {report.artifacts.map((artifact, index) => (
+                <StructuredArtifactView
+                  key={artifact.id}
+                  artifact={artifact}
+                  isFirst={index === 0}
+                  selectedId={selectedId}
+                  onSelect={setSelection}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {hasAnalysis && (
+          <section className="space-y-8 pb-16">
+            <SectionHeader
+              number={sectionNumber(sectionFlags, "analysis")}
+              label="Analysis"
+              title="The deeper read"
+              meta={
+                <span className="font-mono tabular-nums">
+                  {report.blocks.length.toString().padStart(2, "0")} blocks
+                </span>
+              }
+              id="analysis"
+              className={sectionHeaderClass("analysis")}
+            />
+            <AnalysisSection
+              blocks={report.blocks}
+              sourceMap={sourceMap}
+              selectedId={selectedId}
+              onSelect={setSelection}
+            />
+          </section>
+        )}
+
+        {hasSources && (
+          <section className="space-y-8 pb-16">
+            <SectionHeader
+              number={sectionNumber(sectionFlags, "sources")}
+              label="Sources"
+              title="Bibliography"
+              meta={
+                <span className="font-mono tabular-nums">
+                  {report.sources.length.toString().padStart(2, "0")} cited
+                </span>
+              }
+              id="sources"
+              className={sectionHeaderClass("sources")}
+            />
+            <SourceList sources={report.sources} selectedId={selectedId} onSelect={setSelection} />
+          </section>
+        )}
+      </article>
+      <div className="hidden pt-28 xl:block">
+        <ReportContextTray
+          selection={selection}
+          sourceMap={sourceMap}
+          onClear={() => setSelection(null)}
+          onAsk={onAskFollowUp}
+        />
+      </div>
+      {selection && (
+        <div className="xl:hidden">
+          <ReportContextTray
+            selection={selection}
+            sourceMap={sourceMap}
+            onClear={() => setSelection(null)}
+            onAsk={onAskFollowUp}
           />
-          <SourceList sources={report.sources} />
-        </section>
+        </div>
       )}
-    </article>
+    </div>
   );
 }
 
@@ -383,7 +433,7 @@ function StaleStanceBanner({ report }: { report: AnalysisReport }) {
 
   if (stale.length === 0) return null;
   return (
-    <section className="mb-8 border-t border-border pt-4">
+    <section className="report-callout report-tone-negative mb-8 border-t px-4 py-4">
       <a
         href="#metrics"
         className="flex items-baseline justify-between gap-4 text-destructive transition-opacity hover:opacity-80"
@@ -413,7 +463,7 @@ function firstSection(flags: SectionFlags): SectionKey | null {
 
 function DecisionCriteria({ criteria }: { criteria: string[] }) {
   return (
-    <div className="flex flex-col gap-3 border-t border-border pt-5">
+    <div className="report-callout report-tone-info flex flex-col gap-3 border-t px-4 py-5">
       <Eyebrow>Decision criteria</Eyebrow>
       <ol className="divide-y divide-border/60 text-[13.5px] text-foreground/85">
         {criteria.map((criterion, index) => (
@@ -430,20 +480,30 @@ function DecisionCriteria({ criteria }: { criteria: string[] }) {
 }
 
 function SectionJumpNav(flags: SectionFlags) {
-  const items: { href: string; label: string }[] = [];
-  if (flags.hasPortfolioOutcomes) items.push({ href: "#outcomes", label: "Outcomes" });
-  if (flags.hasProjections) items.push({ href: "#projections", label: "Projection" });
-  if (flags.hasHoldingReviews) items.push({ href: "#holdings", label: "Holdings" });
-  if (flags.hasAllocation) items.push({ href: "#allocation", label: "Allocation" });
-  if (flags.hasPortfolioRisk) items.push({ href: "#risk", label: "Risk" });
-  if (flags.hasRebalancing) items.push({ href: "#rebalancing", label: "Rebalancing" });
-  if (flags.hasMetrics) items.push({ href: "#metrics", label: "Metrics" });
-  if (flags.hasEvidence) items.push({ href: "#evidence", label: "Evidence" });
-  if (flags.hasAnalysis) items.push({ href: "#analysis", label: "Analysis" });
-  if (flags.hasSources) items.push({ href: "#sources", label: "Sources" });
+  const items: { href: string; label: string; tone: string }[] = [];
+  if (flags.hasPortfolioOutcomes)
+    items.push({ href: "#outcomes", label: "Outcomes", tone: sectionTone("outcomes") });
+  if (flags.hasProjections)
+    items.push({ href: "#projections", label: "Projection", tone: sectionTone("projections") });
+  if (flags.hasHoldingReviews)
+    items.push({ href: "#holdings", label: "Holdings", tone: sectionTone("holdings") });
+  if (flags.hasAllocation)
+    items.push({ href: "#allocation", label: "Allocation", tone: sectionTone("allocation") });
+  if (flags.hasPortfolioRisk)
+    items.push({ href: "#risk", label: "Risk", tone: sectionTone("risk") });
+  if (flags.hasRebalancing)
+    items.push({ href: "#rebalancing", label: "Rebalancing", tone: sectionTone("rebalancing") });
+  if (flags.hasMetrics)
+    items.push({ href: "#metrics", label: "Metrics", tone: sectionTone("metrics") });
+  if (flags.hasEvidence)
+    items.push({ href: "#evidence", label: "Evidence", tone: sectionTone("evidence") });
+  if (flags.hasAnalysis)
+    items.push({ href: "#analysis", label: "Analysis", tone: sectionTone("analysis") });
+  if (flags.hasSources)
+    items.push({ href: "#sources", label: "Sources", tone: sectionTone("sources") });
 
   return (
-    <nav className="sticky top-11 z-20 -mx-8 mb-8 flex h-12 items-center border-b border-border bg-background px-8">
+    <nav className="report-section-nav sticky top-11 z-20 -mx-8 mb-8 flex h-12 items-center border-b border-border px-8">
       <div className="flex items-center gap-6">
         <Eyebrow>Contents</Eyebrow>
         <div className="flex items-center gap-5 text-[12.5px]">
@@ -451,7 +511,7 @@ function SectionJumpNav(flags: SectionFlags) {
             <a
               key={item.href}
               href={item.href}
-              className="text-muted-foreground transition-colors hover:text-foreground"
+              className={`report-jump-link ${item.tone} transition-colors`}
             >
               {item.label}
             </a>
@@ -460,6 +520,31 @@ function SectionJumpNav(flags: SectionFlags) {
       </div>
     </nav>
   );
+}
+
+function sectionTone(key: SectionKey): string {
+  switch (key) {
+    case "outcomes":
+      return "report-tone-info";
+    case "projections":
+      return "report-tone-info";
+    case "holdings":
+      return "report-tone-neutral";
+    case "allocation":
+      return "report-tone-info";
+    case "risk":
+      return "report-tone-negative";
+    case "rebalancing":
+      return "report-tone-warning";
+    case "metrics":
+      return "report-tone-info";
+    case "evidence":
+      return "report-tone-neutral";
+    case "analysis":
+      return "report-tone-info";
+    case "sources":
+      return "report-tone-neutral";
+  }
 }
 
 function PortfolioOutcomesView({

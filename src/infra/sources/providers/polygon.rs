@@ -14,8 +14,7 @@ const ID: &str = "polygon";
 /// via `INFI_POLYGON_BASE_URL` so we can patch the default without a full
 /// release if they actually move.
 fn base_url() -> String {
-    std::env::var("INFI_POLYGON_BASE_URL")
-        .unwrap_or_else(|_| "https://api.polygon.io".to_string())
+    std::env::var("INFI_POLYGON_BASE_URL").unwrap_or_else(|_| "https://api.polygon.io".to_string())
 }
 
 pub struct PolygonProvider;

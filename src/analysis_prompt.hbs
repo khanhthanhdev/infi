@@ -64,7 +64,13 @@ If the request asks about one equity, include `financials`, `valuation`, and `ca
 <required_artifacts>
 Use `submit_structured_artifact` when a structured view would make the report easier to understand:
 - For comparison requests or watchlists: submit `comparison_matrix` with at least two entities and the most decision-relevant metrics.
-- For one equity: submit `metric_table` for core operating, valuation, and balance-sheet metrics when available.
+- For one equity: submit a source-backed fundamental dashboard when available:
+  - `kpi_grid` for headline KPIs such as revenue, net income, total assets, equity, EPS, P/E, or market cap. Put one KPI per row with columns such as `metric`, `value`, `unit`, `period`, `prior_value`, `change_pct`, and `source_id`.
+  - `financial_statement` for period-by-period income statement, balance sheet, or cash-flow rows. Use columns for line item and periods; include row metadata such as `statement`, `unit`, and `source_id` when useful.
+  - `grouped_bar_chart` for multi-period category/segment bars using `series` for each segment/category and point labels for periods.
+  - `ratio_snapshot` for valuation, profitability, leverage, and liquidity ratios. Put one ratio per row with `group`, `metric`, `value`, `unit`, `period`, and `source_id`.
+  - `factor_list` for grouped strengths, risks, catalysts, and open questions. Use rows with `group`, `factor`, `detail`, `importance`, and `source_id`.
+- If the fundamental dashboard kinds do not fit, submit `metric_table` for core operating, valuation, and balance-sheet metrics when available.
 - For one equity, comparison, or high-uncertainty requests: submit `scenario_matrix` covering upside/base/downside drivers when supported by evidence. Include a `probability` column (0.0–1.0) — rows should sum to 1.0 within 0.02.
 - Submit `bar_chart`, `line_chart`, or `area_chart` only when you have real sourced data points. Do not invent chart data. Use `area_chart` for growth curves, margin expansion, or cumulative trends that benefit from a filled visual; use `line_chart` for pure series tracking; use `bar_chart` for category comparisons.
 </required_artifacts>

@@ -10,15 +10,21 @@ import { viteSingleFile } from "vite-plugin-singlefile";
  * substitutes the report JSON at export time.
  */
 export default defineConfig({
-  plugins: [react(), tailwindcss(), viteSingleFile()],
+  plugins: [react(), tailwindcss(), viteSingleFile({ useRecommendedBuildConfig: false })],
   clearScreen: false,
+  base: "./",
   build: {
     outDir: "dist-viewer",
     emptyOutDir: true,
+    assetsDir: "",
     cssCodeSplit: false,
+    chunkSizeWarningLimit: 100_000_000,
     assetsInlineLimit: 100_000_000,
     rollupOptions: {
       input: path.resolve(__dirname, "viewer.html"),
+      output: {
+        codeSplitting: false,
+      },
     },
   },
   resolve: {

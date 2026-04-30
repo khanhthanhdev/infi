@@ -1,4 +1,12 @@
-import { CircleNotch, MagnifyingGlass, Plus, X } from "@phosphor-icons/react";
+import {
+  CaretDown,
+  CircleNotch,
+  FolderSimple,
+  MagnifyingGlass,
+  Plus,
+  Tray,
+  X,
+} from "@phosphor-icons/react";
 import {
   type CSSProperties,
   type KeyboardEvent,
@@ -79,11 +87,56 @@ export function AppSidebar({
       <div data-tauri-drag-region className="h-10 shrink-0" />
 
       <SidebarContent className="overflow-y-auto">
-        <SidebarGroup className="px-4 py-0">
-          <SidebarGroupContent className="flex flex-col gap-6">
-            {/* ── Analyses ── */}
-            <section>
-              {searchActive ? (
+        <SidebarGroup className="px-0 py-0">
+          <SidebarGroupContent className="flex flex-col gap-0">
+            <section className="border-b border-sidebar-border px-2 pb-4 pt-2">
+              <FilterItem
+                icon={<Tray size={16} weight="fill" />}
+                label="Analyses"
+                count={analyses.length}
+                active={currentView === "analysis" || currentView === "new-analysis"}
+                onClick={() => onViewChange("new-analysis")}
+              />
+              <FilterItem
+                icon={<FolderSimple size={16} weight="fill" />}
+                label="Portfolios"
+                count={portfolios.length}
+                active={currentView === "portfolio"}
+                onClick={() => {
+                  if (selectedPortfolioId) {
+                    void onSelectPortfolio(selectedPortfolioId);
+                  }
+                }}
+              />
+            </section>
+
+            <section className="px-1 py-2">
+              <SectionBandHeader
+                label="Analyses"
+                accentClass="text-[var(--accent-red)]"
+                actions={
+                  <div className="flex items-center gap-2">
+                    {analyses.length >= SEARCH_MIN && (
+                      <IconButton
+                        ariaLabel="Search analyses"
+                        onClick={() => setSearchActive((active) => !active)}
+                      >
+                        <MagnifyingGlass size={12} weight="bold" />
+                      </IconButton>
+                    )}
+                    <IconButton
+                      ariaLabel="New analysis"
+                      onClick={() => onViewChange("new-analysis")}
+                    >
+                      <Plus size={12} weight="bold" />
+                    </IconButton>
+                  </div>
+                }
+              />
+            </section>
+
+            <section className="px-2 pb-2">
+              {searchActive && (
                 <SearchHeader
                   value={search}
                   onChange={setSearch}
@@ -92,16 +145,7 @@ export function AppSidebar({
                     setSearchActive(false);
                   }}
                 />
-              ) : (
-                <SectionHeaderRow
-                  label="Analyses"
-                  count={analyses.length}
-                  showSearch={analyses.length >= SEARCH_MIN}
-                  onSearchClick={() => setSearchActive(true)}
-                  onAddClick={() => onViewChange("new-analysis")}
-                />
               )}
-
               {analyses.length === 0 ? (
                 <EmptyCta
                   label="New analysis"
@@ -114,7 +158,7 @@ export function AppSidebar({
                 </p>
               ) : (
                 <>
-                  <SidebarMenu className="mt-2 gap-1.5">
+                  <SidebarMenu className="mt-1 gap-0.5">
                     {visibleAnalyses.map((analysis) => (
                       <SidebarMenuItem key={analysis.id} className="sidebar-report-row">
                         <SidebarMenuButton
@@ -122,13 +166,13 @@ export function AppSidebar({
                           isActive={
                             currentView === "analysis" && selectedAnalysisId === analysis.id
                           }
-                          className="h-auto items-start px-2 py-2 text-[13px] font-normal data-[active=true]:font-normal data-[active=true]:bg-sidebar-accent/70"
+                          className="h-auto items-start rounded-[6px] px-0 py-0 text-[13px] font-normal data-[active=true]:font-normal data-[active=true]:bg-[var(--accent-red-light)]"
                         >
                           <Button
                             type="button"
                             variant="ghost"
                             size="xs"
-                            className="h-auto min-w-0 flex-col items-stretch justify-start gap-1 px-2 py-0 text-[13px]"
+                            className="h-auto min-w-0 flex-col items-stretch justify-start gap-1 rounded-[6px] px-4 py-[7px] text-[13px]"
                             onClick={() => {
                               void onSelectAnalysis(analysis.id);
                             }}
@@ -140,7 +184,6 @@ export function AppSidebar({
                       </SidebarMenuItem>
                     ))}
                   </SidebarMenu>
-
                   <Expander
                     hiddenCount={hiddenAnalysesCount}
                     expanded={analysesExpanded}
@@ -150,20 +193,24 @@ export function AppSidebar({
               )}
             </section>
 
-            {/* ── Portfolios ── */}
-            <section>
-              <SectionHeaderRow
+            <section className="border-t border-sidebar-border px-1 py-2">
+              <SectionBandHeader
                 label="Portfolios"
-                count={portfolios.length}
-                showSearch={false}
-                onSearchClick={() => {
-                  /* no-op */
-                }}
-                onAddClick={() => {
-                  void onNewPortfolio();
-                }}
+                accentClass="text-[var(--accent-purple)]"
+                actions={
+                  <IconButton
+                    ariaLabel="New portfolio"
+                    onClick={() => {
+                      void onNewPortfolio();
+                    }}
+                  >
+                    <Plus size={12} weight="bold" />
+                  </IconButton>
+                }
               />
+            </section>
 
+            <section className="px-2 pb-3">
               {portfolios.length === 0 ? (
                 <EmptyCta
                   label="New portfolio"
@@ -174,7 +221,7 @@ export function AppSidebar({
                 />
               ) : (
                 <>
-                  <SidebarMenu className="mt-2 gap-0.5">
+                  <SidebarMenu className="mt-0.5 gap-0.5">
                     {visiblePortfolios.map((portfolio) => (
                       <SidebarMenuItem key={portfolio.id}>
                         <SidebarMenuButton
@@ -182,13 +229,13 @@ export function AppSidebar({
                           isActive={
                             currentView === "portfolio" && selectedPortfolioId === portfolio.id
                           }
-                          className="h-7 items-center px-2 text-[13px] font-normal data-[active=true]:bg-sidebar-accent/70"
+                          className="h-auto items-center rounded-[6px] px-0 py-0 text-[13px] font-normal data-[active=true]:bg-[var(--accent-purple-light)]"
                         >
                           <Button
                             type="button"
                             variant="ghost"
                             size="xs"
-                            className="h-7 min-w-0 items-center justify-between gap-2 px-2 text-[13px]"
+                            className="h-auto min-w-0 items-center justify-between gap-2 rounded-[6px] px-4 py-[7px] text-[13px]"
                             onClick={() => {
                               void onSelectPortfolio(portfolio.id);
                             }}
@@ -202,7 +249,6 @@ export function AppSidebar({
                       </SidebarMenuItem>
                     ))}
                   </SidebarMenu>
-
                   <Expander
                     hiddenCount={hiddenPortfoliosCount}
                     expanded={portfoliosExpanded}
@@ -215,7 +261,17 @@ export function AppSidebar({
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="gap-2 border-t border-sidebar-border px-4 pb-4 pt-2">
+      <SidebarFooter className="gap-3 border-t border-sidebar-border px-3 py-3">
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          className="h-9 w-full justify-center gap-2 px-3"
+          onClick={() => onViewChange("new-analysis")}
+        >
+          <Tray size={14} weight="bold" />
+          <span>New Analysis</span>
+        </Button>
         <div className="flex items-center justify-between gap-2">
           <button
             type="button"
@@ -249,36 +305,70 @@ export function AppSidebar({
   );
 }
 
-function SectionHeaderRow({
+function SectionBandHeader({
   label,
-  count,
-  showSearch,
-  onSearchClick,
-  onAddClick,
+  accentClass,
+  actions,
 }: {
   label: string;
-  count: number;
-  showSearch: boolean;
-  onSearchClick: () => void;
-  onAddClick: () => void;
+  accentClass: string;
+  actions?: React.ReactNode;
 }) {
   return (
-    <div className="flex h-7 items-center justify-between">
-      <Eyebrow>{label}</Eyebrow>
+    <div className="flex items-center justify-between rounded-[4px] px-3 py-1.5">
       <div className="flex items-center gap-2">
-        <span className="font-mono text-[10.5px] tabular-nums text-sidebar-foreground/40">
-          {String(count).padStart(2, "0")}
+        <span className={cn("text-[15px]", accentClass)}>
+          <FolderSimple size={15} weight="fill" />
         </span>
-        {showSearch && (
-          <IconButton ariaLabel={`Search ${label.toLowerCase()}`} onClick={onSearchClick}>
-            <MagnifyingGlass size={13} weight="bold" />
-          </IconButton>
-        )}
-        <IconButton ariaLabel={`New ${label.slice(0, -1).toLowerCase()}`} onClick={onAddClick}>
-          <Plus size={13} weight="bold" />
-        </IconButton>
+        <Eyebrow className="text-sidebar-foreground">{label}</Eyebrow>
+      </div>
+      <div className="flex items-center gap-2">
+        {actions}
+        <span className="text-sidebar-foreground/55">
+          <CaretDown size={13} weight="bold" />
+        </span>
       </div>
     </div>
+  );
+}
+
+function FilterItem({
+  icon,
+  label,
+  count,
+  active,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  count: number;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "mt-1 flex w-full items-center justify-between rounded-[6px] px-4 py-[7px] text-left transition-colors",
+        active
+          ? "bg-[var(--accent-blue-light)] text-primary"
+          : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+      )}
+    >
+      <span className="flex items-center gap-2 text-[13px] font-medium">
+        <span className={cn(active ? "text-primary" : "text-sidebar-foreground")}>{icon}</span>
+        <span>{label}</span>
+      </span>
+      <span
+        className={cn(
+          "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 font-mono text-[10px] font-semibold tabular-nums",
+          active ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
+        )}
+      >
+        {Math.min(99, count)}
+      </span>
+    </button>
   );
 }
 
@@ -296,7 +386,7 @@ function IconButton({
       type="button"
       aria-label={ariaLabel}
       onClick={onClick}
-      className="flex h-6 w-6 items-center justify-center text-sidebar-foreground/50 transition-colors hover:text-sidebar-foreground"
+      className="flex h-6 w-6 items-center justify-center rounded-[4px] text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent/70 hover:text-sidebar-foreground"
     >
       {children}
     </button>
@@ -323,7 +413,7 @@ function SearchHeader({
     }
   };
   return (
-    <div className="flex h-7 items-center gap-2">
+    <div className="mb-1 flex h-8 items-center gap-2 rounded-[6px] border border-[var(--search-border)] bg-[var(--search-input-bg)] px-2">
       <MagnifyingGlass size={13} weight="bold" className="text-sidebar-foreground/45" />
       <input
         ref={inputRef}
@@ -354,12 +444,12 @@ function EmptyCta({
   isActive: boolean;
 }) {
   return (
-    <SidebarMenu className="mt-2">
+    <SidebarMenu className="mt-1">
       <SidebarMenuItem>
         <SidebarMenuButton
           isActive={isActive}
           onClick={onClick}
-          className="h-8 text-[13px] font-normal"
+          className="h-8 rounded-[6px] text-[13px] font-normal data-[active=true]:bg-[var(--accent-blue-light)]"
         >
           <span className="flex items-center gap-2">
             <span aria-hidden className="font-mono text-muted-foreground">
@@ -388,7 +478,7 @@ function Expander({
     <button
       type="button"
       onClick={onToggle}
-      className="mt-2 flex h-6 w-full items-center px-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-sidebar-foreground/45 transition-colors hover:text-sidebar-foreground"
+      className="mt-1 flex h-6 w-full items-center px-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-sidebar-foreground/45 transition-colors hover:text-sidebar-foreground"
     >
       {label}
     </button>

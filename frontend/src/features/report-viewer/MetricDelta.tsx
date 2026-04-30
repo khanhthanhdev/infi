@@ -13,9 +13,9 @@ export function MetricDelta({ changePct, priorValue, className }: MetricDeltaPro
   const isNegative = pct < 0;
   const arrow = isPositive ? "↑" : isNegative ? "↓" : "·";
   const color = isPositive
-    ? "text-emerald-700 dark:text-emerald-400"
+    ? "text-[var(--accent-green)]"
     : isNegative
-      ? "text-red-700 dark:text-red-400"
+      ? "text-[var(--accent-red)]"
       : "text-muted-foreground";
   const sign = isPositive ? "+" : "";
   return (

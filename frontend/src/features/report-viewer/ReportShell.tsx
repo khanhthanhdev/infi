@@ -82,7 +82,7 @@ export function ReportShell({
     <div className="flex h-full min-h-0 flex-col bg-background">
       <div ref={scrollRef} className="report-shell-scroll min-h-0 flex-1 overflow-auto">
         <div className="pointer-events-none sticky top-0 z-30 h-0">
-          <div className="report-compact-bar pointer-events-auto border-b border-border bg-background">
+          <div className="report-compact-bar report-section-nav pointer-events-auto border-b border-border">
             <div className="mx-auto flex h-11 max-w-5xl items-center justify-between gap-4 px-8">
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 {compactLabel && (
@@ -103,7 +103,7 @@ export function ReportShell({
           </div>
         </div>
 
-        <header className="border-b border-border bg-background">
+        <header className="report-hero-panel report-tone-info border-b border-border">
           <div className="mx-auto flex max-w-5xl flex-col gap-6 px-8 pt-10 pb-5">
             <ReportShellMetaLine
               analysis={analysis}

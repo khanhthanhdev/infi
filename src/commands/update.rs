@@ -33,9 +33,8 @@ pub async fn get_app_version() -> String {
 #[tauri::command]
 pub async fn run_self_update(app: AppHandle) -> Result<(), CommandError> {
     let Some(brew) = find_bin("brew") else {
-        let msg =
-            "Homebrew not found in PATH. Open Terminal and run `brew upgrade --cask infi`."
-                .to_string();
+        let msg = "Homebrew not found in PATH. Open Terminal and run `brew upgrade --cask infi`."
+            .to_string();
         emit_error(&app, msg.clone());
         return Err(msg.into());
     };
