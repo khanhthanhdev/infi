@@ -24,23 +24,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: "9"
+          bun-version: latest
 
       - name: Install landing dependencies
         working-directory: landing
-        run: pnpm install --no-frozen-lockfile
+        run: bun install
 
       - name: Build landing site
         working-directory: landing
-        run: pnpm run build
+        run: bun run build
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

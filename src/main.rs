@@ -10,6 +10,7 @@ fn main() {
         return;
     }
 
+    #[cfg(unix)]
     let _ = fix_path_env::fix();
 
     // Capture the user's interactive PATH once, on the main thread, before

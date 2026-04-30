@@ -173,6 +173,10 @@ async fn generate_with_acp_inner(input: GenerateAnalysisInput) -> Result<Generat
         cmd.process_group(0);
     }
 
+    // Suppress the flashing console window when launching agent processes on
+    // Windows. No-op on other targets.
+    crate::infra::shell::suppress_windows_console_tokio(&mut cmd);
+
     let mut child = cmd.spawn().with_context(|| {
         format!(
             "failed to spawn agent process: {} {}",

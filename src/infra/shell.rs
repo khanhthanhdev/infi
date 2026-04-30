@@ -65,6 +65,96 @@ pub fn find_bin(command: &str) -> Option<PathBuf> {
     None
 }
 
+/// Locate a coding-agent CLI binary.
+///
+/// On Unix this is identical to [`find_bin`] (a PATH lookup, similar to `which`).
+///
+/// On Windows the lookup performs the Tolaria-style two-step fallback:
+///
+/// 1. PATH lookup (the same logic `where.exe` uses).
+/// 2. If still not found, probe well-known per-user install directories
+///    (`AppData\Roaming\npm`, `AppData\Local\pnpm`, `scoop\shims`,
+///    `.npm-global\bin`, `.local\bin`, `.local\share\mise\shims`,
+///    `.asdf\shims`, `.bun\bin`, `.<agent>\bin`) for `.exe` and `.cmd`
+///    binaries matching the agent name.
+#[must_use]
+pub fn find_agent_bin(agent: &str) -> Option<PathBuf> {
+    if let Some(path) = find_bin(agent) {
+        return Some(path);
+    }
+    #[cfg(target_os = "windows")]
+    {
+        return find_agent_in_windows_locations(agent);
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        None
+    }
+}
+
+#[cfg(target_os = "windows")]
+fn find_agent_in_windows_locations(agent: &str) -> Option<PathBuf> {
+    let home = dirs::home_dir()?;
+    let exe = format!("{agent}.exe");
+    let cmd = format!("{agent}.cmd");
+
+    let candidates: Vec<PathBuf> = vec![
+        home.join("AppData").join("Roaming").join("npm").join(&cmd),
+        home.join("AppData").join("Roaming").join("npm").join(&exe),
+        home.join("AppData").join("Local").join("pnpm").join(&cmd),
+        home.join("AppData").join("Local").join("pnpm").join(&exe),
+        home.join("scoop").join("shims").join(&exe),
+        home.join(".npm-global").join("bin").join(&cmd),
+        home.join(".npm-global").join("bin").join(&exe),
+        home.join(".npm").join("bin").join(&cmd),
+        home.join(".npm").join("bin").join(&exe),
+        home.join(".local").join("bin").join(&exe),
+        home.join(format!(".{agent}")).join("bin").join(&exe),
+        home.join(".local")
+            .join("share")
+            .join("mise")
+            .join("shims")
+            .join(&exe),
+        home.join(".asdf").join("shims").join(&exe),
+        home.join(".bun").join("bin").join(&exe),
+    ];
+
+    candidates.into_iter().find(|path| path.is_file())
+}
+
+/// Build a `std::process::Command` that does not flash a console window on
+/// Windows. On other platforms this is identical to `Command::new`.
+#[must_use]
+pub fn hidden_std_command(program: impl AsRef<OsStr>) -> std::process::Command {
+    let mut command = std::process::Command::new(program);
+    suppress_windows_console_std(&mut command);
+    command
+}
+
+#[cfg(target_os = "windows")]
+fn suppress_windows_console_std(command: &mut std::process::Command) {
+    use std::os::windows::process::CommandExt;
+    // CREATE_NO_WINDOW: prevents a console window from being created for the
+    // child process. https://learn.microsoft.com/windows/win32/procthread/process-creation-flags
+    const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+    command.creation_flags(CREATE_NO_WINDOW);
+}
+
+#[cfg(not(target_os = "windows"))]
+fn suppress_windows_console_std(_command: &mut std::process::Command) {}
+
+/// Apply the Windows `CREATE_NO_WINDOW` flag to a Tokio command so that
+/// spawning a child process does not flash a console window. Safe no-op on
+/// non-Windows targets.
+pub fn suppress_windows_console_tokio(_command: &mut tokio::process::Command) {
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        _command.creation_flags(CREATE_NO_WINDOW);
+    }
+}
+
 fn collect_search_paths() -> Vec<PathBuf> {
     let mut paths = Vec::new();
 

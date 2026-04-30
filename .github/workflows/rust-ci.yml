@@ -136,15 +136,10 @@ jobs:
             libxdo-dev \
             libssl-dev
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: "9"
+          bun-version: latest
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -155,11 +150,11 @@ jobs:
           workspaces: ". -> target"
 
       - name: Install frontend dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: bun install
         working-directory: frontend
 
       - name: Build frontend
-        run: pnpm build
+        run: bun run build
         working-directory: frontend
 
       - name: Build release binary

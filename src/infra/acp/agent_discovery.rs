@@ -133,7 +133,7 @@ impl CodexAgent {
                 label: "Codex".into(),
                 command: find_bin("npx"),
                 args: vec!["-y".into(), package],
-                available: crate::infra::shell::find_bin("codex").is_some(),
+                available: crate::infra::shell::find_agent_bin("codex").is_some(),
                 models,
                 supports_model_override: true,
             },
@@ -461,7 +461,7 @@ fn npx_candidate(
     AgentCandidate {
         id: id.into(),
         label: label.into(),
-        available: crate::infra::shell::find_bin(raw_bin).is_some(),
+        available: crate::infra::shell::find_agent_bin(raw_bin).is_some(),
         command: find_bin("npx"),
         args: vec!["-y".into(), package.into()],
         models: Vec::new(),
@@ -490,11 +490,14 @@ fn command_candidate(
         };
     }
 
+    let resolved =
+        crate::infra::shell::find_agent_bin(bin).map(|path| path.to_string_lossy().to_string());
+    let available = resolved.is_some();
     AgentCandidate {
         id: id.into(),
         label: label.into(),
-        command: find_bin(bin),
-        available: crate::infra::shell::find_bin(bin).is_some(),
+        command: resolved.or_else(|| find_bin(bin)),
+        available,
         args: args.iter().map(|arg| (*arg).to_string()).collect(),
         models: Vec::new(),
         supports_model_override: false,
