@@ -77,8 +77,8 @@ export function ResearchComposer({
   };
 
   return (
-    <div className="flex items-center justify-between gap-4">
-      <div className="flex items-center gap-3">
+    <div className="relative flex items-center justify-between gap-4 border-t border-[#edf0f4] px-4 py-3">
+      <div className="flex min-w-0 flex-wrap items-center gap-3">
         <AgentSelector
           agents={agents}
           selectedAgentId={agentId}
@@ -96,24 +96,24 @@ export function ResearchComposer({
             <button
               type="button"
               onClick={() => setState({ view: "settings" })}
-              className="inline-flex items-center gap-2 border border-dashed border-border px-3 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+              className="inline-flex h-8 items-center gap-2 rounded-[5px] border border-[#e4e7ec] bg-white px-3 text-[12px] font-medium text-[#495260] transition-colors hover:border-[#c9d3e2] hover:text-[#171b23]"
               title="No data sources enabled. Open Settings to turn some on."
             >
               <span>No sources</span>
-              <span aria-hidden className="h-3 w-px bg-border" />
-              <span>Enable in settings →</span>
+              <span aria-hidden className="h-3 w-px bg-[#d9dde5]" />
+              <span>Enable in settings</span>
             </button>
           ))}
       </div>
-      <div className="flex items-center gap-4">
-        <span className="hidden font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground/70 sm:inline">
+      <div className="flex shrink-0 items-center gap-4">
+        <span className="hidden font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground/60 xl:inline">
           {canRun ? "⌘ + ↵ to run" : ""}
         </span>
         <button
           type="button"
           disabled={!canRun}
           onClick={handleRun}
-          className="group inline-flex items-center gap-2 border border-foreground bg-foreground px-4 py-2 text-[13px] font-medium text-background transition-colors hover:bg-background hover:text-foreground disabled:border-border disabled:bg-transparent disabled:text-muted-foreground/60"
+          className="group inline-flex h-10 items-center gap-3 rounded-[6px] border border-[#155dff] bg-[#155dff] px-5 text-[14px] font-medium text-white transition-colors hover:bg-[#0d4ad6] disabled:border-[#dce2ec] disabled:bg-[#f5f7fb] disabled:text-[#9aa4b2]"
         >
           <span>Run analysis</span>
           <ArrowRight
@@ -125,7 +125,7 @@ export function ResearchComposer({
       </div>
 
       {(!selectedAgent?.available || localError) && (
-        <div className="absolute -top-10 right-0 flex items-center gap-2 text-xs text-destructive">
+        <div className="absolute -top-8 right-4 flex items-center gap-2 text-xs text-destructive">
           <WarningCircle size={14} />
           <span>
             {!selectedAgent?.available
