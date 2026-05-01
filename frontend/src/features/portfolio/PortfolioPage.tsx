@@ -1,6 +1,8 @@
 import {
   CaretDown,
+  ChartPieSlice,
   CircleNotch,
+  Database,
   DotsThree,
   FileArrowUp,
   SpinnerGap,
@@ -16,7 +18,6 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { AgentModelOptions, hasAgentModelChoices } from "@/components/Agent/AgentModelOptions";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +27,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Eyebrow, SectionHeader } from "@/components/ui/editorial";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -130,9 +130,9 @@ export function PortfolioPage({ agents, onSelectAnalysis }: PortfolioPageProps) 
   };
 
   return (
-    <main className="flex h-full min-h-0 flex-col overflow-hidden">
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-5xl px-5 pb-12 pt-12 md:px-8">
+    <div className="relative flex h-full min-h-0 flex-col bg-[#fbfbfa]">
+      <div className="flex-1 overflow-y-auto">
+        <div className="w-full px-6 pb-12 pt-5 lg:px-8">
           {selectedPortfolio ? (
             <PortfolioView
               detail={selectedPortfolio}
@@ -150,7 +150,7 @@ export function PortfolioPage({ agents, onSelectAnalysis }: PortfolioPageProps) 
           )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -166,40 +166,56 @@ function EmptyCreate({
   onCreate: () => void;
 }) {
   return (
-    <section className="space-y-5">
-      <Eyebrow>Portfolio workspace</Eyebrow>
-      <h1 className="max-w-[760px] text-[42px] font-semibold leading-[0.98] md:text-[64px]">
-        Create a portfolio.
-      </h1>
-      <p className="max-w-[62ch] text-[15px] leading-[1.65] text-muted-foreground">
-        Set up a portfolio, paste or upload the current holdings snapshot, and run portfolio-level
-        research when you want it.
-      </p>
-      <div className="flex flex-wrap items-end gap-3 pt-1">
-        <div className="space-y-2">
-          <FieldLabel label="Base currency" />
-          <Select value={currency} onValueChange={onCurrencyChange}>
-            <SelectTrigger className="h-10 w-[140px] rounded-none font-mono uppercase shadow-none">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {CURRENCY_OPTIONS.map((code) => (
-                <SelectItem key={code} value={code} className="font-mono">
-                  {code}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    <section className="relative min-h-[360px] overflow-hidden">
+      <div className="relative z-10 flex min-h-[360px] flex-col justify-center px-8 py-9 sm:px-11 lg:w-[62%] xl:w-[58%]">
+        <p className="mb-4 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3572ad]">
+          Portfolio workspace
+        </p>
+        <h1 className="max-w-[560px] text-[44px] font-semibold leading-[1.02] tracking-[-0.035em] text-[#111827] sm:text-[52px]">
+          Create a portfolio.
+        </h1>
+        <p className="mt-5 max-w-[520px] text-[14.5px] leading-[1.55] text-[#3f4653]">
+          Set up a portfolio, paste or upload the current holdings snapshot, and run portfolio-level
+          research when you want it.
+        </p>
+        <div className="mt-7 flex flex-wrap items-center gap-3">
+          <div className="space-y-1">
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              Base currency
+            </span>
+            <Select value={currency} onValueChange={onCurrencyChange}>
+              <SelectTrigger className="h-10 w-[140px] rounded-[6px] border border-[#dfe5ee] bg-white/80 font-mono uppercase shadow-none hover:border-[#cbd5e1] hover:bg-white data-[state=open]:border-[#155dff]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCY_OPTIONS.map((code) => (
+                  <SelectItem key={code} value={code} className="font-mono">
+                    {code}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={onCreate}
+            className="inline-flex h-10 items-center gap-3 rounded-[6px] border border-[#155dff] bg-[#155dff] px-5 text-[14px] font-medium text-white transition-colors hover:bg-[#0d4ad6] disabled:border-[#dfe5ee] disabled:bg-[#f1f5ff] disabled:text-[#155dff]/35"
+          >
+            {disabled && <SpinnerGap size={14} className="animate-spin" />}
+            Create a portfolio
+          </button>
         </div>
-        <Button
-          type="button"
-          disabled={disabled}
-          onClick={onCreate}
-          className="h-10 rounded-none border border-foreground bg-foreground text-background shadow-none hover:bg-background hover:text-foreground"
-        >
-          {disabled && <SpinnerGap size={14} className="animate-spin" />}
-          Create a portfolio
-        </Button>
+        <div className="mt-6 flex flex-wrap gap-2.5 lg:flex-nowrap">
+          <span className="inline-flex h-9 shrink-0 items-center gap-2 rounded-[5px] border border-[#dde6f2] bg-white/75 px-3 text-[12px] font-medium text-[#1c2430]">
+            <ChartPieSlice size={17} weight="duotone" className="text-[#155dff]" />
+            Portfolio tracking
+          </span>
+          <span className="inline-flex h-9 shrink-0 items-center gap-2 rounded-[5px] border border-[#dde6f2] bg-white/75 px-3 text-[12px] font-medium text-[#1c2430]">
+            <Database size={17} weight="duotone" className="text-[#155dff]" />
+            Holdings snapshot
+          </span>
+        </div>
       </div>
     </section>
   );
@@ -400,7 +416,9 @@ function PortfolioView({
     <div className="space-y-10">
       <header className="flex flex-wrap items-start justify-between gap-6">
         <div className="min-w-0 space-y-3">
-          <Eyebrow>Portfolio</Eyebrow>
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3572ad]">
+            Portfolio
+          </p>
           {editingName ? (
             <div className="space-y-1">
               <Input
@@ -410,10 +428,10 @@ function PortfolioView({
                 onBlur={() => void commitRename()}
                 onKeyDown={handleNameKeyDown}
                 disabled={renameMutation.isPending}
-                className="h-auto max-w-[640px] rounded-none border-0 border-b border-border bg-transparent p-0 text-[34px] font-semibold leading-[1.02] tracking-[-0.02em] shadow-none focus-visible:border-foreground focus-visible:ring-0 md:text-[48px]"
+                className="h-auto max-w-[640px] rounded-[6px] border border-[#155dff] bg-white p-3 text-[34px] font-semibold leading-[1.02] tracking-[-0.02em] text-[#111827] shadow-none focus-visible:border-[#155dff] focus-visible:ring-0 md:text-[48px]"
                 aria-label="Portfolio name"
               />
-              <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+              <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
                 ↵ save · esc cancel
               </div>
             </div>
@@ -421,10 +439,10 @@ function PortfolioView({
             <button
               type="button"
               onClick={() => setEditingName(true)}
-              className="group block max-w-[640px] truncate text-left text-[34px] font-semibold leading-[1.02] tracking-[-0.02em] text-foreground hover:text-foreground md:text-[48px]"
+              className="group block max-w-[640px] truncate text-left text-[34px] font-semibold leading-[1.02] tracking-[-0.02em] text-[#111827] hover:text-[#155dff] md:text-[48px]"
               title="Click to rename"
             >
-              <span className="border-b border-transparent group-hover:border-border">
+              <span className="border-b border-transparent group-hover:border-[#155dff]">
                 {detail.portfolio.name}
               </span>
             </button>
@@ -455,27 +473,33 @@ function PortfolioView({
       </header>
 
       {!hasAnyAvailableAgent && (
-        <div className="flex items-center gap-2 text-xs text-destructive">
+        <div className="flex items-center gap-2 rounded-[6px] border border-[#f0a8a8] bg-[#fff5f5] px-4 py-3 text-xs text-[#c0392b]">
           <WarningCircle size={14} />
           <span>Configure an ACP agent binary in Settings before running analysis.</span>
         </div>
       )}
 
       <section className="space-y-5">
-        <SectionHeader number="01" label="Holdings" title="Current allocation" />
+        <div className="flex items-center gap-4">
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            01 · Holdings
+          </span>
+          <div className="h-px flex-1 bg-[#dfe5ee]" />
+          <span className="text-[13px] font-medium text-[#111827]">Current allocation</span>
+        </div>
         {loading ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 rounded-[10px] border border-[#e7e9ee] bg-white px-5 py-4 text-sm text-[#3f4653]">
             <SpinnerGap size={14} className="animate-spin" />
             Loading
           </div>
         ) : sortedHoldings.length === 0 ? (
-          <div className="border-t border-border py-6 text-sm leading-[1.6] text-muted-foreground">
+          <div className="rounded-[10px] border border-[#e7e9ee] bg-white px-5 py-6 text-sm leading-[1.6] text-[#3f4653]">
             Update the snapshot to build the holdings view.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <div className="min-w-[700px] divide-y divide-border border-t border-border">
-              <div className="grid grid-cols-[minmax(150px,1.2fr)_80px_100px_100px_120px_90px] gap-3 py-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+          <div className="overflow-x-auto rounded-[10px] border border-[#e7e9ee] bg-white">
+            <div className="min-w-[700px]">
+              <div className="grid grid-cols-[minmax(150px,1.2fr)_80px_100px_100px_120px_90px] gap-3 border-b border-[#e7e9ee] px-5 py-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
                 <span>Instrument</span>
                 <span className="text-right">30d</span>
                 <span className="text-right">Qty</span>
@@ -501,25 +525,29 @@ function PortfolioView({
       />
 
       <section className="space-y-5">
-        <SectionHeader number="03" label="Snapshot" title="Update current holdings" />
-        <div className="space-y-3 border-t border-border pt-5">
+        <div className="flex items-center gap-4">
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            03 · Snapshot
+          </span>
+          <div className="h-px flex-1 bg-[#dfe5ee]" />
+          <span className="text-[13px] font-medium text-[#111827]">Update current holdings</span>
+        </div>
+        <div className="rounded-[10px] border border-[#e7e9ee] bg-white p-5">
           <textarea
             value={snapshotText}
             onChange={(event) => setSnapshotText(event.target.value)}
             placeholder={placeholder}
-            className="min-h-[180px] w-full border border-border bg-transparent p-3 font-mono text-[12.5px] leading-[1.5] shadow-none outline-none focus:border-foreground"
+            className="min-h-[180px] w-full rounded-[6px] border border-[#dfe5ee] bg-[#fbfbfa] p-3 font-mono text-[12.5px] leading-[1.5] text-[#111827] shadow-none outline-none focus:border-[#155dff] placeholder:text-[#3f4653]/50"
           />
-          <div className="flex flex-wrap items-center gap-3">
-            <Button
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
               onClick={() => fileInputRef.current?.click()}
-              className="h-9 rounded-none border border-border shadow-none"
+              className="inline-flex h-9 items-center gap-2 rounded-[6px] border border-[#dfe5ee] bg-white/80 px-4 text-[13px] font-medium text-[#171b23] transition-colors hover:border-[#cbd5e1] hover:bg-white"
             >
               <FileArrowUp size={14} />
               Upload CSV
-            </Button>
+            </button>
             <input
               ref={fileInputRef}
               type="file"
@@ -527,15 +555,15 @@ function PortfolioView({
               className="hidden"
               onChange={handleFile}
             />
-            <Button
+            <button
               type="button"
               disabled={importCsvMutation.isPending || snapshotText.trim().length === 0}
               onClick={handleUpdate}
-              className="h-9 rounded-none border border-foreground bg-foreground text-background shadow-none hover:bg-background hover:text-foreground"
+              className="inline-flex h-9 items-center gap-2 rounded-[6px] border border-[#155dff] bg-[#155dff] px-5 text-[13px] font-medium text-white transition-colors hover:bg-[#0d4ad6] disabled:border-[#dfe5ee] disabled:bg-[#f1f5ff] disabled:text-[#155dff]/35"
             >
               {importCsvMutation.isPending && <SpinnerGap size={14} className="animate-spin" />}
               Update snapshot
-            </Button>
+            </button>
           </div>
         </div>
       </section>
@@ -558,9 +586,9 @@ function PortfolioMeta({
   // "no snapshot yet" — everything else is noise.
   if (holdingCount === 0) {
     return (
-      <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
         <span>{baseCurrency}</span>
-        <span aria-hidden className="text-muted-foreground/50">
+        <span aria-hidden className="text-[#3f4653]/40">
           ·
         </span>
         <span>No snapshot yet</span>
@@ -580,11 +608,11 @@ function PortfolioMeta({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
         {segments.map((segment, index) => (
           <span key={segment} className="flex items-center gap-3">
             {index > 0 && (
-              <span aria-hidden className="text-muted-foreground/50">
+              <span aria-hidden className="text-[#3f4653]/40">
                 ·
               </span>
             )}
@@ -593,11 +621,11 @@ function PortfolioMeta({
         ))}
       </div>
       {totals.length > 1 && (
-        <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground/60">
+        <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]/50">
           {totals.map(([code, sum], index) => (
             <span key={code} className="flex items-center gap-3">
               {index > 0 && (
-                <span aria-hidden className="text-muted-foreground/30">
+                <span aria-hidden className="text-[#3f4653]/20">
                   ·
                 </span>
               )}
@@ -622,19 +650,17 @@ function PortfolioOverflowMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
           aria-label="Portfolio actions"
-          className="h-10 w-10 rounded-none border border-transparent p-0 shadow-none hover:border-border hover:bg-transparent data-[state=open]:border-border"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-[6px] border border-[#dfe5ee] bg-white/80 text-[#3f4653] transition-colors hover:border-[#cbd5e1] hover:bg-white data-[state=open]:border-[#155dff] data-[state=open]:bg-white"
         >
           <DotsThree size={18} weight="bold" />
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-[180px] rounded-md border-border bg-popover/95 p-1 shadow-md backdrop-blur-xl"
+        className="w-[180px] rounded-[10px] border border-[#e7e9ee] bg-white/95 p-1 shadow-[0_8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl"
       >
         <DropdownMenuItem
           onSelect={() => {
@@ -674,20 +700,20 @@ function RunAnalysisMenu({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild disabled={disabled}>
-        <Button
+      <DropdownMenuTrigger asChild>
+        <button
           type="button"
           disabled={disabled}
-          className="h-10 rounded-none border border-foreground bg-foreground text-background shadow-none hover:bg-background hover:text-foreground disabled:border-border disabled:bg-transparent disabled:text-muted-foreground/60"
+          className="inline-flex h-10 items-center gap-2 rounded-[6px] border border-[#155dff] bg-[#155dff] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#0d4ad6] disabled:border-[#dfe5ee] disabled:bg-[#f1f5ff] disabled:text-[#155dff]/35"
         >
           {running && <SpinnerGap size={14} className="animate-spin" />}
           <span>Run analysis</span>
           <CaretDown size={12} weight="bold" className="ml-1" />
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-[240px] rounded-md border-border bg-popover/95 p-1 shadow-md backdrop-blur-xl"
+        className="w-[240px] rounded-[10px] border border-[#e7e9ee] bg-white/95 p-1 shadow-[0_8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl"
       >
         {availableAgents.length === 0 && (
           <DropdownMenuItem disabled className="text-xs text-muted-foreground">
@@ -757,29 +783,31 @@ function HoldingRow({
       : null;
   const currency = holding.currency || baseCurrency;
   return (
-    <div className="grid grid-cols-[minmax(150px,1.2fr)_80px_100px_100px_120px_90px] items-center gap-3 py-3 text-[13px]">
+    <div className="grid grid-cols-[minmax(150px,1.2fr)_80px_100px_100px_120px_90px] items-center gap-3 border-t border-[#e7e9ee] px-5 py-3.5 text-[13px]">
       <div className="min-w-0">
         <div className="flex items-baseline gap-2">
-          <span className="truncate font-medium">{holding.symbol}</span>
+          <span className="truncate font-medium text-[#111827]">{holding.symbol}</span>
           {holding.market && (
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
               {holding.market}
             </span>
           )}
         </div>
-        <div className="truncate text-xs text-muted-foreground">
+        <div className="truncate text-xs text-[#3f4653]/70">
           {holding.name ?? holding.asset_type}
         </div>
       </div>
       <HoldingSparkline symbol={holding.symbol} market={holding.market} />
-      <span className="text-right font-mono tabular-nums">{formatNumber(holding.quantity)}</span>
-      <span className="text-right font-mono tabular-nums">
+      <span className="text-right font-mono tabular-nums text-[#111827]">
+        {formatNumber(holding.quantity)}
+      </span>
+      <span className="text-right font-mono tabular-nums text-[#111827]">
         {price !== null ? formatMoney(price, currency) : "—"}
       </span>
-      <span className="text-right font-mono tabular-nums">
+      <span className="text-right font-mono tabular-nums text-[#111827]">
         {holding.market_value !== null ? formatMoney(holding.market_value, currency) : "—"}
       </span>
-      <span className="text-right font-mono tabular-nums">
+      <span className="text-right font-mono tabular-nums text-[#111827]">
         {holding.allocation_pct !== null ? formatPercent(holding.allocation_pct) : "—"}
       </span>
     </div>
@@ -801,13 +829,19 @@ function PortfolioAnalysesSection({
 
   return (
     <section className="space-y-5">
-      <SectionHeader number="02" label="Analyses" title="Linked research" />
+      <div className="flex items-center gap-4">
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          02 · Analyses
+        </span>
+        <div className="h-px flex-1 bg-[#dfe5ee]" />
+        <span className="text-[13px] font-medium text-[#111827]">Linked research</span>
+      </div>
       {linked.length === 0 ? (
-        <div className="border-t border-border py-6 text-sm leading-[1.6] text-muted-foreground">
+        <div className="rounded-[10px] border border-[#e7e9ee] bg-white px-5 py-6 text-sm leading-[1.6] text-[#3f4653]">
           No analyses yet. Run one with the "Run analysis" action above.
         </div>
       ) : (
-        <div className="divide-y divide-border border-t border-border">
+        <div className="overflow-hidden rounded-[10px] border border-[#e7e9ee] bg-white">
           {linked.map((analysis) => (
             <AnalysisRow
               key={analysis.id}
@@ -830,24 +864,24 @@ function AnalysisRow({ analysis, onSelect }: { analysis: AnalysisSummary; onSele
     <button
       type="button"
       onClick={onSelect}
-      className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4 py-3 text-left transition-colors hover:bg-muted/30"
+      className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-t border-[#e7e9ee] px-5 py-3.5 text-left transition-colors hover:bg-[#f5f7fa] first:border-0"
     >
       <div className="min-w-0">
-        <div className="truncate text-[14px] font-medium">{analysis.title}</div>
-        <div className="mt-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+        <div className="truncate text-[14px] font-medium text-[#111827]">{analysis.title}</div>
+        <div className="mt-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
           {formatDate(analysis.updated_at)}
-          <span aria-hidden className="mx-2 text-muted-foreground/50">
+          <span aria-hidden className="mx-2 text-[#3f4653]/40">
             ·
           </span>
           <span className="tabular-nums">{String(analysis.block_count).padStart(2, "0")}b</span>
-          <span aria-hidden className="mx-2 text-muted-foreground/50">
+          <span aria-hidden className="mx-2 text-[#3f4653]/40">
             ·
           </span>
           <span className="tabular-nums">{String(analysis.source_count).padStart(2, "0")}s</span>
         </div>
       </div>
       <span
-        className={`flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] ${running ? "text-primary" : "text-muted-foreground"}`}
+        className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] ${running ? "bg-[#e4ecff] text-[#155dff]" : "bg-[#f1f5ff] text-[#3f4653]"}`}
       >
         {running && <CircleNotch size={10} className="animate-spin" />}
         {statusText}
