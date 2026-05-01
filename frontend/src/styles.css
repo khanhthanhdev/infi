@@ -775,6 +775,11 @@
   will-change: transform;
 }
 
+.report-shell-scroll {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 .report-surface {
   background: var(--background);
 }
