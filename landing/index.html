@@ -950,54 +950,165 @@
                         class="font-mono text-[11px] uppercase tracking-[0.18em] text-muted/80 mb-12"
                     >
                         macOS (Apple Silicon &amp; Intel) &middot; Linux x86_64
-                        &middot; Windows not yet
+                        &middot; Windows x64
                     </p>
 
                     <div
-                        id="install-block"
-                        role="button"
-                        tabindex="0"
-                        aria-label="Copy install command to clipboard"
-                        class="relative group cursor-pointer select-none text-left bg-ink text-paper px-5 md:px-7 py-5 font-mono text-[13px] md:text-[14px] flex items-center justify-between gap-4 mb-8"
+                        class="flex flex-col gap-3 text-left mb-8"
+                        role="list"
+                        aria-label="Install commands by platform"
                     >
-                        <div
-                            class="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide"
+                        <button
+                            type="button"
+                            class="install-block relative group cursor-pointer select-none bg-ink text-paper px-5 md:px-7 py-4 font-mono text-[13px] md:text-[14px] flex items-center justify-between gap-4 w-full"
+                            data-install-cmd="brew install --cask puemos/tap/infi"
+                            aria-label="Copy macOS install command"
+                            role="listitem"
                         >
                             <span
-                                class="text-gold select-none"
+                                class="font-mono text-[10px] uppercase tracking-[0.2em] text-paper/60 shrink-0 w-16"
+                                >macOS</span
+                            >
+                            <div
+                                class="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide flex-1"
+                            >
+                                <span
+                                    class="text-gold select-none"
+                                    aria-hidden="true"
+                                    >$</span
+                                >
+                                <span class="whitespace-nowrap"
+                                    >brew install --cask puemos/tap/infi</span
+                                >
+                            </div>
+                            <span
                                 aria-hidden="true"
-                                >$</span
+                                class="copy-label font-mono text-[11px] uppercase tracking-[0.2em] text-paper/50 group-hover:text-gold transition-colors shrink-0"
+                                >Copy</span
                             >
-                            <span class="whitespace-nowrap"
-                                >brew install --cask puemos/tap/infi</span
-                            >
-                        </div>
-                        <span
-                            aria-hidden="true"
-                            class="font-mono text-[11px] uppercase tracking-[0.2em] text-paper/50 group-hover:text-gold transition-colors shrink-0"
-                            >Copy</span
+                        </button>
+
+                        <button
+                            type="button"
+                            class="install-block relative group cursor-pointer select-none bg-ink text-paper px-5 md:px-7 py-4 font-mono text-[13px] md:text-[14px] flex items-center justify-between gap-4 w-full"
+                            data-install-cmd="curl -fsSL https://puemos.github.io/infi/install.sh | sh"
+                            aria-label="Copy Linux install command"
+                            role="listitem"
                         >
+                            <span
+                                class="font-mono text-[10px] uppercase tracking-[0.2em] text-paper/60 shrink-0 w-16"
+                                >Linux</span
+                            >
+                            <div
+                                class="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide flex-1"
+                            >
+                                <span
+                                    class="text-gold select-none"
+                                    aria-hidden="true"
+                                    >$</span
+                                >
+                                <span class="whitespace-nowrap"
+                                    >curl -fsSL
+                                    https://puemos.github.io/infi/install.sh |
+                                    sh</span
+                                >
+                            </div>
+                            <span
+                                aria-hidden="true"
+                                class="copy-label font-mono text-[11px] uppercase tracking-[0.2em] text-paper/50 group-hover:text-gold transition-colors shrink-0"
+                                >Copy</span
+                            >
+                        </button>
+
+                        <button
+                            type="button"
+                            class="install-block relative group cursor-pointer select-none bg-ink text-paper px-5 md:px-7 py-4 font-mono text-[13px] md:text-[14px] flex items-center justify-between gap-4 w-full"
+                            data-install-cmd="winget install puemos.Infi"
+                            aria-label="Copy Windows winget install command"
+                            role="listitem"
+                        >
+                            <span
+                                class="font-mono text-[10px] uppercase tracking-[0.2em] text-paper/60 shrink-0 w-16"
+                                >Windows</span
+                            >
+                            <div
+                                class="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide flex-1"
+                            >
+                                <span
+                                    class="text-gold select-none"
+                                    aria-hidden="true"
+                                    >&gt;</span
+                                >
+                                <span class="whitespace-nowrap"
+                                    >winget install puemos.Infi</span
+                                >
+                            </div>
+                            <span
+                                aria-hidden="true"
+                                class="copy-label font-mono text-[11px] uppercase tracking-[0.2em] text-paper/50 group-hover:text-gold transition-colors shrink-0"
+                                >Copy</span
+                            >
+                        </button>
+
+                        <button
+                            type="button"
+                            class="install-block relative group cursor-pointer select-none bg-ink text-paper px-5 md:px-7 py-4 font-mono text-[13px] md:text-[14px] flex items-center justify-between gap-4 w-full"
+                            data-install-cmd="irm https://puemos.github.io/infi/install.ps1 | iex"
+                            aria-label="Copy Windows PowerShell install command"
+                            role="listitem"
+                        >
+                            <span
+                                class="font-mono text-[10px] uppercase tracking-[0.2em] text-paper/60 shrink-0 w-16"
+                                >Windows</span
+                            >
+                            <div
+                                class="flex items-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide flex-1"
+                            >
+                                <span
+                                    class="text-gold select-none"
+                                    aria-hidden="true"
+                                    >&gt;</span
+                                >
+                                <span class="whitespace-nowrap"
+                                    >irm
+                                    https://puemos.github.io/infi/install.ps1 |
+                                    iex</span
+                                >
+                            </div>
+                            <span
+                                aria-hidden="true"
+                                class="copy-label font-mono text-[11px] uppercase tracking-[0.2em] text-paper/50 group-hover:text-gold transition-colors shrink-0"
+                                >Copy</span
+                            >
+                        </button>
+
                         <span
                             id="copy-feedback"
-                            class="absolute -top-8 left-1/2 -translate-x-1/2 bg-violet text-paper font-mono text-[10px] uppercase tracking-[0.2em] px-2 py-1 opacity-0 transition-opacity whitespace-nowrap pointer-events-none"
+                            class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-violet text-paper font-mono text-[10px] uppercase tracking-[0.2em] px-3 py-2 opacity-0 transition-opacity whitespace-nowrap pointer-events-none z-50"
                             >Copied</span
                         >
                     </div>
 
                     <div
-                        class="flex flex-col sm:flex-row justify-center gap-3 mb-8"
+                        class="flex flex-col sm:flex-row flex-wrap justify-center gap-3 mb-8"
                     >
                         <a
-                            href="https://github.com/puemos/infi/releases"
+                            href="https://github.com/puemos/infi/releases/latest"
                             class="inline-flex items-center justify-center gap-2 border border-rule bg-transparent text-ink hover:border-violet hover:text-violet px-5 py-3 text-[13px] font-medium tracking-[0.01em] transition-colors"
                         >
                             Download for macOS
                         </a>
                         <a
-                            href="https://github.com/puemos/infi/releases"
+                            href="https://github.com/puemos/infi/releases/latest"
                             class="inline-flex items-center justify-center gap-2 border border-rule bg-transparent text-ink hover:border-violet hover:text-violet px-5 py-3 text-[13px] font-medium tracking-[0.01em] transition-colors"
                         >
-                            Download for Linux
+                            Download AppImage
+                        </a>
+                        <a
+                            href="https://github.com/puemos/infi/releases/latest"
+                            class="inline-flex items-center justify-center gap-2 border border-rule bg-transparent text-ink hover:border-violet hover:text-violet px-5 py-3 text-[13px] font-medium tracking-[0.01em] transition-colors"
+                        >
+                            Download for Windows
                         </a>
                     </div>
 
@@ -1059,10 +1170,9 @@
 
         <script>
             (function () {
-                const block = document.getElementById("install-block");
+                const blocks = document.querySelectorAll(".install-block");
                 const feedback = document.getElementById("copy-feedback");
-                if (!block || !feedback) return;
-                const cmd = "brew install --cask puemos/tap/infi";
+                if (!blocks.length || !feedback) return;
                 let hideTimer = null;
 
                 function showCopied() {
@@ -1075,7 +1185,7 @@
                     }, 1600);
                 }
 
-                async function copy() {
+                async function copyText(cmd) {
                     try {
                         if (navigator.clipboard && window.isSecureContext) {
                             await navigator.clipboard.writeText(cmd);
@@ -1096,12 +1206,18 @@
                     }
                 }
 
-                block.addEventListener("click", copy);
-                block.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        copy();
-                    }
+                blocks.forEach(function (block) {
+                    const cmd = block.getAttribute("data-install-cmd");
+                    if (!cmd) return;
+                    block.addEventListener("click", function () {
+                        copyText(cmd);
+                    });
+                    block.addEventListener("keydown", function (e) {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            copyText(cmd);
+                        }
+                    });
                 });
             })();
         </script>

@@ -151,6 +151,30 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  publish-winget:
+    name: Submit to winget-pkgs
+    needs: release
+    runs-on: windows-latest
+    # Requires repo variable WINGET_PUBLISH=true and a fine-grained PAT in
+    # secrets.WINGET_TOKEN with `public_repo` scope on a fork of microsoft/winget-pkgs.
+    # See: https://github.com/vedantmgoyal9/winget-releaser
+    if: ${{ vars.WINGET_PUBLISH == 'true' }}
+    steps:
+      - name: Get version
+        id: release
+        shell: bash
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Submit package to winget-pkgs
+        uses: vedantmgoyal9/winget-releaser@main
+        with:
+          identifier: puemos.Infi
+          version: ${{ steps.release.outputs.version }}
+          # Tauri NSIS installer asset name (x64-setup.exe).
+          installers-regex: '_x64-setup\.exe$'
+          release-tag: ${{ github.ref_name }}
+          token: ${{ secrets.WINGET_TOKEN }}
+
   publish-homebrew:
     name: Bump Homebrew Tap
     needs: release
