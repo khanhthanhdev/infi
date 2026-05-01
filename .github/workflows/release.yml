@@ -48,12 +48,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: "macos-latest"
-            args: "--target aarch64-apple-darwin"
-            rust-targets: "aarch64-apple-darwin,x86_64-apple-darwin"
-          - platform: "macos-latest"
-            args: "--target x86_64-apple-darwin"
-            rust-targets: "aarch64-apple-darwin,x86_64-apple-darwin"
+          # - platform: "macos-latest"
+          #   args: "--target aarch64-apple-darwin"
+          #   rust-targets: "aarch64-apple-darwin,x86_64-apple-darwin"
+          # - platform: "macos-latest"
+          #   args: "--target x86_64-apple-darwin"
+          #   rust-targets: "aarch64-apple-darwin,x86_64-apple-darwin"
           - platform: "ubuntu-24.04"
             args: ""
             rust-targets: ""
@@ -125,31 +125,7 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
 
-      - name: Create Linux tarball
-        if: matrix.platform == 'ubuntu-24.04'
-        run: |
-          # Find the binary in the Tauri build output
-          BINARY_PATH=$(find target/release -name "infi" -type f -executable | head -n 1)
 
-          if [ -z "$BINARY_PATH" ]; then
-            echo "Error: Could not find infi binary"
-            exit 1
-          fi
-
-          # Create tarball
-          mkdir -p dist
-          tar -czf dist/infi-linux.tar.gz -C $(dirname "$BINARY_PATH") $(basename "$BINARY_PATH")
-
-          echo "Created tarball: dist/infi-linux.tar.gz"
-          ls -lh dist/infi-linux.tar.gz
-
-      - name: Upload Linux tarball to release
-        if: matrix.platform == 'ubuntu-24.04'
-        uses: softprops/action-gh-release@v1
-        with:
-          files: dist/infi-linux.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-winget:
     name: Submit to winget-pkgs
