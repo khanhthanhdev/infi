@@ -105,6 +105,7 @@ Write concise, high-signal blocks:
 - Body: readable markdown with 2-5 short paragraphs or bullets.
 - Evidence: include `evidence_ids` that map to submitted source IDs.
 - Confidence and importance must be explicit. Out-of-range or missing values reject the submission.
+- Number highlighting: wrap every numeric value in `[[...]]` markers so the renderer can display them in a highlighted, easy-to-read style (e.g., "Revenue grew to **[[12.5]]B**" or "P/E ratio of **[[18]]x**"). Use `[[N]]` for integers, `[[N.M]]` for decimals. This applies to all numbers in body text, bullets, and paragraphs — not in structured artifact tables where numeric values are already explicit.
 </block_quality>
 
 <artifact_quality>

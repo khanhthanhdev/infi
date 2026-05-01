@@ -132,7 +132,7 @@ export function AnalysisPage({ agents }: AnalysisPageProps) {
 
   if (!selectedAnalysisId) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+      <div className="flex h-full items-center justify-center text-sm text-[#3f4653]">
         No analysis selected.
       </div>
     );
@@ -150,19 +150,19 @@ export function AnalysisPage({ agents }: AnalysisPageProps) {
         introLabel="Analysis"
         isRunning={isRunning}
         controls={
-          <TabsList className="h-auto w-fit gap-6 rounded-none bg-transparent p-0">
+          <TabsList className="h-auto w-fit gap-6 rounded-[6px] bg-[#f1f5ff] p-1">
             <TabsTrigger
               value="report"
-              className="h-auto flex-none rounded-none border-0 border-b-2 border-transparent bg-transparent px-0 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground shadow-none data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+              className="h-auto flex-none rounded-[5px] border-0 bg-transparent px-4 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-[#3f4653] shadow-none data-[state=active]:bg-white data-[state=active]:text-[#111827] data-[state=active]:shadow-none"
             >
               Report
             </TabsTrigger>
             <TabsTrigger
               value="agent"
-              className="h-auto flex-none rounded-none border-0 border-b-2 border-transparent bg-transparent px-0 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground shadow-none data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+              className="h-auto flex-none rounded-[5px] border-0 bg-transparent px-4 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-[#3f4653] shadow-none data-[state=active]:bg-white data-[state=active]:text-[#111827] data-[state=active]:shadow-none"
             >
               Agent
-              {isRunning && <Dot className="-ml-0.5 size-1.5 animate-pulse bg-blue-500" />}
+              {isRunning && <Dot className="-ml-0.5 size-1.5 animate-pulse bg-[#155dff]" />}
             </TabsTrigger>
           </TabsList>
         }
@@ -172,14 +172,14 @@ export function AnalysisPage({ agents }: AnalysisPageProps) {
               <button
                 type="button"
                 onClick={copyMarkdown}
-                className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                className="inline-flex items-center gap-1.5 text-[#3f4653] transition-colors hover:text-[#111827]"
               >
                 <Copy size={13} />
                 <span>{copyState || "Copy as markdown"}</span>
               </button>
-              <span aria-hidden className="h-3 w-px bg-border" />
+              <span aria-hidden className="h-3 w-px bg-[#dfe5ee]" />
               <DropdownMenu>
-                <DropdownMenuTrigger className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors outline-none hover:text-foreground data-[state=open]:text-foreground">
+                <DropdownMenuTrigger className="inline-flex items-center gap-1.5 text-[#3f4653] transition-colors outline-none hover:text-[#111827] data-[state=open]:text-[#111827]">
                   <DownloadSimple size={13} />
                   <span>{exportState || "Export"}</span>
                   <CaretDown size={11} />
@@ -187,18 +187,18 @@ export function AnalysisPage({ agents }: AnalysisPageProps) {
                 <DropdownMenuContent
                   align="end"
                   sideOffset={8}
-                  className="w-[320px] min-w-[320px] rounded-none border border-border bg-background p-0 shadow-none"
+                  className="w-[320px] min-w-[320px] rounded-[10px] border border-[#e7e9ee] bg-white/95 p-0 shadow-[0_8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl"
                 >
                   <DropdownMenuItem
                     onSelect={() => {
                       void exportHtml();
                     }}
-                    className="flex items-start gap-3 rounded-none border-b border-border px-3 py-3 focus:bg-muted/60"
+                    className="flex items-start gap-3 rounded-[6px] border-b border-[#e7e9ee] px-4 py-4 focus:bg-[#f5f7fa]"
                   >
-                    <DownloadSimple size={15} className="mt-[3px] shrink-0 text-foreground" />
+                    <DownloadSimple size={15} className="mt-[3px] shrink-0 text-[#111827]" />
                     <div className="flex min-w-0 flex-col gap-0.5">
-                      <span className="text-[13px] font-medium text-foreground">Save as file…</span>
-                      <span className="text-[11px] leading-[1.45] text-muted-foreground">
+                      <span className="text-[13px] font-medium text-[#111827]">Save as file…</span>
+                      <span className="text-[11px] leading-[1.45] text-[#3f4653]">
                         Local HTML — stays on your machine.
                       </span>
                     </div>
@@ -207,30 +207,30 @@ export function AnalysisPage({ agents }: AnalysisPageProps) {
                     onSelect={() => {
                       void publishHtml();
                     }}
-                    className="flex items-start gap-3 rounded-none px-3 py-3 focus:bg-muted/60"
+                    className="flex items-start gap-3 rounded-[6px] px-4 py-4 focus:bg-[#f5f7fa]"
                   >
-                    <UploadSimple size={15} className="mt-[3px] shrink-0 text-foreground" />
+                    <UploadSimple size={15} className="mt-[3px] shrink-0 text-[#111827]" />
                     <div className="flex min-w-0 flex-col gap-0.5">
-                      <span className="text-[13px] font-medium text-foreground">
+                      <span className="text-[13px] font-medium text-[#111827]">
                         Publish via PageDrop.io
                       </span>
-                      <span className="text-[11px] leading-[1.45] text-muted-foreground">
+                      <span className="text-[11px] leading-[1.45] text-[#3f4653]">
                         Third-party host — anyone with the link can read.
                       </span>
                     </div>
                   </DropdownMenuItem>
-                  <p className="border-t border-border bg-muted/30 px-3 py-2.5 text-[10.5px] leading-[1.45] text-muted-foreground">
+                  <p className="border-t border-[#e7e9ee] bg-[#f5f7fa] px-4 py-3 text-[10.5px] leading-[1.45] text-[#3f4653]">
                     Publish uploads your report HTML to PageDrop.io, a third-party service not
                     operated by Infi. The host can read the contents. Use Save if that's not
                     acceptable.
                   </p>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <span aria-hidden className="h-3 w-px bg-border" />
+              <span aria-hidden className="h-3 w-px bg-[#dfe5ee]" />
               <button
                 type="button"
                 onClick={remove}
-                className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-destructive"
+                className="inline-flex items-center gap-1.5 text-[#3f4653] transition-colors hover:text-[#c0392b]"
               >
                 <Trash size={13} />
                 <span>Delete</span>
@@ -248,7 +248,7 @@ export function AnalysisPage({ agents }: AnalysisPageProps) {
         </TabsContent>
         <TabsContent
           value="agent"
-          className="mt-0 min-h-[calc(100vh-44px)] overflow-hidden border-t border-border outline-none"
+          className="mt-0 min-h-[calc(100vh-44px)] overflow-hidden border-t border-[#e7e9ee] outline-none"
         >
           <AgentTimeline
             runId={runId}
@@ -324,7 +324,7 @@ function AgentTimeline({
 
   if (!runId) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+      <div className="flex h-full items-center justify-center text-sm text-[#3f4653]">
         No agent activity for this analysis.
       </div>
     );
@@ -374,8 +374,8 @@ function AgentTimeline({
           })}
 
           {isRunning && (
-            <div className="flex animate-pulse items-center gap-2 py-2 text-xs text-muted-foreground">
-              <Dot className="size-1.5 bg-primary" />
+            <div className="flex animate-pulse items-center gap-2 py-2 text-xs text-[#3f4653]">
+              <Dot className="size-1.5 bg-[#155dff]" />
               Agent is working...
             </div>
           )}
@@ -383,12 +383,12 @@ function AgentTimeline({
       </div>
 
       {isRunning && (
-        <div className="shrink-0 border-t border-border">
+        <div className="shrink-0 border-t border-[#e7e9ee]">
           <div className="mx-auto max-w-3xl px-6 py-3">
             <button
               type="button"
               onClick={handleStop}
-              className="inline-flex items-center gap-1.5 text-[12.5px] text-muted-foreground transition-colors hover:text-destructive"
+              className="inline-flex items-center gap-1.5 rounded-[6px] border border-[#dfe5ee] bg-white px-4 py-2 text-[12.5px] text-[#3f4653] transition-colors hover:border-[#c0392b] hover:bg-white hover:text-[#c0392b]"
             >
               <Stop size={13} weight="fill" />
               <span>Stop</span>

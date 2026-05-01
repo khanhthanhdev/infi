@@ -1,5 +1,4 @@
 import { memo } from "react";
-import { Eyebrow } from "@/components/ui/editorial";
 import type { FinalStance } from "@/types";
 import { getStanceAccent } from "./badge-styles";
 
@@ -25,7 +24,7 @@ export const ArgumentSpine = memo(function ArgumentSpine({ stance }: ArgumentSpi
         number="02"
         label="Would change our mind"
         items={stance.what_would_change}
-        markerClass="bg-[var(--accent-purple)]"
+        markerClass="bg-[#7c3aed]"
         markerStyle="dot"
         toneClass="report-tone-warning"
       />
@@ -51,10 +50,12 @@ function SpineColumn({
   return (
     <div className={`report-card-tint ${toneClass} flex flex-col gap-5 border-t px-4 py-4`}>
       <div className="flex items-baseline gap-2 border-b border-border pb-3">
-        <span className="font-mono text-[10.5px] font-medium tabular-nums text-[var(--report-accent)]">
+        <span className="font-mono text-[10.5px] font-medium tabular-nums text-[#3572ad]">
           {number}
         </span>
-        <Eyebrow className="text-[var(--report-accent)]">{label}</Eyebrow>
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+          {label}
+        </span>
       </div>
       {items.length === 0 ? (
         <p className="text-sm italic text-muted-foreground/70">None stated.</p>

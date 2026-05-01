@@ -1,5 +1,4 @@
 import { memo, type ReactElement } from "react";
-import { Eyebrow } from "@/components/ui/editorial";
 import {
   Table,
   TableBody,
@@ -50,7 +49,9 @@ export const StructuredArtifactView = memo(function StructuredArtifactView({
       >
         <header className="flex flex-wrap items-baseline justify-between gap-3">
           <div className="space-y-2">
-            <Eyebrow>{formatKind(artifact.kind)}</Eyebrow>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              {formatKind(artifact.kind)}
+            </span>
             <h3 className="text-[17px] font-semibold leading-snug tracking-tight">
               {artifact.title}
             </h3>
@@ -121,7 +122,9 @@ function KpiGrid({ artifact, selectedId, onSelect }: RendererProps) {
                     selected && "report-selected",
                   )}
                 >
-                  <Eyebrow>{textValue(row.period) || textValue(row.group) || "Metric"}</Eyebrow>
+                  <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+                    {textValue(row.period) || textValue(row.group) || "Metric"}
+                  </span>
                   <div className="mt-3 font-mono text-[22px] tabular-nums tracking-normal text-foreground">
                     {formatValue(value)}
                     {row.unit ? (
@@ -138,7 +141,9 @@ function KpiGrid({ artifact, selectedId, onSelect }: RendererProps) {
                 </button>
               </TooltipTrigger>
               <TooltipContent variant="editorial" className="max-w-xs space-y-1.5 text-left">
-                <Eyebrow>Details</Eyebrow>
+                <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+                  Details
+                </span>
                 {Object.entries(row)
                   .slice(0, 8)
                   .map(([key, val]) => (
@@ -166,7 +171,9 @@ function RatioSnapshot({ artifact, selectedId, onSelect }: RendererProps) {
     <div className="grid gap-6 md:grid-cols-2">
       {groups.map(([group, rows]) => (
         <section key={group} className="border-t border-border pt-3">
-          <Eyebrow>{group}</Eyebrow>
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            {group}
+          </span>
           <div className="mt-3 divide-y divide-border/70">
             {rows.map((row) => {
               const index = artifact.rows.indexOf(row);
@@ -203,7 +210,9 @@ function FactorList({ artifact, selectedId, onSelect }: RendererProps) {
     <div className="grid gap-7 md:grid-cols-2">
       {groups.map(([group, rows]) => (
         <section key={group} className="space-y-3 border-t border-border pt-3">
-          <Eyebrow>{group}</Eyebrow>
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            {group}
+          </span>
           <div className="divide-y divide-border/70">
             {rows.map((row) => {
               const index = artifact.rows.indexOf(row);
@@ -223,7 +232,11 @@ function FactorList({ artifact, selectedId, onSelect }: RendererProps) {
                     <span className="text-[14px] font-medium">
                       {textValue(row.factor) || textValue(row.metric) || "Factor"}
                     </span>
-                    {row.importance ? <Eyebrow>{formatValue(row.importance)}</Eyebrow> : null}
+                    {row.importance ? (
+                      <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+                        {formatValue(row.importance)}
+                      </span>
+                    ) : null}
                   </div>
                   {row.detail ? (
                     <p className="mt-1 text-[13px] leading-[1.55] text-muted-foreground">
@@ -459,11 +472,7 @@ function LineAreaChart({
                   <stop offset="100%" stopColor="currentColor" stopOpacity="0.02" />
                 </linearGradient>
               </defs>
-              <path
-                d={areaPath}
-                fill={`url(#${gradientId})`}
-                className="text-[var(--accent-blue)]"
-              />
+              <path d={areaPath} fill={`url(#${gradientId})`} className="text-[#3572ad]" />
             </>
           )}
           <polyline
@@ -471,7 +480,7 @@ function LineAreaChart({
             stroke="currentColor"
             strokeWidth="2"
             points={linePoints}
-            className="text-[var(--accent-blue)]"
+            className="text-[#3572ad]"
           />
           {coords.map((c, index) => {
             const selection = artifactPointSelection(artifact, c.point, c.point.series, index);
@@ -528,13 +537,13 @@ function rowTone(index: number): string {
 }
 
 function valueFillTone(value: number): string {
-  if (value > 0) return "fill-[var(--accent-green)]";
-  if (value < 0) return "fill-[var(--accent-red)]";
-  return "fill-[var(--accent-blue)]";
+  if (value > 0) return "fill-[#38a169]";
+  if (value < 0) return "fill-[#e03535]";
+  return "fill-[#3572ad]";
 }
 
 function valueTextTone(value: number): string {
-  if (value > 0) return "text-[var(--accent-green)]";
-  if (value < 0) return "text-[var(--accent-red)]";
-  return "text-[var(--accent-blue)]";
+  if (value > 0) return "text-[#38a169]";
+  if (value < 0) return "text-[#e03535]";
+  return "text-[#3572ad]";
 }

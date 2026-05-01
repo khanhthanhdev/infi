@@ -1,5 +1,4 @@
 import { memo } from "react";
-import { Dot, Eyebrow } from "@/components/ui/editorial";
 import type { AnalysisReport, FinalStance } from "@/types";
 import { ConfidenceRail, getStanceAccent } from "./badge-styles";
 
@@ -17,14 +16,24 @@ export const ReportHero = memo(function ReportHero({ report, onSwitchRun }: Repo
 
   return (
     <header
-      className={`report-hero-panel ${heroTone(stance?.stance ?? "")} space-y-10 px-4 pt-5 pb-6`}
+      className={`report-hero-panel ${heroTone(stance?.stance ?? "")} space-y-10 rounded-[10px] border border-[#e7e9ee] bg-white p-6`}
     >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <Eyebrow>Final stance</Eyebrow>
-        <Dot />
-        <Eyebrow>{horizon}</Eyebrow>
-        <Dot />
-        <Eyebrow>As of {asOf}</Eyebrow>
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+          Final stance
+        </span>
+        <span className="text-[#dfe5ee]" aria-hidden>
+          ·
+        </span>
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          {horizon}
+        </span>
+        <span className="text-[#dfe5ee]" aria-hidden>
+          ·
+        </span>
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          As of {asOf}
+        </span>
       </div>
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-16">
@@ -32,29 +41,31 @@ export const ReportHero = memo(function ReportHero({ report, onSwitchRun }: Repo
           <StanceHeadline accent={accent} stance={stance} />
 
           {stance?.summary && (
-            <p className="max-w-[34em] text-xl font-normal leading-[1.45] tracking-[-0.005em] text-foreground">
+            <p className="max-w-[34em] text-xl font-normal leading-[1.45] tracking-[-0.005em] text-[#111827]">
               {stance.summary}
             </p>
           )}
         </div>
 
-        <aside className="space-y-6 lg:border-l lg:border-border lg:pl-8">
+        <aside className="space-y-6 lg:border-l lg:border-[#e7e9ee] lg:pl-8">
           <div className="space-y-2">
-            <Eyebrow>Confidence</Eyebrow>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+              Confidence
+            </span>
             <ConfidenceRail confidence={stance?.confidence ?? 0} accentClass={accent.rule} />
           </div>
 
           {report.runs.length > 1 && activeRunId && (
             <div className="space-y-2">
-              <Eyebrow>Run</Eyebrow>
+              <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+                Run
+              </span>
               <RunSwitcher runs={report.runs} activeRunId={activeRunId} onSwitch={onSwitchRun} />
             </div>
           )}
 
           {stance?.disclaimer && (
-            <p className="text-[11px] leading-relaxed text-muted-foreground/80">
-              {stance.disclaimer}
-            </p>
+            <p className="text-[11px] leading-relaxed text-[#3f4653]/80">{stance.disclaimer}</p>
           )}
         </aside>
       </div>
@@ -111,7 +122,7 @@ function StatFooter({
   projections: number;
 }) {
   return (
-    <div className="border-t border-border pt-5">
+    <div className="rounded-[6px] border border-[#e7e9ee] bg-[#fbfbfa] p-4">
       <dl className="grid grid-cols-2 gap-y-4 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="Entities" value={entities} tone="report-tone-neutral" />
         <Stat label="Sources" value={sources} tone="report-tone-neutral" />
@@ -126,11 +137,13 @@ function StatFooter({
 
 function Stat({ label, value, tone }: { label: string; value: number; tone: string }) {
   return (
-    <div className={`report-stat ${tone} flex flex-col gap-1 px-3 py-3`}>
+    <div className={`report-stat ${tone} flex flex-col gap-1 px-3 py-2`}>
       <dt>
-        <Eyebrow>{label}</Eyebrow>
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#3f4653]">
+          {label}
+        </span>
       </dt>
-      <dd className="font-mono text-2xl font-medium tabular-nums text-foreground">{value}</dd>
+      <dd className="font-mono text-2xl font-medium tabular-nums text-[#111827]">{value}</dd>
     </div>
   );
 }

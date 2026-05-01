@@ -1,5 +1,4 @@
 import { memo } from "react";
-import { Eyebrow } from "@/components/ui/editorial";
 import { cn } from "@/lib/utils";
 import type { Entity, Projection, ProjectionScenario, Source } from "@/types";
 import { ConfidenceRail } from "./badge-styles";
@@ -76,11 +75,17 @@ function ProjectionCard({
       <header className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-14">
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <Eyebrow>Projection</Eyebrow>
-            <Dot />
-            <Eyebrow>{projection.horizon}</Eyebrow>
-            <Dot />
-            <Eyebrow>{formatMetric(projection.metric)}</Eyebrow>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              Projection
+            </span>
+            <span className="h-1 w-1 rounded-full bg-border" aria-hidden />
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              {projection.horizon}
+            </span>
+            <span className="h-1 w-1 rounded-full bg-border" aria-hidden />
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              {formatMetric(projection.metric)}
+            </span>
           </div>
           <h3 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.02em] sm:text-[40px]">
             {label}
@@ -101,11 +106,10 @@ function ProjectionCard({
           </button>
         </div>
         <aside className="space-y-2 lg:border-l lg:border-border lg:pl-6">
-          <Eyebrow>Confidence</Eyebrow>
-          <ConfidenceRail
-            confidence={projection.confidence}
-            accentClass="bg-[var(--report-accent)]"
-          />
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            Confidence
+          </span>
+          <ConfidenceRail confidence={projection.confidence} accentClass="bg-[#3572ad]" />
         </aside>
       </header>
 
@@ -128,7 +132,9 @@ function ProjectionCard({
 
       {projection.key_assumptions.length > 0 && (
         <section className="space-y-3 border-t border-border pt-6">
-          <Eyebrow>Key assumptions</Eyebrow>
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            Key assumptions
+          </span>
           <ol className="space-y-2 text-[14px] leading-[1.6] text-foreground/90">
             {projection.key_assumptions.map((assumption, i) => (
               <li key={`${i}-${assumption.slice(0, 32)}`} className="flex gap-3">
@@ -330,7 +336,9 @@ function ProbabilityBar({ scenarios }: { scenarios: ProjectionScenario[] }) {
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between">
-        <Eyebrow>Probability weight</Eyebrow>
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          Probability weight
+        </span>
         <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
           {Math.round(total * 100)}%
         </span>
@@ -394,7 +402,9 @@ function ScenarioColumn({
           <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
             {indexLabel}
           </span>
-          <Eyebrow className={accent.text}>{scenario.label}</Eyebrow>
+          <span className={cn("font-mono text-[10.5px] uppercase tracking-[0.14em]", accent.text)}>
+            {scenario.label}
+          </span>
         </div>
         <div className="flex items-baseline gap-3">
           <span className={cn("text-2xl font-semibold tracking-tight", accent.text)}>
@@ -436,7 +446,9 @@ function ScenarioList({
 }) {
   return (
     <div className="space-y-2">
-      <Eyebrow>{label}</Eyebrow>
+      <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+        {label}
+      </span>
       <ul className="space-y-1.5 text-[13.5px] leading-[1.55] text-foreground/85">
         {items.map((item, i) => (
           <li key={`${i}-${item.slice(0, 32)}`} className="flex gap-2.5">
@@ -455,7 +467,9 @@ function ScenarioList({
 function EvidenceRow({ ids, sourceMap }: { ids: string[]; sourceMap: Map<string, Source> }) {
   return (
     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5 border-t border-border pt-4">
-      <Eyebrow className="shrink-0">Evidence</Eyebrow>
+      <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+        Evidence
+      </span>
       {ids.map((id, index) => {
         const source = sourceMap.get(id);
         const label = source?.title ?? id.slice(0, 8);
@@ -496,21 +510,21 @@ function scenarioAccent(label: string): {
   switch (label.toLowerCase()) {
     case "bull":
       return {
-        fill: "fill-[var(--accent-green)]",
-        text: "text-[var(--accent-green)]",
-        bar: "bg-[var(--accent-green)]",
+        fill: "fill-[#38a169]",
+        text: "text-[#38a169]",
+        bar: "bg-[#38a169]",
       };
     case "bear":
       return {
-        fill: "fill-[var(--accent-red)]",
-        text: "text-[var(--accent-red)]",
-        bar: "bg-[var(--accent-red)]",
+        fill: "fill-[#e03535]",
+        text: "text-[#e03535]",
+        bar: "bg-[#e03535]",
       };
     default:
       return {
-        fill: "fill-[var(--accent-blue)]",
-        text: "text-[var(--accent-blue)]",
-        bar: "bg-[var(--accent-blue)]",
+        fill: "fill-[#3572ad]",
+        text: "text-[#3572ad]",
+        bar: "bg-[#3572ad]",
       };
   }
 }
@@ -528,8 +542,4 @@ function scenarioTone(label: string): string {
 
 function formatMetric(metric: string) {
   return metric.replace(/_/g, " ");
-}
-
-function Dot() {
-  return <span className="h-1 w-1 rounded-full bg-border" aria-hidden />;
 }

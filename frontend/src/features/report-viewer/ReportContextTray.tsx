@@ -1,7 +1,6 @@
 import { Copy, PaperPlaneTilt, X } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Eyebrow } from "@/components/ui/editorial";
 import { Textarea } from "@/components/ui/textarea";
 import type { Source } from "@/types";
 import type { ReportSelection } from "./selection";
@@ -35,7 +34,9 @@ export function ReportContextTray({
       <div className="space-y-5">
         <header className="flex items-start justify-between gap-3 border-b border-border pb-4">
           <div className="min-w-0 space-y-2">
-            <Eyebrow>{selection.type.replace(/_/g, " ")}</Eyebrow>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              {selection.type.replace(/_/g, " ")}
+            </span>
             <h3 className="text-[16px] font-semibold leading-snug tracking-tight">
               {selection.title}
             </h3>
@@ -57,7 +58,9 @@ export function ReportContextTray({
 
         {selection.values.length > 0 && (
           <section className="space-y-2">
-            <Eyebrow>Values</Eyebrow>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              Values
+            </span>
             <dl className="divide-y divide-border/70 border-y border-border text-[12.5px]">
               {selection.values.map((item) => (
                 <div
@@ -74,7 +77,9 @@ export function ReportContextTray({
 
         {sourceIds.length > 0 && (
           <section className="space-y-2">
-            <Eyebrow>Sources</Eyebrow>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              Sources
+            </span>
             <div className="divide-y divide-border/70 border-y border-border">
               {sourceIds.map((id) => {
                 const source = sourceMap.get(id);
@@ -99,7 +104,9 @@ export function ReportContextTray({
 
         <section className="space-y-2">
           <div className="flex items-center justify-between gap-3">
-            <Eyebrow>JSON context</Eyebrow>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              JSON context
+            </span>
             <button
               type="button"
               onClick={() => void navigator.clipboard?.writeText(json)}
@@ -116,7 +123,9 @@ export function ReportContextTray({
 
         {onAsk ? (
           <section className="space-y-3 border-t border-border pt-4">
-            <Eyebrow>Ask about this</Eyebrow>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              Ask about this
+            </span>
             <Textarea
               value={question}
               onChange={(event) => setQuestion(event.target.value)}

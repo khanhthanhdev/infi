@@ -1,6 +1,6 @@
 import { ArrowUpRight } from "@phosphor-icons/react";
 import { memo } from "react";
-import { Eyebrow, FreshnessChip } from "@/components/ui/editorial";
+import { FreshnessChip } from "@/components/ui/editorial";
 import { cn } from "@/lib/utils";
 import type { Source } from "@/types";
 import { type SelectionProps, sourceSelection } from "./selection";
@@ -21,7 +21,7 @@ export const SourceList = memo(function SourceList({
   );
 
   return (
-    <div className="divide-y divide-border border-y border-border">
+    <div className="rounded-[10px] border border-[#e7e9ee] bg-white">
       {sorted.map((source, index) => (
         <SourceRow
           key={source.id}
@@ -48,25 +48,25 @@ function SourceRow({
 }) {
   const content = (
     <>
-      <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+      <span className="font-mono text-[11px] tabular-nums text-[#3f4653]">
         {String(index + 1).padStart(2, "0")}
       </span>
       <div className="min-w-0 flex-1 space-y-1.5">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <ReliabilityPill reliability={source.reliability} />
-          <Eyebrow className="text-muted-foreground/80">
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]/80">
             {source.source_type.replace(/_/g, " ")}
-          </Eyebrow>
+          </span>
           {source.publisher && (
-            <span className="text-[12px] text-muted-foreground">{source.publisher}</span>
+            <span className="text-[12px] text-[#3f4653]">{source.publisher}</span>
           )}
           <FreshnessChip iso={source.retrieved_at} variant="source" />
-          <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground/60">
+          <span className="font-mono text-[10.5px] tabular-nums text-[#3f4653]/60">
             {formatDate(source.retrieved_at)}
           </span>
           {source.last_verification_status === "dead" && (
             <span
-              className="font-mono text-[10.5px] font-medium uppercase tracking-[0.14em] text-destructive"
+              className="font-mono text-[10.5px] font-medium uppercase tracking-[0.14em] text-[#c0392b]"
               title={
                 source.last_verified_at
                   ? `Verified dead on ${formatDate(source.last_verified_at)}`
@@ -77,17 +77,17 @@ function SourceRow({
             </span>
           )}
         </div>
-        <div className="flex items-start gap-1.5 text-[14.5px] font-medium leading-snug text-foreground">
+        <div className="flex items-start gap-1.5 text-[14.5px] font-medium leading-snug text-[#111827]">
           <span className="min-w-0 flex-1 truncate">{source.title}</span>
           {source.url && (
             <ArrowUpRight
               size={14}
-              className="mt-[3px] shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
+              className="mt-[3px] shrink-0 text-[#3f4653] transition-colors group-hover:text-[#111827]"
             />
           )}
         </div>
         {source.summary && (
-          <p className="line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
+          <p className="line-clamp-2 text-[13px] leading-relaxed text-[#3f4653]">
             {source.summary}
           </p>
         )}
@@ -96,7 +96,7 @@ function SourceRow({
   );
 
   const baseClass = cn(
-    "report-row-tint group flex items-start gap-4 px-3 py-4 text-left transition-colors",
+    "report-row-tint group flex items-start gap-4 border-t border-[#e7e9ee] px-5 py-4 text-left transition-colors first:border-0",
     reliabilityTone(source.reliability),
     selected && "report-selected",
   );

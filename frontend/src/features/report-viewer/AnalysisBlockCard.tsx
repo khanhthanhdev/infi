@@ -1,6 +1,5 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Eyebrow } from "@/components/ui/editorial";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { AnalysisBlock, Source } from "@/types";
@@ -24,32 +23,36 @@ export function AnalysisBlockCard({
   return (
     <article
       className={cn(
-        "report-card-tint grid gap-6 px-4 py-8 transition-colors md:grid-cols-[180px_minmax(0,1fr)] md:gap-10",
+        "report-card-tint grid gap-6 rounded-[10px] border border-[#e7e9ee] bg-white p-5 transition-colors md:grid-cols-[220px_minmax(0,1fr)] md:gap-10",
         importanceTone(block.importance),
-        !isFirstInGroup && "border-t border-border",
         selectedId === `analysis_block:${block.id}` && "report-selected",
       )}
     >
       <header className="flex flex-col gap-2 md:sticky md:top-28 md:self-start">
         <div className="flex items-center gap-2">
           <ImportanceGlyph importance={block.importance} />
-          <Eyebrow className="text-[var(--report-accent)]">{String(block.importance)}</Eyebrow>
+          <span
+            className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]"
+            style={{ "--report-accent": "#3572ad" } as React.CSSProperties}
+          >
+            {String(block.importance)}
+          </span>
         </div>
-        <h3 className="text-[17px] font-semibold leading-snug tracking-tight text-foreground">
+        <h3 className="text-[17px] font-semibold leading-snug tracking-tight text-[#111827]">
           {block.title}
         </h3>
         <ConfidenceBadge confidence={block.confidence} />
         <button
           type="button"
           onClick={() => onSelect?.(blockSelection(block))}
-          className="w-fit font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-[var(--report-accent)]"
+          className="w-fit font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#155dff]"
         >
           Inspect
         </button>
       </header>
 
       <div className="min-w-0 space-y-5">
-        <div className="max-w-[62ch] text-[15px] leading-[1.65] text-foreground/90 [&>*+*]:mt-4">
+        <div className="max-w-[88ch] text-[15px] leading-[1.65] text-[#111827]/90 [&>*+*]:mt-4">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={reportMarkdownComponents}>
             {block.body}
           </ReactMarkdown>
@@ -65,10 +68,10 @@ export function AnalysisBlockCard({
 function ImportanceGlyph({ importance }: { importance: string }) {
   const cls =
     importance === "high"
-      ? "bg-[var(--accent-red)]"
+      ? "bg-[#e03535]"
       : importance === "medium"
-        ? "bg-[var(--accent-orange)]"
-        : "bg-[var(--accent-teal)]";
+        ? "bg-[#d97706]"
+        : "bg-[#0a8f8f]";
   return <span className={cn("h-2 w-2 shrink-0 rounded-full", cls)} aria-hidden />;
 }
 
@@ -86,7 +89,9 @@ function importanceTone(importance: string): string {
 function EvidenceRow({ ids, sourceMap }: { ids: string[]; sourceMap?: Map<string, Source> }) {
   return (
     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5 border-t border-border pt-4">
-      <Eyebrow className="shrink-0">Cited</Eyebrow>
+      <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+        Cited
+      </span>
       <TooltipProvider delayDuration={150}>
         {ids.map((id, index) => {
           const source = sourceMap?.get(id);

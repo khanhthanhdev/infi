@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Eyebrow, FreshnessChip } from "@/components/ui/editorial";
+import { FreshnessChip } from "@/components/ui/editorial";
 import { cn } from "@/lib/utils";
 import type { Entity, MetricSnapshot, Source } from "@/types";
 import { MetricDelta } from "./MetricDelta";
@@ -21,7 +21,7 @@ export const MetricList = memo(function MetricList({
   if (metrics.length === 0) return null;
 
   return (
-    <div className="divide-y divide-border border-y border-border">
+    <div className="rounded-[10px] border border-[#e7e9ee] bg-white">
       {metrics.map((metric, index) => {
         const entity = metric.entity_id ? entityMap.get(metric.entity_id) : null;
         const source = sourceMap.get(metric.source_id);
@@ -31,33 +31,33 @@ export const MetricList = memo(function MetricList({
             key={metric.id}
             onClick={() => onSelect?.(metricSelection(metric, source))}
             className={cn(
-              "report-row-tint grid w-full grid-cols-[3ch_minmax(0,1fr)_auto] items-baseline gap-4 px-3 py-3 text-left transition-colors",
+              "report-row-tint grid w-full grid-cols-[3ch_minmax(0,1fr)_auto] items-baseline gap-4 border-t border-[#e7e9ee] px-5 py-3.5 text-left transition-colors first:border-0",
               metricTone(metric.change_pct),
               selectedId === `metric:${metric.id}` && "report-selected",
             )}
           >
-            <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
+            <span className="font-mono text-[10.5px] tabular-nums text-[#3f4653]">
               {String(index + 1).padStart(2, "0")}
             </span>
             <div className="min-w-0 space-y-0.5">
               <div className="flex flex-wrap items-baseline gap-x-2">
-                <span className="text-[14px] font-medium text-foreground">
+                <span className="text-[14px] font-medium text-[#111827]">
                   {formatMetric(metric.metric)}
                 </span>
                 {entity && (
-                  <Eyebrow className="text-muted-foreground/80">
+                  <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]/80">
                     {entity.symbol || entity.name}
-                  </Eyebrow>
+                  </span>
                 )}
                 {metric.period && (
-                  <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
+                  <span className="font-mono text-[10.5px] tabular-nums text-[#3f4653]">
                     {metric.period}
                   </span>
                 )}
                 <FreshnessChip iso={metric.as_of} variant="metric" />
               </div>
               {source && (
-                <div className="font-mono text-[10.5px] tabular-nums text-muted-foreground/80">
+                <div className="font-mono text-[10.5px] tabular-nums text-[#3f4653]/80">
                   {source.title}
                 </div>
               )}
@@ -67,11 +67,11 @@ export const MetricList = memo(function MetricList({
                 const { value, suffix } = formatMetricValue(metric.numeric_value, metric.unit);
                 return (
                   <>
-                    <span className="font-mono text-[14px] tabular-nums text-foreground">
+                    <span className="font-mono text-[14px] tabular-nums text-[#111827]">
                       {value}
                     </span>
                     {suffix && (
-                      <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
+                      <span className="font-mono text-[10.5px] tabular-nums text-[#3f4653]">
                         {suffix}
                       </span>
                     )}

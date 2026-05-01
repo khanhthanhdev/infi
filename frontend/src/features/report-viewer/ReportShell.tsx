@@ -1,5 +1,4 @@
 import { type ReactNode, useEffect, useRef } from "react";
-import { Dot, Eyebrow } from "@/components/ui/editorial";
 import { useExpandableOverflow } from "@/hooks/useExpandableOverflow";
 import type { AnalysisIntent, AnalysisStatus } from "@/types";
 
@@ -79,21 +78,25 @@ export function ReportShell({
   }, []);
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background">
+    <div className="flex h-full min-h-0 flex-col bg-[#fbfbfa]">
       <div ref={scrollRef} className="report-shell-scroll min-h-0 flex-1 overflow-auto">
         <div className="pointer-events-none sticky top-0 z-30 h-0">
-          <div className="report-compact-bar report-section-nav pointer-events-auto border-b border-border">
-            <div className="mx-auto flex h-11 max-w-5xl items-center justify-between gap-4 px-8">
+          <div className="report-compact-bar report-section-nav pointer-events-auto border-b border-[#e7e9ee] bg-white/95 backdrop-blur-xl">
+            <div className="mx-auto flex h-12 max-w-5xl items-center justify-between gap-4 px-8">
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 {compactLabel && (
-                  <Eyebrow>
-                    <span className="sm:hidden">{compactShortLabel ?? compactLabel}</span>
-                    <span className="hidden sm:inline">{compactLabel}</span>
-                  </Eyebrow>
+                  <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad] sm:hidden">
+                    {compactShortLabel ?? compactLabel}
+                  </span>
+                )}
+                {compactLabel && (
+                  <span className="hidden font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad] sm:inline">
+                    {compactLabel}
+                  </span>
                 )}
                 <span className="report-compact-title flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-                  {compactLabel && <Dot />}
-                  <span className="min-w-0 truncate text-[13px] font-medium leading-none tracking-normal text-foreground">
+                  <span className="h-1 w-1 rounded-full bg-[#155dff]" aria-hidden />
+                  <span className="min-w-0 truncate text-[13px] font-medium leading-none tracking-normal text-[#111827]">
                     {analysis.title}
                   </span>
                 </span>
@@ -103,7 +106,7 @@ export function ReportShell({
           </div>
         </div>
 
-        <header className="report-hero-panel report-tone-info border-b border-border">
+        <header className="report-hero-panel report-tone-info border-b border-[#e7e9ee]">
           <div className="mx-auto flex max-w-5xl flex-col gap-6 px-8 pt-10 pb-5">
             <ReportShellMetaLine
               analysis={analysis}
@@ -112,20 +115,20 @@ export function ReportShell({
             />
 
             <div className="space-y-4">
-              <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.02em]">
+              <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.02em] text-[#111827]">
                 {analysis.title}
               </h1>
               {prompt &&
                 (promptExpanded ? (
                   <p
                     ref={promptRef}
-                    className="max-w-[62ch] whitespace-pre-wrap break-words text-[14.5px] leading-[1.55] text-muted-foreground"
+                    className="max-w-[62ch] whitespace-pre-wrap break-words text-[14.5px] leading-[1.55] text-[#3f4653]"
                   >
                     {prompt}
                     <button
                       type="button"
                       onClick={togglePromptExpanded}
-                      className="ml-2 align-baseline font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
+                      className="ml-2 align-baseline font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#111827]"
                     >
                       Show less
                     </button>
@@ -134,7 +137,7 @@ export function ReportShell({
                   <div className="flex max-w-[62ch] items-baseline gap-2">
                     <p
                       ref={promptRef}
-                      className="min-w-0 flex-1 truncate text-[14.5px] leading-[1.55] text-muted-foreground"
+                      className="min-w-0 flex-1 truncate text-[14.5px] leading-[1.55] text-[#3f4653]"
                     >
                       {prompt}
                     </p>
@@ -142,7 +145,7 @@ export function ReportShell({
                       <button
                         type="button"
                         onClick={togglePromptExpanded}
-                        className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
+                        className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#111827]"
                       >
                         Show more
                       </button>
@@ -181,25 +184,39 @@ function ReportShellMetaLine({
 
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-      <Eyebrow>{introLabel}</Eyebrow>
+      <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+        {introLabel}
+      </span>
       {intent && (
         <>
-          <Dot />
-          <Eyebrow>{intent.replace(/_/g, " ")}</Eyebrow>
+          <span className="text-[#dfe5ee]" aria-hidden>
+            ·
+          </span>
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            {intent.replace(/_/g, " ")}
+          </span>
         </>
       )}
       {status && (
         <>
-          <Dot />
-          <Eyebrow className={isRunning ? "text-primary" : undefined}>
+          <span className="text-[#dfe5ee]" aria-hidden>
+            ·
+          </span>
+          <span
+            className={`font-mono text-[10.5px] uppercase tracking-[0.14em] ${isRunning ? "text-[#155dff]" : "text-[#3f4653]"}`}
+          >
             {isRunning ? "Running" : status}
-          </Eyebrow>
+          </span>
         </>
       )}
       {created && (
         <>
-          <Dot />
-          <Eyebrow>{formatCreated(created)}</Eyebrow>
+          <span className="text-[#dfe5ee]" aria-hidden>
+            ·
+          </span>
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            {formatCreated(created)}
+          </span>
         </>
       )}
     </div>
