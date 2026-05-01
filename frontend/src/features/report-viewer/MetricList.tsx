@@ -1,7 +1,8 @@
 import { memo } from "react";
 import { FreshnessChip } from "@/components/ui/editorial";
+import { MetricExplanationTooltip } from "@/components/ui/MetricExplanationTooltip";
 import { cn } from "@/lib/utils";
-import type { Entity, MetricSnapshot, Source } from "@/types";
+import type { Entity, MetricExplanation, MetricSnapshot, Source } from "@/types";
 import { MetricDelta } from "./MetricDelta";
 import { metricSelection, type SelectionProps } from "./selection";
 
@@ -9,6 +10,7 @@ interface MetricListProps extends SelectionProps {
   metrics: MetricSnapshot[];
   entityMap: Map<string, Entity>;
   sourceMap: Map<string, Source>;
+  explanations?: MetricExplanation[];
 }
 
 export const MetricList = memo(function MetricList({
@@ -17,7 +19,14 @@ export const MetricList = memo(function MetricList({
   sourceMap,
   selectedId,
   onSelect,
+  explanations = [],
 }: MetricListProps) {
+  const explanationMap = new Map(
+    explanations
+      .filter((e) => e.target_type === "metric")
+      .map((e) => [e.target_key || normalizeExplanationKey(e.metric_name), e]),
+  );
+
   if (metrics.length === 0) return null;
 
   return (
@@ -25,6 +34,9 @@ export const MetricList = memo(function MetricList({
       {metrics.map((metric, index) => {
         const entity = metric.entity_id ? entityMap.get(metric.entity_id) : null;
         const source = sourceMap.get(metric.source_id);
+        const explanation = explanationMap.get(normalizeExplanationKey(metric.metric));
+        const metricLabel = formatMetric(metric.metric);
+
         return (
           <button
             type="button"
@@ -41,9 +53,15 @@ export const MetricList = memo(function MetricList({
             </span>
             <div className="min-w-0 space-y-0.5">
               <div className="flex flex-wrap items-baseline gap-x-2">
-                <span className="text-[14px] font-medium text-[#111827]">
-                  {formatMetric(metric.metric)}
-                </span>
+                {explanation ? (
+                  <MetricExplanationTooltip explanation={explanation}>
+                    <span className="cursor-help text-[14px] font-medium text-[#111827] underline decoration-dotted underline-offset-2">
+                      {metricLabel}
+                    </span>
+                  </MetricExplanationTooltip>
+                ) : (
+                  <span className="text-[14px] font-medium text-[#111827]">{metricLabel}</span>
+                )}
                 {entity && (
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]/80">
                     {entity.symbol || entity.name}
@@ -94,6 +112,14 @@ function metricTone(changePct: number | null): string {
 
 function formatMetric(metric: string) {
   return metric.replace(/_/g, " ");
+}
+
+function normalizeExplanationKey(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
 }
 
 function formatNumeric(value: number): string {

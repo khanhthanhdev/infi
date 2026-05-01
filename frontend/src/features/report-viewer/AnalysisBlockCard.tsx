@@ -2,24 +2,27 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import type { AnalysisBlock, Source } from "@/types";
+import type { AnalysisBlock, MetricExplanation, Source } from "@/types";
 import { ConfidenceBadge } from "./badge-styles";
-import { reportMarkdownComponents } from "./markdown-components";
+import { createReportMarkdownComponents } from "./markdown-components";
 import { blockSelection, type SelectionProps } from "./selection";
 
 interface AnalysisBlockCardProps extends SelectionProps {
   block: AnalysisBlock;
   sourceMap?: Map<string, Source>;
+  explanations?: MetricExplanation[];
   isFirstInGroup?: boolean;
 }
 
 export function AnalysisBlockCard({
   block,
   sourceMap,
-  isFirstInGroup,
+  explanations = [],
   selectedId,
   onSelect,
 }: AnalysisBlockCardProps) {
+  const markdownComponents = createReportMarkdownComponents(explanations);
+
   return (
     <article
       className={cn(
@@ -53,7 +56,7 @@ export function AnalysisBlockCard({
 
       <div className="min-w-0 space-y-5">
         <div className="max-w-[88ch] text-[15px] leading-[1.65] text-[#111827]/90 [&>*+*]:mt-4">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} components={reportMarkdownComponents}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
             {block.body}
           </ReactMarkdown>
         </div>

@@ -339,6 +339,22 @@ export interface MetricSnapshot {
   change_pct: number | null;
 }
 
+export interface MetricExplanation {
+  id: string;
+  run_id: string;
+  target_type: "metric" | "term" | string;
+  target_key: string;
+  display_name: string;
+  metric_name: string;
+  definition: string;
+  meaning: string;
+  value_interpretation: string;
+  good_threshold: string | null;
+  current_value_assessment: string;
+  source_id: string | null;
+  created_at: string;
+}
+
 export type ArtifactKind =
   | "metric_table"
   | "comparison_matrix"
@@ -668,6 +684,7 @@ export interface AnalysisReport {
   uncertainty_entries: UncertaintyEntry[];
   methodology_note: MethodologyNote | null;
   decision_criterion_answers: DecisionCriterionAnswer[];
+  explanations: MetricExplanation[];
   holding_reviews: HoldingReview[];
   allocation_reviews: AllocationReview[];
   portfolio_risks: PortfolioRisk[];

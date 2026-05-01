@@ -29,9 +29,56 @@ const HERO_FEATURES = [
   { label: "Portfolio aware", icon: ChartPieSlice },
 ];
 
+const EXPLAINABLE_STORAGE_KEY = "infi.research.explainable";
+const EXPLAIN_MODEL_STORAGE_KEY = "infi.research.explainModelId";
+
+function readStoredExplainable(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(EXPLAINABLE_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function readStoredExplainModelId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(EXPLAIN_MODEL_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export function ResearchPage({ agents }: ResearchPageProps) {
   const [prompt, setPrompt] = useState("");
+  const [explainable, setExplainableState] = useState<boolean>(readStoredExplainable);
+  const [explainModelId, setExplainModelIdState] = useState<string | null>(
+    readStoredExplainModelId,
+  );
   const agentId = useAppStore((state) => state.agentId);
+
+  const setExplainable = (next: boolean) => {
+    setExplainableState(next);
+    try {
+      window.localStorage.setItem(EXPLAINABLE_STORAGE_KEY, next ? "true" : "false");
+    } catch {
+      // localStorage may be unavailable (e.g., private mode); silently ignore.
+    }
+  };
+
+  const setExplainModelId = (next: string | null) => {
+    setExplainModelIdState(next);
+    try {
+      if (next) {
+        window.localStorage.setItem(EXPLAIN_MODEL_STORAGE_KEY, next);
+      } else {
+        window.localStorage.removeItem(EXPLAIN_MODEL_STORAGE_KEY);
+      }
+    } catch {
+      // ignore
+    }
+  };
 
   const selectedAgent = agents.find((agent) => agent.id === agentId);
   const canRun = prompt.trim().length > 0 && !!selectedAgent?.available;
@@ -46,7 +93,10 @@ export function ResearchPage({ agents }: ResearchPageProps) {
     if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       event.preventDefault();
       if (canRun) {
-        start(prompt, null);
+        start(prompt, null, {
+          explainable,
+          explainModelId: explainable ? explainModelId : null,
+        });
       }
     }
   };
@@ -152,7 +202,12 @@ export function ResearchPage({ agents }: ResearchPageProps) {
                 type="button"
                 disabled={!canRun}
                 onClick={() => {
-                  if (canRun) start(prompt, null);
+                  if (canRun) {
+                    start(prompt, null, {
+                      explainable,
+                      explainModelId: explainable ? explainModelId : null,
+                    });
+                  }
                 }}
                 className="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f1f5ff] text-[#155dff] transition-colors hover:bg-[#e4ecff] disabled:text-[#155dff]/35"
                 aria-label="Run analysis"
@@ -164,9 +219,13 @@ export function ResearchPage({ agents }: ResearchPageProps) {
               agentId={agentId}
               agents={agents}
               canRun={canRun}
+              explainable={explainable}
+              explainModelId={explainModelId}
               localError={localError}
               selectedAgent={selectedAgent}
-              onRun={(enabledSources) => start(prompt, enabledSources)}
+              onExplainableChange={setExplainable}
+              onExplainModelChange={setExplainModelId}
+              onRun={(enabledSources, options) => start(prompt, enabledSources, options)}
             />
           </div>
         </div>

@@ -2,12 +2,12 @@ use crate::domain::{
     AllocationReview, Analysis, AnalysisBlock, AnalysisIntent, AnalysisReport, AnalysisRun,
     AnalysisStatus, AnalysisSummary, ArtifactKind, BlockKind, CounterThesis, CriterionVerdict,
     DecisionCriterionAnswer, Entity, FinalStance, HoldingReview, HoldingStance, Importance,
-    MethodologyNote, MetricSnapshot, Portfolio, PortfolioAccount, PortfolioCsvImportInput,
-    PortfolioDetail, PortfolioExpectedReturnModel, PortfolioHolding, PortfolioHoldingAccount,
-    PortfolioImportBatch, PortfolioImportKind, PortfolioImportResult, PortfolioImportWarning,
-    PortfolioModelType, PortfolioPosition, PortfolioRisk, PortfolioScenarioAnalysis,
-    PortfolioSummary, PortfolioTransaction, PortfolioTransactionAction, Projection,
-    RebalancingSuggestion, ResearchPlan, ScenarioLabel, Source, SourceReliability,
+    MethodologyNote, MetricExplanation, MetricSnapshot, Portfolio, PortfolioAccount,
+    PortfolioCsvImportInput, PortfolioDetail, PortfolioExpectedReturnModel, PortfolioHolding,
+    PortfolioHoldingAccount, PortfolioImportBatch, PortfolioImportKind, PortfolioImportResult,
+    PortfolioImportWarning, PortfolioModelType, PortfolioPosition, PortfolioRisk,
+    PortfolioScenarioAnalysis, PortfolioSummary, PortfolioTransaction, PortfolioTransactionAction,
+    Projection, RebalancingSuggestion, ResearchPlan, ScenarioLabel, Source, SourceReliability,
     StanceFreshnessInputs, StanceKind, StructuredArtifact, UncertaintyEntry, VerificationStatus,
     portfolio_holding_entity_id, stale_stance_metrics,
 };
@@ -521,6 +521,23 @@ impl Database {
                 FOREIGN KEY(run_id) REFERENCES analysis_runs(id) ON DELETE CASCADE
             );
 
+            CREATE TABLE IF NOT EXISTS metric_explanations (
+                id TEXT PRIMARY KEY,
+                run_id TEXT NOT NULL,
+                target_type TEXT NOT NULL DEFAULT 'metric',
+                target_key TEXT NOT NULL DEFAULT '',
+                display_name TEXT NOT NULL DEFAULT '',
+                metric_name TEXT NOT NULL,
+                definition TEXT NOT NULL,
+                meaning TEXT NOT NULL,
+                value_interpretation TEXT NOT NULL,
+                good_threshold TEXT,
+                current_value_assessment TEXT NOT NULL,
+                source_id TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(run_id) REFERENCES analysis_runs(id) ON DELETE CASCADE
+            );
+
             CREATE INDEX IF NOT EXISTS idx_analysis_runs_analysis_id ON analysis_runs(analysis_id);
             CREATE INDEX IF NOT EXISTS idx_entities_run_id ON entities(run_id);
             CREATE INDEX IF NOT EXISTS idx_sources_run_id ON sources(run_id);
@@ -543,6 +560,7 @@ impl Database {
             CREATE INDEX IF NOT EXISTS idx_rebalancing_suggestions_run_id ON rebalancing_suggestions(run_id);
             CREATE INDEX IF NOT EXISTS idx_portfolio_scenario_analyses_run_id ON portfolio_scenario_analyses(run_id);
             CREATE INDEX IF NOT EXISTS idx_portfolio_expected_return_models_run_id ON portfolio_expected_return_models(run_id);
+            CREATE INDEX IF NOT EXISTS idx_metric_explanations_run_id ON metric_explanations(run_id);
             ",
         )?;
 
@@ -575,6 +593,29 @@ impl Database {
         );
         let _ = conn.execute(
             "ALTER TABLE analyses ADD COLUMN portfolio_id TEXT REFERENCES portfolios(id) ON DELETE SET NULL",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE metric_explanations ADD COLUMN target_type TEXT",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE metric_explanations ADD COLUMN target_key TEXT",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE metric_explanations ADD COLUMN display_name TEXT",
+            [],
+        );
+        let _ = conn.execute(
+            "UPDATE metric_explanations
+             SET target_type = COALESCE(NULLIF(target_type, ''), 'metric'),
+                 target_key = COALESCE(NULLIF(target_key, ''), lower(metric_name)),
+                 display_name = COALESCE(NULLIF(display_name, ''), metric_name)",
+            [],
+        );
+        let _ = conn.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_metric_explanations_target ON metric_explanations(run_id, target_type, target_key)",
             [],
         );
         let _ = conn.execute(
@@ -772,6 +813,7 @@ impl Database {
                 uncertainty_entries: Vec::new(),
                 methodology_note: None,
                 decision_criterion_answers: Vec::new(),
+                explanations: Vec::new(),
                 holding_reviews: Vec::new(),
                 allocation_reviews: Vec::new(),
                 portfolio_risks: Vec::new(),
@@ -797,6 +839,7 @@ impl Database {
             uncertainty_entries: self.get_uncertainty_entries(&run_id)?,
             methodology_note: self.get_methodology_note(&run_id)?,
             decision_criterion_answers: self.get_decision_criterion_answers(&run_id)?,
+            explanations: self.get_metric_explanations(&run_id)?,
             holding_reviews: if load_portfolio_sections {
                 self.get_holding_reviews_for_run(&run_id)?
             } else {
@@ -993,6 +1036,74 @@ impl Database {
             ],
         )?;
         Ok(())
+    }
+
+    pub fn save_metric_explanation(&self, explanation: &MetricExplanation) -> Result<()> {
+        let conn = self.lock_conn()?;
+        conn.execute(
+            "DELETE FROM metric_explanations
+             WHERE run_id = ?1 AND target_type = ?2 AND target_key = ?3",
+            params![
+                explanation.run_id,
+                explanation.target_type,
+                explanation.target_key
+            ],
+        )?;
+        conn.execute(
+            "INSERT OR REPLACE INTO metric_explanations
+            (id, run_id, target_type, target_key, display_name, metric_name, definition, meaning, value_interpretation, good_threshold, current_value_assessment, source_id, created_at)
+            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+            params![
+                explanation.id,
+                explanation.run_id,
+                explanation.target_type,
+                explanation.target_key,
+                explanation.display_name,
+                explanation.metric_name,
+                explanation.definition,
+                explanation.meaning,
+                explanation.value_interpretation,
+                explanation.good_threshold,
+                explanation.current_value_assessment,
+                explanation.source_id,
+                explanation.created_at,
+            ],
+        )?;
+        Ok(())
+    }
+
+    pub fn get_metric_explanations(&self, run_id: &str) -> Result<Vec<MetricExplanation>> {
+        let conn = self.lock_conn()?;
+        let mut stmt = conn.prepare(
+            "SELECT id, run_id,
+                    COALESCE(NULLIF(target_type, ''), 'metric'),
+                    COALESCE(NULLIF(target_key, ''), lower(metric_name)),
+                    COALESCE(NULLIF(display_name, ''), metric_name),
+                    metric_name, definition, meaning, value_interpretation, good_threshold, current_value_assessment, source_id, created_at
+             FROM metric_explanations WHERE run_id = ?1",
+        )?;
+        let rows = stmt.query_map([run_id], |row| {
+            Ok(MetricExplanation {
+                id: row.get(0)?,
+                run_id: row.get(1)?,
+                target_type: row.get(2)?,
+                target_key: row.get(3)?,
+                display_name: row.get(4)?,
+                metric_name: row.get(5)?,
+                definition: row.get(6)?,
+                meaning: row.get(7)?,
+                value_interpretation: row.get(8)?,
+                good_threshold: row.get(9)?,
+                current_value_assessment: row.get(10)?,
+                source_id: row.get(11)?,
+                created_at: row.get(12)?,
+            })
+        })?;
+        let mut explanations = Vec::new();
+        for row in rows {
+            explanations.push(row?);
+        }
+        Ok(explanations)
     }
 
     pub(crate) fn save_structured_artifact(&self, artifact: &StructuredArtifact) -> Result<()> {
@@ -4562,6 +4673,36 @@ pub(crate) mod tests {
                     && a.verdict == CriterionVerdict::Confirmed
                     && a.supporting_evidence_ids == vec!["source-1".to_string()])
         );
+    }
+
+    #[test]
+    fn metric_explanations_upsert_by_target() {
+        let db = Database::open_at(PathBuf::from(":memory:")).unwrap();
+        let run_id = seed_run(&db, "Analyze AAPL", AnalysisIntent::SingleEquity);
+        let now = chrono::Utc::now().to_rfc3339();
+
+        for definition in ["first", "second"] {
+            db.save_metric_explanation(&MetricExplanation {
+                id: uuid::Uuid::new_v4().to_string(),
+                run_id: run_id.clone(),
+                target_type: "metric".into(),
+                target_key: "p_e_ratio".into(),
+                display_name: "P/E ratio".into(),
+                metric_name: "P/E ratio".into(),
+                definition: definition.into(),
+                meaning: "Valuation multiple".into(),
+                value_interpretation: "Average".into(),
+                good_threshold: None,
+                current_value_assessment: "12.4x is moderate".into(),
+                source_id: None,
+                created_at: now.clone(),
+            })
+            .unwrap();
+        }
+
+        let explanations = db.get_metric_explanations(&run_id).unwrap();
+        assert_eq!(explanations.len(), 1);
+        assert_eq!(explanations[0].definition, "second");
     }
 
     #[test]

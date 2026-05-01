@@ -152,6 +152,8 @@ export async function generateAnalysis(
   analysisId: string,
   onProgress: Channel<ProgressEventPayload>,
   enabledSources: string[] | null = null,
+  explainable?: boolean,
+  explainModelId?: string | null,
 ): Promise<{ analysis_id: string; run_id: string }> {
   return invoke("generate_analysis", {
     userPrompt,
@@ -161,6 +163,8 @@ export async function generateAnalysis(
     runId,
     enabledSources,
     onProgress,
+    explainable,
+    explainModelId,
   });
 }
 

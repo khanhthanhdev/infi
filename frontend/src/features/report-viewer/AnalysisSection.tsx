@@ -1,11 +1,12 @@
 import { type CSSProperties, memo } from "react";
-import type { AnalysisBlock, BlockKind, Source } from "@/types";
+import type { AnalysisBlock, BlockKind, MetricExplanation, Source } from "@/types";
 import { AnalysisBlockCard } from "./AnalysisBlockCard";
 import type { SelectionProps } from "./selection";
 
 interface AnalysisSectionProps extends SelectionProps {
   blocks: AnalysisBlock[];
   sourceMap: Map<string, Source>;
+  explanations?: MetricExplanation[];
 }
 
 interface BlockGroup {
@@ -29,6 +30,7 @@ const GROUPS: BlockGroup[] = [
 export const AnalysisSection = memo(function AnalysisSection({
   blocks,
   sourceMap,
+  explanations = [],
   selectedId,
   onSelect,
 }: AnalysisSectionProps) {
@@ -68,6 +70,7 @@ export const AnalysisSection = memo(function AnalysisSection({
                 key={block.id}
                 block={block}
                 sourceMap={sourceMap}
+                explanations={explanations}
                 isFirstInGroup={index === 0}
                 selectedId={selectedId}
                 onSelect={onSelect}

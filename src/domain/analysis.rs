@@ -943,6 +943,30 @@ pub struct PortfolioExpectedReturnModel {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MetricExplanation {
+    pub id: String,
+    pub run_id: String,
+    #[serde(default = "default_metric_explanation_target_type")]
+    pub target_type: String,
+    #[serde(default)]
+    pub target_key: String,
+    #[serde(default)]
+    pub display_name: String,
+    pub metric_name: String,
+    pub definition: String,
+    pub meaning: String,
+    pub value_interpretation: String,
+    pub good_threshold: Option<String>,
+    pub current_value_assessment: String,
+    pub source_id: Option<String>,
+    pub created_at: String,
+}
+
+fn default_metric_explanation_target_type() -> String {
+    "metric".to_string()
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AnalysisReport {
     pub analysis: Analysis,
     pub runs: Vec<AnalysisRun>,
@@ -958,6 +982,8 @@ pub struct AnalysisReport {
     pub uncertainty_entries: Vec<UncertaintyEntry>,
     pub methodology_note: Option<MethodologyNote>,
     pub decision_criterion_answers: Vec<DecisionCriterionAnswer>,
+    #[serde(default)]
+    pub explanations: Vec<MetricExplanation>,
     #[serde(default)]
     pub holding_reviews: Vec<HoldingReview>,
     #[serde(default)]

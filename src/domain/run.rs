@@ -17,4 +17,7 @@ pub struct RunContext {
     /// absent from the list will not appear in the agent's tool list at all.
     #[serde(default)]
     pub enabled_sources: Vec<String>,
+    /// When true, this run is for generating metric explanations.
+    #[serde(default)]
+    pub is_explanation_pass: bool,
 }

@@ -3,12 +3,12 @@ use crate::domain::{
     AllocationBucket, AllocationDimension, AllocationReview, AnalysisBlock, AnalysisIntent,
     AnalysisStatus, ArtifactColumn, ArtifactKind, ArtifactSeries, BlockKind, CounterThesis,
     CriterionVerdict, DecisionCriterionAnswer, Entity, FactorExposure, FinalStance, HoldingReview,
-    HoldingStance, Importance, MethodologyNote, MetricSnapshot, PortfolioExpectedReturnInput,
-    PortfolioExpectedReturnModel, PortfolioModelType, PortfolioRisk, PortfolioScenarioAnalysis,
-    PortfolioScenarioOutcome, PortfolioStressCase, Projection, ProjectionScenario,
-    RESEARCH_DISCLAIMER, RebalancingRow, RebalancingSuggestion, ResearchPlan, RiskLevel,
-    ScenarioLabel, Source, SourceReliability, StanceKind, StructuredArtifact, UncertaintyEntry,
-    VerificationStatus, age_days,
+    HoldingStance, Importance, MethodologyNote, MetricExplanation, MetricSnapshot,
+    PortfolioExpectedReturnInput, PortfolioExpectedReturnModel, PortfolioModelType, PortfolioRisk,
+    PortfolioScenarioAnalysis, PortfolioScenarioOutcome, PortfolioStressCase, Projection,
+    ProjectionScenario, RESEARCH_DISCLAIMER, RebalancingRow, RebalancingSuggestion, ResearchPlan,
+    RiskLevel, ScenarioLabel, Source, SourceReliability, StanceKind, StructuredArtifact,
+    UncertaintyEntry, VerificationStatus, age_days,
 };
 use crate::infra::db::Database;
 use pmcp::{SimpleTool, ToolHandler};
@@ -470,6 +470,98 @@ pub fn create_submit_metric_snapshot_tool(config: Arc<ServerConfig>) -> impl Too
             "change_percent": { "type": "number", "description": "Percent-point change. Use 8 for +8%, not 0.08." }
         }
     }))
+}
+
+#[derive(Debug, Deserialize)]
+struct SubmitMetricExplanationArgs {
+    target_type: Option<String>,
+    target_key: Option<String>,
+    display_name: Option<String>,
+    metric_name: String,
+    definition: String,
+    meaning: String,
+    value_interpretation: String,
+    good_threshold: Option<String>,
+    current_value_assessment: String,
+    source_id: Option<String>,
+}
+
+pub fn create_submit_metric_explanation_tool(config: Arc<ServerConfig>) -> impl ToolHandler {
+    SimpleTool::new("submit_metric_explanation", move |args: Value, _extra| {
+        let config = config.clone();
+        Box::pin(async move {
+            let input: SubmitMetricExplanationArgs = serde_json::from_value(args)
+                .map_err(|err| pmcp::Error::Validation(err.to_string()))?;
+            let context = config
+                .load_context()
+                .map_err(|err| pmcp::Error::InvalidState(err.to_string()))?;
+            let database = db(&config).map_err(|err| pmcp::Error::Internal(err.to_string()))?;
+            if let Some(ref source_id) = input.source_id {
+                validate_evidence_ids(
+                    &database,
+                    &context.run_id,
+                    "source_id",
+                    std::slice::from_ref(source_id),
+                )?;
+            }
+            let target_type = input.target_type.unwrap_or_else(|| "metric".to_string());
+            let target_key = input
+                .target_key
+                .unwrap_or_else(|| normalize_explanation_key(&input.metric_name));
+            let display_name = input
+                .display_name
+                .unwrap_or_else(|| input.metric_name.clone());
+            let explanation = MetricExplanation {
+                id: uuid::Uuid::new_v4().to_string(),
+                run_id: context.run_id,
+                target_type,
+                target_key,
+                display_name,
+                metric_name: input.metric_name,
+                definition: input.definition,
+                meaning: input.meaning,
+                value_interpretation: input.value_interpretation,
+                good_threshold: input.good_threshold,
+                current_value_assessment: input.current_value_assessment,
+                source_id: input.source_id,
+                created_at: now(),
+            };
+            database
+                .save_metric_explanation(&explanation)
+                .map_err(|err| pmcp::Error::Internal(err.to_string()))?;
+            Ok(json!({ "status": "ok", "explanation_id": explanation.id }))
+        })
+    })
+    .with_description("Submit an explanation for a metric in the report. This provides plain-language context about what the metric means, how to interpret it, and whether the current value is good or bad.")
+    .with_schema(json!({
+        "type": "object",
+        "required": ["metric_name", "definition", "meaning", "value_interpretation", "current_value_assessment"],
+        "properties": {
+            "target_type": { "type": "string", "enum": ["metric", "term"], "description": "Whether this explains a normalized report metric or a finance term found in report prose" },
+            "target_key": { "type": "string", "description": "Stable normalized key for the target supplied in the prompt" },
+            "display_name": { "type": "string", "description": "Human-readable label to show in the tooltip" },
+            "metric_name": { "type": "string", "description": "The exact metric name this explanation is for (e.g., 'P/E ratio', 'CASA ratio')" },
+            "definition": { "type": "string", "description": "What this metric measures in one sentence" },
+            "meaning": { "type": "string", "description": "How to interpret values of this metric generally (e.g., 'Higher P/E means investors are paying more for each dollar of earnings')" },
+            "value_interpretation": { "type": "string", "description": "What the current value in the report means - is it good, average, or poor?" },
+            "good_threshold": { "type": "string", "description": "What range is typically considered 'good' for this metric" },
+            "current_value_assessment": { "type": "string", "description": "Brief assessment of the specific current value from the report" },
+            "source_id": { "type": "string", "description": "Optional source ID this explanation is based on" }
+        }
+    }))
+}
+
+fn normalize_explanation_key(value: &str) -> String {
+    value
+        .trim()
+        .to_ascii_lowercase()
+        .chars()
+        .map(|ch| if ch.is_ascii_alphanumeric() { ch } else { '_' })
+        .collect::<String>()
+        .split('_')
+        .filter(|part| !part.is_empty())
+        .collect::<Vec<_>>()
+        .join("_")
 }
 
 #[derive(Debug, Deserialize)]
@@ -2247,9 +2339,9 @@ mod tests {
             user_prompt: "Analyze AAPL".into(),
             created_at: chrono::Utc::now().to_rfc3339(),
             enabled_sources: Vec::new(),
+            is_explanation_pass: false,
         };
         std::fs::write(&ctx_path, serde_json::to_string(&context).unwrap()).unwrap();
-
         let config = Arc::new(ServerConfig {
             run_context: Some(ctx_path),
             db_path: Some(db_path),
@@ -2925,6 +3017,7 @@ mod tests {
             user_prompt: "Analyze AAPL".into(),
             created_at: chrono::Utc::now().to_rfc3339(),
             enabled_sources: Vec::new(),
+            is_explanation_pass: false,
         };
         std::fs::write(&ctx_path, serde_json::to_string(&context).unwrap()).unwrap();
         let config = Arc::new(ServerConfig {
@@ -2977,6 +3070,7 @@ mod tests {
             user_prompt: "Review".into(),
             created_at: chrono::Utc::now().to_rfc3339(),
             enabled_sources: Vec::new(),
+            is_explanation_pass: false,
         };
         std::fs::write(&ctx_path, serde_json::to_string(&context).unwrap()).unwrap();
         let config = Arc::new(ServerConfig {

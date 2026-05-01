@@ -260,6 +260,7 @@ export function ReportContent({ onAskFollowUp }: ReportContentProps = {}) {
               sourceMap={sourceMap}
               selectedId={selectedId}
               onSelect={setSelection}
+              explanations={report.explanations}
             />
           </section>
         )}
@@ -309,6 +310,7 @@ export function ReportContent({ onAskFollowUp }: ReportContentProps = {}) {
             <AnalysisSection
               blocks={report.blocks}
               sourceMap={sourceMap}
+              explanations={report.explanations}
               selectedId={selectedId}
               onSelect={setSelection}
             />

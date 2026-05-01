@@ -18,7 +18,7 @@ use crate::infra::keystore;
 use crate::infra::sources::{self, ProviderDescriptor};
 use crate::state::AppState;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use tauri::{AppHandle, Emitter, State, ipc::Channel};
 use tokio::sync::mpsc;
 use tokio_util::sync::CancellationToken;
@@ -532,11 +532,17 @@ pub async fn generate_analysis(
     run_id: Option<String>,
     enabled_sources: Option<Vec<String>>,
     on_progress: Channel<ProgressEventPayload>,
+    explainable: Option<bool>,
+    explain_model_id: Option<String>,
 ) -> Result<GenerateAnalysisResult, CommandError> {
     let trimmed_prompt = user_prompt.trim();
     if trimmed_prompt.is_empty() {
         return Err("Enter a research request before starting analysis.".into());
     }
+
+    log::info!(
+        "generate_analysis received: analysis_id={analysis_id}, explainable={explainable:?}, explain_model_id={explain_model_id:?}"
+    );
 
     let (candidate, launch) = resolve_agent_launch(&agent_id, model_id.as_deref())
         .map_err(|message| CommandError::with_kind(message, CommandErrorKind::Validation))?;
@@ -620,6 +626,7 @@ pub async fn generate_analysis(
         user_prompt: trimmed_prompt.to_string(),
         created_at: now,
         enabled_sources: resolved_sources.clone(),
+        is_explanation_pass: false,
     };
 
     let mut source_keys: HashMap<String, String> = HashMap::new();
@@ -651,6 +658,7 @@ pub async fn generate_analysis(
     let progress_channel = on_progress.clone();
     let run_id_clone = run_id.clone();
     let db_clone = state.db.clone();
+    let suppress_child_completed = explainable.unwrap_or(false);
 
     let (coalesce_tx, mut coalesce_rx) = mpsc::unbounded_channel::<()>();
     let coalesce_app = app.clone();
@@ -671,6 +679,9 @@ pub async fn generate_analysis(
 
     tauri::async_runtime::spawn(async move {
         while let Some(payload) = progress_rx.recv().await {
+            if suppress_child_completed && matches!(payload, ProgressEventPayload::Completed) {
+                continue;
+            }
             let data_kind = match &payload {
                 ProgressEventPayload::PlanSubmitted => Some("plan"),
                 ProgressEventPayload::SourceSubmitted => Some("source"),
@@ -724,18 +735,38 @@ pub async fn generate_analysis(
     })
     .await;
 
-    {
-        let mut active = state.active_runs.lock()?;
-        active.remove(&run_id);
-    }
-
     match generation_result {
         Ok(_) => {
+            let main_run_agent_id = candidate.id.clone();
+
+            log::info!(
+                "main pass completed; suppress_child_completed={suppress_child_completed}, will run explanation pass: {suppress_child_completed}"
+            );
+            if !suppress_child_completed {
+                let _ = on_progress.send(ProgressEventPayload::Log(
+                    "Explainable pass skipped (toggle was off).".to_string(),
+                ));
+            }
+
+            if suppress_child_completed {
+                run_explanation_pass(
+                    app.clone(),
+                    state.clone(),
+                    analysis_id.clone(),
+                    run_id.clone(),
+                    main_run_agent_id,
+                    explain_model_id,
+                    on_progress.clone(),
+                )
+                .await;
+            }
+
             let db = &state.db;
             db.update_run_status(&run_id, AnalysisStatus::Completed, None)?;
             db.recompute_analysis_status(&analysis_id)?;
             let _ = on_progress.send(ProgressEventPayload::Completed);
         }
+
         Err(err) => {
             use crate::commands::error::CommandErrorKind;
             use crate::infra::acp::analysis_generator::AcpTimeout;
@@ -758,14 +789,317 @@ pub async fn generate_analysis(
             let _ = on_progress.send(ProgressEventPayload::Error {
                 message: message.clone(),
             });
+            {
+                let mut active = state.active_runs.lock()?;
+                active.remove(&run_id);
+            }
             return Err(CommandError::with_kind(message, kind));
         }
+    }
+
+    {
+        let mut active = state.active_runs.lock()?;
+        active.remove(&run_id);
     }
 
     Ok(GenerateAnalysisResult {
         analysis_id,
         run_id,
     })
+}
+
+/// Send a Log event to the live frontend channel AND persist it to
+/// `run_progress` against the main run, so it survives a page reload and shows
+/// up in the historical log view. Use this for explanation-pass status lines
+/// instead of calling `on_progress.send(...)` directly.
+fn emit_explain_log(
+    db: &crate::infra::db::Database,
+    main_run_id: &str,
+    on_progress: &Channel<ProgressEventPayload>,
+    message: impl Into<String>,
+) {
+    let payload = ProgressEventPayload::Log(format!("[explain] {}", message.into()));
+    if let Err(err) = db.append_progress_event(main_run_id, &payload) {
+        log::warn!("explain log persist dropped ({main_run_id}): {err:#}");
+    }
+    let _ = on_progress.send(payload);
+}
+
+async fn run_explanation_pass(
+    app: AppHandle,
+    state: State<'_, AppState>,
+    analysis_id: String,
+    main_run_id: String,
+    agent_id: String,
+    explain_model_id: Option<String>,
+    on_progress: Channel<ProgressEventPayload>,
+) {
+    let max_attempts = 3;
+
+    let db = &state.db;
+    let report = match db.get_report(&analysis_id, Some(&main_run_id)) {
+        Ok(Some(report)) => report,
+        Ok(None) => {
+            emit_explain_log(db, &main_run_id, &on_progress, "Analysis not found");
+            return;
+        }
+        Err(e) => {
+            emit_explain_log(
+                db,
+                &main_run_id,
+                &on_progress,
+                format!("Failed to get metrics for explanation pass: {e}"),
+            );
+            return;
+        }
+    };
+    let targets = crate::prompts::explanation_targets_from_report(&report);
+
+    if targets.is_empty() {
+        emit_explain_log(
+            db,
+            &main_run_id,
+            &on_progress,
+            "No metrics or terms to explain",
+        );
+        return;
+    }
+
+    emit_explain_log(
+        db,
+        &main_run_id,
+        &on_progress,
+        format!(
+            "Starting explanation pass ({} target{} to explain)...",
+            targets.len(),
+            if targets.len() == 1 { "" } else { "s" }
+        ),
+    );
+
+    let model_override = explain_model_id
+        .clone()
+        .or_else(|| preferred_explanation_model_id(&agent_id));
+
+    let (candidate, launch) = match resolve_agent_launch(&agent_id, model_override.as_deref()) {
+        Ok((c, l)) => (c, l),
+        Err(e) => {
+            emit_explain_log(
+                db,
+                &main_run_id,
+                &on_progress,
+                format!("Failed to resolve explanation agent: {e}"),
+            );
+            return;
+        }
+    };
+
+    let command = launch.command;
+    let agent_args = launch.args;
+    let model_env = launch.env;
+
+    let context = RunContext {
+        analysis_id: analysis_id.clone(),
+        run_id: main_run_id.clone(),
+        agent_id: candidate.id.clone(),
+        user_prompt: format!("Explain the metrics from analysis {analysis_id}"),
+        created_at: chrono::Utc::now().to_rfc3339(),
+        enabled_sources: Vec::new(),
+        is_explanation_pass: true,
+    };
+
+    let db_path = state.db.path().clone();
+    let cancel_token = match state.active_runs.lock() {
+        Ok(active) => active.get(&main_run_id).cloned(),
+        Err(err) => {
+            emit_explain_log(
+                db,
+                &main_run_id,
+                &on_progress,
+                format!("Failed to access cancellation state for explanation pass: {err}"),
+            );
+            None
+        }
+    };
+
+    let mut remaining_targets: Vec<crate::prompts::ExplanationTarget> = targets.clone();
+
+    let mut attempt = 0;
+    while attempt < max_attempts {
+        attempt += 1;
+        emit_explain_log(
+            db,
+            &main_run_id,
+            &on_progress,
+            format!(
+                "Explanation attempt {attempt}/{max_attempts} ({} target{} remaining)...",
+                remaining_targets.len(),
+                if remaining_targets.len() == 1 {
+                    ""
+                } else {
+                    "s"
+                }
+            ),
+        );
+
+        let prompt_text =
+            match crate::prompts::build_explanation_prompt(&context, &remaining_targets) {
+                Ok(p) => p,
+                Err(e) => {
+                    emit_explain_log(
+                        db,
+                        &main_run_id,
+                        &on_progress,
+                        format!("Failed to build explanation prompt: {e}"),
+                    );
+                    return;
+                }
+            };
+
+        let (progress_tx, mut progress_rx) = mpsc::unbounded_channel::<ProgressEventPayload>();
+        let progress_channel = on_progress.clone();
+        let db_for_forward = state.db.clone();
+        let run_id_for_forward = main_run_id.clone();
+
+        tauri::async_runtime::spawn(async move {
+            while let Some(payload) = progress_rx.recv().await {
+                // Suppress the inner pass's Completed event — only the outer
+                // generate_analysis caller is allowed to mark the run done.
+                if matches!(payload, ProgressEventPayload::Completed) {
+                    continue;
+                }
+                // Persist every other event against the main run so the
+                // explanation-pass tool calls and logs survive a reload and
+                // show up in get_run_progress alongside the main pass.
+                if let Err(err) =
+                    db_for_forward.append_progress_event(&run_id_for_forward, &payload)
+                {
+                    log::warn!("explain progress persist dropped ({run_id_for_forward}): {err:#}");
+                }
+                if progress_channel.send(payload).is_err() {
+                    break;
+                }
+            }
+        });
+
+        let result = generate_with_acp(GenerateAnalysisInput {
+            run_context: context.clone(),
+            prompt_text,
+            agent_command: command.clone(),
+            agent_args: agent_args.clone(),
+            model_env: model_env.clone(),
+            progress_tx: Some(progress_tx),
+            mcp_server_binary: None,
+            db_path: db_path.clone(),
+            timeout_secs: Some(300),
+            cancel_token: cancel_token.clone(),
+            source_keys: HashMap::new(),
+        })
+        .await;
+
+        match result {
+            Ok(_) => {
+                let missing = missing_explanation_targets(&state.db, &main_run_id, &targets);
+                if missing.is_empty() {
+                    emit_explain_log(db, &main_run_id, &on_progress, "Explanation pass completed");
+                    break;
+                }
+                emit_explain_log(
+                    db,
+                    &main_run_id,
+                    &on_progress,
+                    format!(
+                        "Explanation attempt {attempt} missed {} target(s)",
+                        missing.len()
+                    ),
+                );
+                if attempt >= max_attempts {
+                    emit_explain_log(
+                        db,
+                        &main_run_id,
+                        &on_progress,
+                        "Explanation pass incomplete after 3 attempts, continuing...",
+                    );
+                    let still_missing =
+                        missing_explanation_targets(&state.db, &main_run_id, &targets);
+                    if !still_missing.is_empty() {
+                        emit_explain_log(
+                            db,
+                            &main_run_id,
+                            &on_progress,
+                            format!(
+                                "Warning: {} explanation(s) still missing: {}",
+                                still_missing.len(),
+                                still_missing.join(", ")
+                            ),
+                        );
+                    }
+                } else {
+                    // Retry only the still-missing targets to focus the agent
+                    // and reduce token cost.
+                    let missing_keys: HashSet<String> = missing.into_iter().collect();
+                    remaining_targets.retain(|target| missing_keys.contains(&target.target_key));
+                }
+            }
+            Err(e) => {
+                emit_explain_log(
+                    db,
+                    &main_run_id,
+                    &on_progress,
+                    format!("Explanation attempt {attempt} failed: {e}"),
+                );
+                if attempt >= max_attempts {
+                    emit_explain_log(
+                        db,
+                        &main_run_id,
+                        &on_progress,
+                        "Explanation pass failed after 3 attempts, continuing...",
+                    );
+                }
+            }
+        }
+    }
+
+    let _ = app.emit(
+        "analysis-data-changed",
+        DataChangedPayload {
+            analysis_id,
+            kind: "explanations".to_string(),
+        },
+    );
+}
+
+fn preferred_explanation_model_id(agent_id: &str) -> Option<String> {
+    let agent = list_agent_candidates()
+        .into_iter()
+        .find(|candidate| candidate.id == agent_id)?;
+    if agent.models.iter().any(|model| model.id == "gpt-5.4-mini") {
+        return Some("gpt-5.4-mini".to_string());
+    }
+    None
+}
+
+fn missing_explanation_targets(
+    db: &crate::infra::db::Database,
+    run_id: &str,
+    targets: &[crate::prompts::ExplanationTarget],
+) -> Vec<String> {
+    let Ok(explanations) = db.get_metric_explanations(run_id) else {
+        return targets
+            .iter()
+            .map(|target| target.target_key.clone())
+            .collect();
+    };
+    let present: HashSet<(String, String)> = explanations
+        .into_iter()
+        .map(|explanation| (explanation.target_type, explanation.target_key))
+        .collect();
+    targets
+        .iter()
+        .filter(|target| {
+            !present.contains(&(target.target_type.clone(), target.target_key.clone()))
+        })
+        .map(|target| target.target_key.clone())
+        .collect()
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -1240,6 +1574,7 @@ mod tests {
             uncertainty_entries: vec![],
             methodology_note: None,
             decision_criterion_answers: vec![],
+            explanations: vec![],
             holding_reviews: vec![],
             allocation_reviews: vec![],
             portfolio_risks: vec![],

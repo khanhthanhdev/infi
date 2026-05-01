@@ -1,5 +1,6 @@
-import type { Components } from "react-markdown";
 import type { ReactNode } from "react";
+import type { Components } from "react-markdown";
+import { MetricExplanationTooltip } from "@/components/ui/MetricExplanationTooltip";
 import {
   Table,
   TableBody,
@@ -8,6 +9,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import type { MetricExplanation } from "@/types";
+
+const TERM_ALIASES: Record<string, string[]> = {
+  pe: ["P/E", "P/E ratio", "price to earnings", "price-to-earnings"],
+  casa: ["CASA", "CASA ratio"],
+  eps: ["EPS", "earnings per share"],
+  roe: ["ROE", "return on equity"],
+  roa: ["ROA", "return on assets"],
+  ebitda: ["EBITDA"],
+  nim: ["NIM", "net interest margin"],
+  revenue: ["revenue", "sales"],
+  gross_margin: ["gross margin"],
+  operating_margin: ["operating margin"],
+  net_margin: ["net margin"],
+  free_cash_flow: ["free cash flow", "FCF"],
+  dividend_yield: ["dividend yield"],
+  book_value: ["book value"],
+  market_cap: ["market cap", "market capitalization"],
+  ev_ebitda: ["EV/EBITDA"],
+  debt_to_equity: ["debt-to-equity", "debt to equity"],
+  loan_to_deposit: ["loan-to-deposit", "loan to deposit", "LDR"],
+  non_performing_loan: ["non-performing loan", "NPL"],
+  net_profit: ["net profit", "net income"],
+};
 
 function processNumberHighlights(children: ReactNode): ReactNode {
   if (typeof children !== "string") return children;
@@ -29,8 +54,66 @@ function processNumberHighlights(children: ReactNode): ReactNode {
   });
 }
 
-function TextWithHighlights({ children }: { children: ReactNode }) {
-  return <>{processNumberHighlights(children)}</>;
+function processHighlights(children: ReactNode, explanations: MetricExplanation[]): ReactNode {
+  if (typeof children !== "string") return processNumberHighlights(children);
+
+  const termExplanations = new Map(
+    explanations.filter((e) => e.target_type === "term").map((e) => [e.target_key, e]),
+  );
+  if (termExplanations.size === 0) return processNumberHighlights(children);
+
+  const aliases = Array.from(termExplanations.entries())
+    .flatMap(([key, explanation]) => {
+      const knownAliases = TERM_ALIASES[key] ?? [
+        explanation.display_name || explanation.metric_name,
+      ];
+      return knownAliases.map((alias) => ({ alias, explanation }));
+    })
+    .filter(({ alias }) => alias.trim().length > 0)
+    .sort((a, b) => b.alias.length - a.alias.length);
+
+  if (aliases.length === 0) return processNumberHighlights(children);
+
+  const pattern = new RegExp(
+    `(?<![\\w/])(${aliases.map(({ alias }) => escapeRegExp(alias)).join("|")})(?![\\w/])`,
+    "gi",
+  );
+  const numberParts = children.split(/(\[\[.*?\]\])/g);
+
+  return numberParts.flatMap((part, partIndex) => {
+    if (part.startsWith("[[") && part.endsWith("]]")) {
+      return processNumberHighlights(part);
+    }
+
+    return part.split(pattern).map((piece, pieceIndex) => {
+      const match = aliases.find(({ alias }) => alias.toLowerCase() === piece.toLowerCase());
+      if (!match) return piece;
+      return (
+        <MetricExplanationTooltip
+          key={`${partIndex}-${pieceIndex}-${piece}`}
+          explanation={match.explanation}
+        >
+          <span className="cursor-help underline decoration-dotted underline-offset-2">
+            {piece}
+          </span>
+        </MetricExplanationTooltip>
+      );
+    });
+  });
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function TextWithHighlights({
+  children,
+  explanations = [],
+}: {
+  children: ReactNode;
+  explanations?: MetricExplanation[];
+}) {
+  return <>{processHighlights(children, explanations)}</>;
 }
 
 export const reportMarkdownComponents: Components = {
@@ -43,8 +126,16 @@ export const reportMarkdownComponents: Components = {
       {children}
     </TableHead>
   ),
-  td: ({ children }) => <TableCell className="px-3"><TextWithHighlights>{children}</TextWithHighlights></TableCell>,
-  p: ({ children }) => <p className="leading-[1.65]"><TextWithHighlights>{children}</TextWithHighlights></p>,
+  td: ({ children }) => (
+    <TableCell className="px-3">
+      <TextWithHighlights>{children}</TextWithHighlights>
+    </TableCell>
+  ),
+  p: ({ children }) => (
+    <p className="leading-[1.65]">
+      <TextWithHighlights>{children}</TextWithHighlights>
+    </p>
+  ),
   ul: ({ children }) => (
     <ul className="space-y-1.5 pl-0 [&>li]:relative [&>li]:pl-5 [&>li]:before:absolute [&>li]:before:left-1 [&>li]:before:top-[0.7em] [&>li]:before:h-1 [&>li]:before:w-1 [&>li]:before:rounded-full [&>li]:before:bg-foreground/50">
       {children}
@@ -55,7 +146,11 @@ export const reportMarkdownComponents: Components = {
       {children}
     </ol>
   ),
-  li: ({ children }) => <li className="leading-[1.6]"><TextWithHighlights>{children}</TextWithHighlights></li>,
+  li: ({ children }) => (
+    <li className="leading-[1.6]">
+      <TextWithHighlights>{children}</TextWithHighlights>
+    </li>
+  ),
   a: ({ href, children }) => (
     <a
       href={href}
@@ -67,13 +162,25 @@ export const reportMarkdownComponents: Components = {
     </a>
   ),
   blockquote: ({ children }) => (
-    <blockquote className="border-l-2 border-foreground/30 pl-4 text-muted-foreground"><TextWithHighlights>{children}</TextWithHighlights></blockquote>
+    <blockquote className="border-l-2 border-foreground/30 pl-4 text-muted-foreground">
+      <TextWithHighlights>{children}</TextWithHighlights>
+    </blockquote>
   ),
-  h1: ({ children }) => <h1 className="pt-2 text-lg font-semibold tracking-tight"><TextWithHighlights>{children}</TextWithHighlights></h1>,
+  h1: ({ children }) => (
+    <h1 className="pt-2 text-lg font-semibold tracking-tight">
+      <TextWithHighlights>{children}</TextWithHighlights>
+    </h1>
+  ),
   h2: ({ children }) => (
-    <h2 className="pt-2 text-[15px] font-semibold tracking-tight"><TextWithHighlights>{children}</TextWithHighlights></h2>
+    <h2 className="pt-2 text-[15px] font-semibold tracking-tight">
+      <TextWithHighlights>{children}</TextWithHighlights>
+    </h2>
   ),
-  h3: ({ children }) => <h3 className="text-[14px] font-semibold"><TextWithHighlights>{children}</TextWithHighlights></h3>,
+  h3: ({ children }) => (
+    <h3 className="text-[14px] font-semibold">
+      <TextWithHighlights>{children}</TextWithHighlights>
+    </h3>
+  ),
   h4: ({ children }) => (
     <h4 className="text-[10.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
       <TextWithHighlights>{children}</TextWithHighlights>
@@ -96,3 +203,49 @@ export const reportMarkdownComponents: Components = {
     </pre>
   ),
 };
+
+export function createReportMarkdownComponents(explanations: MetricExplanation[] = []): Components {
+  return {
+    ...reportMarkdownComponents,
+    td: ({ children }) => (
+      <TableCell className="px-3">
+        <TextWithHighlights explanations={explanations}>{children}</TextWithHighlights>
+      </TableCell>
+    ),
+    p: ({ children }) => (
+      <p className="leading-[1.65]">
+        <TextWithHighlights explanations={explanations}>{children}</TextWithHighlights>
+      </p>
+    ),
+    li: ({ children }) => (
+      <li className="leading-[1.6]">
+        <TextWithHighlights explanations={explanations}>{children}</TextWithHighlights>
+      </li>
+    ),
+    blockquote: ({ children }) => (
+      <blockquote className="border-l-2 border-foreground/30 pl-4 text-muted-foreground">
+        <TextWithHighlights explanations={explanations}>{children}</TextWithHighlights>
+      </blockquote>
+    ),
+    h1: ({ children }) => (
+      <h1 className="pt-2 text-lg font-semibold tracking-tight">
+        <TextWithHighlights explanations={explanations}>{children}</TextWithHighlights>
+      </h1>
+    ),
+    h2: ({ children }) => (
+      <h2 className="pt-2 text-[15px] font-semibold tracking-tight">
+        <TextWithHighlights explanations={explanations}>{children}</TextWithHighlights>
+      </h2>
+    ),
+    h3: ({ children }) => (
+      <h3 className="text-[14px] font-semibold">
+        <TextWithHighlights explanations={explanations}>{children}</TextWithHighlights>
+      </h3>
+    ),
+    h4: ({ children }) => (
+      <h4 className="text-[10.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+        <TextWithHighlights explanations={explanations}>{children}</TextWithHighlights>
+      </h4>
+    ),
+  };
+}

@@ -37,6 +37,8 @@ export function useRunAnalysis({ agentId, agents, canRun }: UseRunAnalysisOption
       agentId?: string;
       modelId?: string | null;
       enabledSources?: string[] | null;
+      explainable?: boolean;
+      explainModelId?: string | null;
     },
   ) => {
     const effectiveAgentId = overrides?.agentId ?? agentId;
@@ -46,6 +48,8 @@ export function useRunAnalysis({ agentId, agents, canRun }: UseRunAnalysisOption
         ? overrides.modelId
         : (getState().modelByAgent[effectiveAgentId] ?? null);
     const enabledSources = overrides?.enabledSources ?? null;
+    const explainable = overrides?.explainable ?? false;
+    const explainModelId = overrides?.explainModelId ?? null;
     const runId = crypto.randomUUID();
 
     addRun({
@@ -88,6 +92,8 @@ export function useRunAnalysis({ agentId, agents, canRun }: UseRunAnalysisOption
       analysisId,
       onProgress,
       enabledSources,
+      explainable,
+      explainModelId,
     ).catch((err) => {
       const normalized = normalizeError(err);
       const isCancelled =
@@ -103,7 +109,11 @@ export function useRunAnalysis({ agentId, agents, canRun }: UseRunAnalysisOption
     });
   };
 
-  const start = async (prompt: string, enabledSources: string[] | null = null) => {
+  const start = async (
+    prompt: string,
+    enabledSources: string[] | null = null,
+    options?: { explainable?: boolean; explainModelId?: string | null },
+  ) => {
     if (!canRun) return;
 
     setLocalError(null);
@@ -119,7 +129,7 @@ export function useRunAnalysis({ agentId, agents, canRun }: UseRunAnalysisOption
       return;
     }
 
-    startWithAnalysisId(analysisId, effectivePrompt, { enabledSources });
+    startWithAnalysisId(analysisId, effectivePrompt, { enabledSources, ...options });
   };
 
   const finishRun = async (analysisId: string) => {

@@ -15,6 +15,7 @@ const INFI_TOOLS: &[&str] = &[
     "submit_entity_resolution",
     "submit_source",
     "submit_metric_snapshot",
+    "submit_metric_explanation",
     "submit_structured_artifact",
     "submit_analysis_block",
     "submit_final_stance",
