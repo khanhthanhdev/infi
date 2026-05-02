@@ -1,4 +1,11 @@
-import { memo, type ReactNode, useMemo } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  memo,
+  type ReactElement,
+  type ReactNode,
+  useMemo,
+} from "react";
 import type { Components } from "react-markdown";
 import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -22,6 +29,57 @@ function urlTransform(url: string): string {
   return defaultUrlTransform(url);
 }
 
+function highlightNumberText(text: string, keyPrefix: string): ReactNode {
+  const parts: ReactNode[] = [];
+  const pattern = /\[\[([^[\]]+?)\]\](%?)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    parts.push(
+      <span
+        key={`${keyPrefix}-${match.index}`}
+        className="rounded-sm bg-primary/10 px-0.5 font-mono tabular-nums text-[0.92em] text-primary"
+      >
+        {match[1]}
+        {match[2]}
+      </span>,
+    );
+    lastIndex = pattern.lastIndex;
+  }
+
+  if (parts.length === 0) return text;
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+  return parts;
+}
+
+function NumberHighlights({ children }: { children: ReactNode }) {
+  return <>{processNumberHighlights(children)}</>;
+}
+
+function processNumberHighlights(children: ReactNode): ReactNode {
+  if (typeof children === "string") return highlightNumberText(children, "number");
+  if (Array.isArray(children)) {
+    return children.map((child, index) => processNumberHighlightsWithKey(child, `number-${index}`));
+  }
+  if (isValidElement(children)) {
+    const element = children as ReactElement<{ children?: ReactNode }>;
+    return cloneElement(element, {
+      children: processNumberHighlights(element.props.children),
+    });
+  }
+  return children;
+}
+
+function processNumberHighlightsWithKey(children: ReactNode, keyPrefix: string): ReactNode {
+  if (typeof children === "string") return highlightNumberText(children, keyPrefix);
+  return processNumberHighlights(children);
+}
+
 interface MarkdownMessageProps {
   text: string;
   streaming?: boolean;
@@ -34,7 +92,7 @@ function MarkdownMessage({ text }: MarkdownMessageProps) {
       a({ href, children }) {
         return (
           <a href={href} target="_blank" rel="noopener noreferrer">
-            {children}
+            <NumberHighlights>{children}</NumberHighlights>
           </a>
         );
       },
@@ -51,31 +109,45 @@ function MarkdownMessage({ text }: MarkdownMessageProps) {
       th({ children }) {
         return (
           <th className="border-b border-border px-3 py-2 text-left text-xs font-semibold text-foreground">
-            {children}
+            <NumberHighlights>{children}</NumberHighlights>
           </th>
         );
       },
       td({ children }) {
         return (
-          <td className="border-b border-border/50 px-3 py-2 text-muted-foreground">{children}</td>
+          <td className="border-b border-border/50 px-3 py-2 text-muted-foreground">
+            <NumberHighlights>{children}</NumberHighlights>
+          </td>
         );
       },
       tr({ children }) {
         return <tr className="transition-colors hover:bg-muted/30">{children}</tr>;
       },
       h1({ children }) {
-        return <h1 className="mt-6 mb-3 text-xl font-bold tracking-tight">{children}</h1>;
+        return (
+          <h1 className="mt-6 mb-3 text-xl font-bold tracking-tight">
+            <NumberHighlights>{children}</NumberHighlights>
+          </h1>
+        );
       },
       h2({ children }) {
-        return <h2 className="mt-5 mb-2 text-lg font-semibold tracking-tight">{children}</h2>;
+        return (
+          <h2 className="mt-5 mb-2 text-lg font-semibold tracking-tight">
+            <NumberHighlights>{children}</NumberHighlights>
+          </h2>
+        );
       },
       h3({ children }) {
-        return <h3 className="mt-4 mb-2 text-base font-semibold">{children}</h3>;
+        return (
+          <h3 className="mt-4 mb-2 text-base font-semibold">
+            <NumberHighlights>{children}</NumberHighlights>
+          </h3>
+        );
       },
       blockquote({ children }) {
         return (
           <blockquote className="my-3 border-l-2 border-primary/40 pl-4 text-muted-foreground italic">
-            {children}
+            <NumberHighlights>{children}</NumberHighlights>
           </blockquote>
         );
       },
@@ -94,6 +166,20 @@ function MarkdownMessage({ text }: MarkdownMessageProps) {
           <ol className="my-2 space-y-1 pl-4 list-decimal marker:text-muted-foreground/50">
             {children}
           </ol>
+        );
+      },
+      li({ children }) {
+        return (
+          <li>
+            <NumberHighlights>{children}</NumberHighlights>
+          </li>
+        );
+      },
+      p({ children }) {
+        return (
+          <p>
+            <NumberHighlights>{children}</NumberHighlights>
+          </p>
         );
       },
       pre({ children }) {

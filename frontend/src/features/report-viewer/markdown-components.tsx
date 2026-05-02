@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { cloneElement, isValidElement, type ReactElement, type ReactNode } from "react";
 import type { Components } from "react-markdown";
 import { MetricExplanationTooltip } from "@/components/ui/MetricExplanationTooltip";
 import {
@@ -34,27 +34,63 @@ const TERM_ALIASES: Record<string, string[]> = {
   net_profit: ["net profit", "net income"],
 };
 
-function processNumberHighlights(children: ReactNode): ReactNode {
-  if (typeof children !== "string") return children;
+function highlightNumberText(text: string, keyPrefix: string): ReactNode {
+  const parts: ReactNode[] = [];
+  const pattern = /\[\[([^[\]]+?)\]\](%?)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
 
-  const parts = children.split(/(\[\[.*?\]\])/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("[[") && part.endsWith("]]")) {
-      const numericContent = part.slice(2, -2);
-      return (
-        <span
-          key={i}
-          className="rounded-sm bg-primary/10 px-0.5 font-mono tabular-nums text-[0.92em] text-primary"
-        >
-          {numericContent}
-        </span>
-      );
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
     }
-    return part;
-  });
+
+    parts.push(
+      <span
+        key={`${keyPrefix}-${match.index}`}
+        className="rounded-sm bg-primary/10 px-0.5 font-mono tabular-nums text-[0.92em] text-primary"
+      >
+        {match[1]}
+        {match[2]}
+      </span>,
+    );
+    lastIndex = pattern.lastIndex;
+  }
+
+  if (parts.length === 0) return text;
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+  return parts;
+}
+
+function processNumberHighlights(children: ReactNode): ReactNode {
+  if (typeof children === "string") return highlightNumberText(children, "number");
+  if (Array.isArray(children)) {
+    return children.map((child, index) => processNumberHighlightsWithKey(child, `number-${index}`));
+  }
+  if (isValidElement(children)) {
+    const element = children as ReactElement<{ children?: ReactNode }>;
+    return cloneElement(element, {
+      children: processNumberHighlights(element.props.children),
+    });
+  }
+  return children;
+}
+
+function processNumberHighlightsWithKey(children: ReactNode, keyPrefix: string): ReactNode {
+  if (typeof children === "string") return highlightNumberText(children, keyPrefix);
+  return processNumberHighlights(children);
 }
 
 function processHighlights(children: ReactNode, explanations: MetricExplanation[]): ReactNode {
+  if (Array.isArray(children)) {
+    return children.map((child) => processHighlights(child, explanations));
+  }
+  if (isValidElement(children)) {
+    const element = children as ReactElement<{ children?: ReactNode }>;
+    return cloneElement(element, {
+      children: processHighlights(element.props.children, explanations),
+    });
+  }
   if (typeof children !== "string") return processNumberHighlights(children);
 
   const termExplanations = new Map(
@@ -78,11 +114,11 @@ function processHighlights(children: ReactNode, explanations: MetricExplanation[
     `(?<![\\w/])(${aliases.map(({ alias }) => escapeRegExp(alias)).join("|")})(?![\\w/])`,
     "gi",
   );
-  const numberParts = children.split(/(\[\[.*?\]\])/g);
+  const numberParts = children.split(/(\[\[[^[\]]+?\]\]%?)/g);
 
   return numberParts.flatMap((part, partIndex) => {
-    if (part.startsWith("[[") && part.endsWith("]]")) {
-      return processNumberHighlights(part);
+    if (part.startsWith("[[") && (part.endsWith("]]") || part.endsWith("]]%"))) {
+      return processNumberHighlightsWithKey(part, `number-${partIndex}`);
     }
 
     return part.split(pattern).map((piece, pieceIndex) => {

@@ -30,8 +30,8 @@ trait AgentDefinition {
     fn candidate(&self) -> &AgentCandidate;
 
     fn build_launch(&self, model_id: Option<&str>) -> Result<AgentLaunch, String> {
-        let model_id = validate_model_selection(self.candidate(), model_id)?;
-        self.build_launch_for_model(model_id.as_deref())
+        let validated_model = validate_model_selection(self.candidate(), model_id)?;
+        self.build_launch_for_model(validated_model.as_deref())
     }
 
     fn build_launch_for_model(&self, model_id: Option<&str>) -> Result<AgentLaunch, String>;
@@ -50,12 +50,23 @@ pub fn resolve_agent_launch(
     model_id: Option<&str>,
 ) -> Result<(AgentCandidate, AgentLaunch), String> {
     let agents = agent_definitions();
-    let Some(agent) = agents
-        .iter()
-        .find(|agent| agent.candidate().id == agent_id)
-        .or_else(|| agents.iter().find(|agent| agent.candidate().available))
-    else {
-        return Err("No ACP agent is configured. Add one in Settings.".to_string());
+
+    let requested = agents.iter().find(|agent| agent.candidate().id == agent_id);
+
+    let agent = if let Some(agent) = requested {
+        agent
+    } else {
+        let Some(fallback) = agents.iter().find(|agent| agent.candidate().available) else {
+            return Err(format!(
+                "Requested ACP agent '{agent_id}' is not registered and no other agent is available. Add one in Settings."
+            ));
+        };
+        log::warn!(
+            "requested ACP agent '{}' not found; falling back to '{}'",
+            agent_id,
+            fallback.candidate().id
+        );
+        fallback
     };
 
     let candidate = agent.candidate().clone();
@@ -112,14 +123,14 @@ impl CodexAgent {
         if let Ok(path) = std::env::var("CODEX_ACP_BIN")
             && !path.trim().is_empty()
         {
-            let resolved = resolve_bin_or_literal(path);
+            let (resolved, available) = resolve_env_bin(&path);
             return Self {
                 candidate: AgentCandidate {
                     id: "codex".into(),
                     label: "Codex".into(),
                     command: Some(resolved),
                     args: Vec::new(),
-                    available: true,
+                    available,
                     models,
                     supports_model_override: true,
                 },
@@ -128,13 +139,14 @@ impl CodexAgent {
 
         let package = std::env::var("CODEX_ACP_PACKAGE")
             .unwrap_or_else(|_| "@zed-industries/codex-acp@latest".to_string());
+        let npx = find_bin("npx");
         Self {
             candidate: AgentCandidate {
                 id: "codex".into(),
                 label: "Codex".into(),
-                command: find_bin("npx"),
+                available: npx.is_some(),
+                command: npx,
                 args: vec!["-y".into(), package],
-                available: crate::infra::shell::find_agent_bin("codex").is_some(),
                 models,
                 supports_model_override: true,
             },
@@ -168,6 +180,7 @@ impl ClaudeAgent {
             "CLAUDE_ACP_BIN",
             "claude",
             "@zed-industries/claude-code-acp",
+            true,
         );
         candidate.models = vec![
             model("default", "Default"),
@@ -181,7 +194,6 @@ impl ClaudeAgent {
             model("claude-sonnet-4-6", "Claude Sonnet 4.6"),
             model("claude-opus-4-6", "Claude Opus 4.6"),
         ];
-        candidate.supports_model_override = true;
         Self { candidate }
     }
 }
@@ -206,8 +218,14 @@ struct GeminiAgent {
 
 impl GeminiAgent {
     fn new() -> Self {
-        let mut candidate =
-            command_candidate("gemini", "Gemini", "GEMINI_ACP_BIN", "gemini", &["--acp"]);
+        let mut candidate = command_candidate(
+            "gemini",
+            "Gemini",
+            "GEMINI_ACP_BIN",
+            "gemini",
+            &["--acp"],
+            true,
+        );
         candidate.models = vec![
             model("auto", "Auto"),
             model("pro", "Pro"),
@@ -219,7 +237,6 @@ impl GeminiAgent {
             model("gemini-2.5-flash", "Gemini 2.5 Flash"),
             model("gemini-2.5-flash-lite", "Gemini 2.5 Flash Lite"),
         ];
-        candidate.supports_model_override = true;
         Self { candidate }
     }
 }
@@ -244,14 +261,19 @@ struct QwenAgent {
 
 impl QwenAgent {
     fn new() -> Self {
-        let mut candidate =
-            command_candidate("qwen", "Qwen Code", "QWEN_ACP_BIN", "qwen", &["--acp"]);
+        let mut candidate = command_candidate(
+            "qwen",
+            "Qwen Code",
+            "QWEN_ACP_BIN",
+            "qwen",
+            &["--acp"],
+            true,
+        );
         candidate.models = vec![
             model("qwen3-coder-plus", "Qwen3 Coder Plus"),
             model("qwen3.5-plus", "Qwen3.5 Plus"),
             model("qwen3-max-2026-01-23", "Qwen3 Max"),
         ];
-        candidate.supports_model_override = true;
         Self { candidate }
     }
 }
@@ -283,6 +305,7 @@ impl MistralVibeAgent {
                 "MISTRAL_ACP_BIN",
                 "vibe-acp",
                 &[],
+                false,
             ),
         }
     }
@@ -310,7 +333,8 @@ struct KimiAgent {
 
 impl KimiAgent {
     fn new() -> Self {
-        let mut candidate = command_candidate("kimi", "Kimi", "KIMI_ACP_BIN", "kimi", &["--acp"]);
+        let mut candidate =
+            command_candidate("kimi", "Kimi", "KIMI_ACP_BIN", "kimi", &["--acp"], true);
         candidate.models = vec![
             model("kimi-k2.5", "Kimi K2.5"),
             model("kimi-k2-0905-preview", "Kimi K2 0905 Preview"),
@@ -319,7 +343,6 @@ impl KimiAgent {
             model("kimi-k2-thinking", "Kimi K2 Thinking"),
             model("kimi-k2-thinking-turbo", "Kimi K2 Thinking Turbo"),
         ];
-        candidate.supports_model_override = true;
         Self { candidate }
     }
 }
@@ -344,14 +367,14 @@ struct OpenCodeAgent {
 
 impl OpenCodeAgent {
     fn new() -> Self {
-        let mut candidate = command_candidate(
+        let candidate = command_candidate(
             "opencode",
             "OpenCode",
             "OPENCODE_ACP_BIN",
             "opencode",
             &["acp"],
+            true,
         );
-        candidate.supports_model_override = true;
         Self { candidate }
     }
 }
@@ -400,7 +423,10 @@ impl AgentDefinition for CustomAgent {
 
     fn build_launch_for_model(&self, model_id: Option<&str>) -> Result<AgentLaunch, String> {
         if model_id.is_some() {
-            return Err("Custom agents do not support Infi model overrides.".to_string());
+            return Err(
+                "Custom agents do not support Infi model overrides. Configure model selection in your custom agent's own settings, or pick Default."
+                    .to_string(),
+            );
         }
         launch_from_candidate(&self.candidate)
     }
@@ -442,31 +468,34 @@ fn npx_candidate(
     id: &str,
     label: &str,
     env_var: &str,
-    raw_bin: &str,
+    _raw_bin: &str,
     package: &str,
+    supports_model_override: bool,
 ) -> AgentCandidate {
     if let Ok(path) = std::env::var(env_var)
         && !path.trim().is_empty()
     {
+        let (resolved, available) = resolve_env_bin(&path);
         return AgentCandidate {
             id: id.into(),
             label: label.into(),
-            command: Some(resolve_bin_or_literal(path)),
+            command: Some(resolved),
             args: Vec::new(),
-            available: true,
+            available,
             models: Vec::new(),
-            supports_model_override: false,
+            supports_model_override,
         };
     }
 
+    let npx = find_bin("npx");
     AgentCandidate {
         id: id.into(),
         label: label.into(),
-        available: crate::infra::shell::find_agent_bin(raw_bin).is_some(),
-        command: find_bin("npx"),
+        available: npx.is_some(),
+        command: npx,
         args: vec!["-y".into(), package.into()],
         models: Vec::new(),
-        supports_model_override: false,
+        supports_model_override,
     }
 }
 
@@ -476,32 +505,35 @@ fn command_candidate(
     env_var: &str,
     bin: &str,
     args: &[&str],
+    supports_model_override: bool,
 ) -> AgentCandidate {
     if let Ok(path) = std::env::var(env_var)
         && !path.trim().is_empty()
     {
+        let (resolved, available) = resolve_env_bin(&path);
         return AgentCandidate {
             id: id.into(),
             label: label.into(),
-            command: Some(resolve_bin_or_literal(path)),
+            command: Some(resolved),
             args: args.iter().map(|arg| (*arg).to_string()).collect(),
-            available: true,
+            available,
             models: Vec::new(),
-            supports_model_override: false,
+            supports_model_override,
         };
     }
 
     let resolved =
         crate::infra::shell::find_agent_bin(bin).map(|path| path.to_string_lossy().to_string());
-    let available = resolved.is_some();
+    let command = resolved.or_else(|| find_bin(bin));
+    let available = command.is_some();
     AgentCandidate {
         id: id.into(),
         label: label.into(),
-        command: resolved.or_else(|| find_bin(bin)),
+        command,
         available,
         args: args.iter().map(|arg| (*arg).to_string()).collect(),
         models: Vec::new(),
-        supports_model_override: false,
+        supports_model_override,
     }
 }
 
@@ -521,6 +553,17 @@ fn resolve_bin_or_literal(bin: String) -> String {
     crate::infra::shell::find_bin(&bin)
         .map(|path| path.to_string_lossy().to_string())
         .unwrap_or(bin)
+}
+
+/// Resolve a binary path provided via env var or settings, returning the
+/// resolved path and whether the binary actually exists (either via PATH
+/// lookup or as a literal file on disk).
+fn resolve_env_bin(bin: &str) -> (String, bool) {
+    if let Some(path) = crate::infra::shell::find_bin(bin) {
+        return (path.to_string_lossy().to_string(), true);
+    }
+    let exists = std::path::Path::new(bin).is_file();
+    (bin.to_string(), exists)
 }
 
 fn find_bin(bin: &str) -> Option<String> {
@@ -546,7 +589,11 @@ mod tests {
     #[test]
     fn codex_launch_appends_config_model_after_adapter_args() {
         let agent = CodexAgent {
-            candidate: candidate("codex", &["-y", "@zed-industries/codex-acp@latest"], true),
+            candidate: candidate(
+                "codex",
+                &["-y", "@zed-industries/codex-acp@latest"],
+                true,
+            ),
         };
 
         let launch = agent.build_launch(Some("gpt-5.4")).unwrap();
@@ -565,14 +612,23 @@ mod tests {
     #[test]
     fn claude_launch_appends_selected_model_after_adapter_args() {
         let agent = ClaudeAgent {
-            candidate: candidate("claude", &["-y", "@zed-industries/claude-code-acp"], true),
+            candidate: candidate(
+                "claude",
+                &["-y", "@zed-industries/claude-code-acp"],
+                true,
+            ),
         };
 
         let launch = agent.build_launch(Some("sonnet")).unwrap();
 
         assert_eq!(
             launch.args,
-            vec!["-y", "@zed-industries/claude-code-acp", "--model", "sonnet"]
+            vec![
+                "-y",
+                "@zed-industries/claude-code-acp",
+                "--model",
+                "sonnet"
+            ]
         );
     }
 
@@ -661,6 +717,7 @@ mod tests {
         assert_eq!(
             ids,
             vec![
+                "gpt-5.5",
                 "gpt-5.4",
                 "gpt-5.4-mini",
                 "gpt-5.3-codex",
