@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Infi",
-  "version": "0.1.0",
-  "identifier": "dev.puemos.infi",
+  "version": "0.1.1",
+  "identifier": "dev.khanhthanhdev.infi",
   "build": {
     "beforeDevCommand": {
       "script": "bun run dev --host 127.0.0.1",

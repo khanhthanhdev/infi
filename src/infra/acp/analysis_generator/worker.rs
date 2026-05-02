@@ -157,7 +157,28 @@ async fn generate_with_acp_inner(input: GenerateAnalysisInput) -> Result<Generat
 
     log_fn(format!("spawn: {} {}", agent_command, agent_args.join(" ")));
 
-    let mut cmd = Command::new(&agent_command);
+    // On Windows, .cmd/.bat files (like npx.cmd) cannot be spawned directly
+    // via CreateProcessW. Wrap them with `cmd /C` so cmd.exe handles execution.
+    let mut cmd = {
+        #[cfg(target_os = "windows")]
+        {
+            let is_batch = agent_command.ends_with(".cmd")
+                || agent_command.ends_with(".CMD")
+                || agent_command.ends_with(".bat")
+                || agent_command.ends_with(".BAT");
+            if is_batch {
+                let mut c = Command::new("cmd");
+                c.arg("/C").arg(&agent_command);
+                c
+            } else {
+                Command::new(&agent_command)
+            }
+        }
+        #[cfg(not(target_os = "windows"))]
+        {
+            Command::new(&agent_command)
+        }
+    };
     cmd.args(&agent_args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
