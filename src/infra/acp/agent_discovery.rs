@@ -589,11 +589,7 @@ mod tests {
     #[test]
     fn codex_launch_appends_config_model_after_adapter_args() {
         let agent = CodexAgent {
-            candidate: candidate(
-                "codex",
-                &["-y", "@zed-industries/codex-acp@latest"],
-                true,
-            ),
+            candidate: candidate("codex", &["-y", "@zed-industries/codex-acp@latest"], true),
         };
 
         let launch = agent.build_launch(Some("gpt-5.4")).unwrap();
@@ -612,23 +608,14 @@ mod tests {
     #[test]
     fn claude_launch_appends_selected_model_after_adapter_args() {
         let agent = ClaudeAgent {
-            candidate: candidate(
-                "claude",
-                &["-y", "@zed-industries/claude-code-acp"],
-                true,
-            ),
+            candidate: candidate("claude", &["-y", "@zed-industries/claude-code-acp"], true),
         };
 
         let launch = agent.build_launch(Some("sonnet")).unwrap();
 
         assert_eq!(
             launch.args,
-            vec![
-                "-y",
-                "@zed-industries/claude-code-acp",
-                "--model",
-                "sonnet"
-            ]
+            vec!["-y", "@zed-industries/claude-code-acp", "--model", "sonnet"]
         );
     }
 
