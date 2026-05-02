@@ -15,11 +15,11 @@ Please report vulnerabilities privately. Do **not** open a public GitHub issue f
 
 Preferred channel:
 
-- [Open a private security advisory](https://github.com/puemos/infi/security/advisories/new) on GitHub.
+- [Open a private security advisory](https://github.com/khanhthanhdev/infi/security/advisories/new) on GitHub.
 
 Alternative channel:
 
-- Email the maintainer at **puemos@gmail.com** with the subject line `SECURITY: infi`.
+- Email the maintainer at **thanhkt27507@gmail.com** with the subject line `SECURITY: infi`.
 
 When reporting, please include:
 

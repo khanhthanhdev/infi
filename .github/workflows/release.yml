@@ -144,7 +144,7 @@ jobs:
       - name: Submit package to winget-pkgs
         uses: vedantmgoyal9/winget-releaser@main
         with:
-          identifier: puemos.Infi
+          identifier: khanhthanhdev.Infi
           version: ${{ steps.release.outputs.version }}
           # Tauri NSIS installer asset name (x64-setup.exe).
           installers-regex: '_x64-setup\.exe$'
@@ -155,11 +155,13 @@ jobs:
     name: Bump Homebrew Tap
     needs: release
     runs-on: ubuntu-latest
+    # TEMPORARILY DISABLED
+    if: false
     steps:
       - name: Checkout homebrew-tap
         uses: actions/checkout@v4
         with:
-          repository: puemos/homebrew-tap
+          repository: khanhthanhdev/homebrew-tap
           token: ${{ secrets.GH_TOKEN }}
           path: homebrew-tap
 
@@ -177,19 +179,19 @@ jobs:
           cd homebrew-tap
 
           # Get SHA256 for Linux AppImage
-          APPIMAGE_URL="https://github.com/puemos/infi/releases/download/v${VERSION}/Infi_${VERSION}_amd64.AppImage"
+          APPIMAGE_URL="https://github.com/khanhthanhdev/infi/releases/download/v${VERSION}/Infi_${VERSION}_amd64.AppImage"
           APPIMAGE_SHA=$(curl -sL "$APPIMAGE_URL" | sha256sum | cut -d' ' -f1)
 
           # Get SHA256 for macOS ARM
-          ARM_URL="https://github.com/puemos/infi/releases/download/v${VERSION}/Infi_aarch64.app.tar.gz"
+          ARM_URL="https://github.com/khanhthanhdev/infi/releases/download/v${VERSION}/Infi_aarch64.app.tar.gz"
           ARM_SHA=$(curl -sL "$ARM_URL" | sha256sum | cut -d' ' -f1)
 
           # Get SHA256 for macOS Intel
-          INTEL_URL="https://github.com/puemos/infi/releases/download/v${VERSION}/Infi_x64.app.tar.gz"
+          INTEL_URL="https://github.com/khanhthanhdev/infi/releases/download/v${VERSION}/Infi_x64.app.tar.gz"
           INTEL_SHA=$(curl -sL "$INTEL_URL" | sha256sum | cut -d' ' -f1)
 
           # Update Formula
-          sed -i "s|url \"https://github.com/puemos/infi/releases/download/v[^\"]*\"|url \"https://github.com/puemos/infi/releases/download/v${VERSION}/Infi_${VERSION}_amd64.AppImage\"|" Formula/infi.rb
+          sed -i "s|url \"https://github.com/khanhthanhdev/infi/releases/download/v[^\"]*\"|url \"https://github.com/khanhthanhdev/infi/releases/download/v${VERSION}/Infi_${VERSION}_amd64.AppImage\"|" Formula/infi.rb
           sed -i "s/version \"[^\"]*\"/version \"${VERSION}\"/" Formula/infi.rb
           sed -i "s/sha256 \"[^\"]*\"/sha256 \"${APPIMAGE_SHA}\"/" Formula/infi.rb
 

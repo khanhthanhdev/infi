@@ -21,7 +21,7 @@ export function compareVersions(a: string, b: string): number {
 
 export async function fetchLatestRelease(): Promise<ReleaseInfo | null> {
   try {
-    const res = await fetch("https://api.github.com/repos/puemos/infi/releases/latest", {
+    const res = await fetch("https://api.github.com/repos/khanhthanhdev/infi/releases/latest", {
       headers: { Accept: "application/vnd.github.v3+json" },
     });
     if (!res.ok) return null;

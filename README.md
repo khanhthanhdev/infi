@@ -11,8 +11,8 @@
 <p align="center"><b>Stock and portfolio research through coding agents.</b></p>
 
 <p align="center">
-  <a href="https://github.com/puemos/infi/actions/workflows/rust-ci.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/puemos/infi/rust-ci.yml?style=flat-square" /></a>
-  <a href="https://github.com/puemos/infi/releases"><img alt="Release" src="https://img.shields.io/github/v/release/puemos/infi?style=flat-square" /></a>
+  <a href="https://github.com/khanhthanhdev/infi/actions/workflows/rust-ci.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/khanhthanhdev/infi/rust-ci.yml?style=flat-square" /></a>
+  <a href="https://github.com/khanhthanhdev/infi/releases"><img alt="Release" src="https://img.shields.io/github/v/release/khanhthanhdev/infi?style=flat-square" /></a>
   <a href="LICENSE-MIT"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" /></a>
 </p>
 
@@ -45,13 +45,13 @@ Custom agent: `INFI_CUSTOM_AGENT`, `INFI_CUSTOM_AGENT_ARGS`.
 ### Homebrew (macOS)
 
 ```bash
-brew install --cask puemos/tap/infi
+brew install --cask khanhthanhdev/tap/infi
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/puemos/infi
+git clone https://github.com/khanhthanhdev/infi
 cd infi && cargo run
 ```
 

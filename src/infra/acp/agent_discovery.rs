@@ -101,6 +101,7 @@ struct CodexAgent {
 impl CodexAgent {
     fn new() -> Self {
         let models = vec![
+            model("gpt-5.5", "GPT-5.5"),
             model("gpt-5.4", "GPT-5.4"),
             model("gpt-5.4-mini", "GPT-5.4 Mini"),
             model("gpt-5.3-codex", "GPT-5.3 Codex"),
@@ -212,8 +213,8 @@ impl GeminiAgent {
             model("pro", "Pro"),
             model("flash", "Flash"),
             model("flash-lite", "Flash Lite"),
-            model("gemini-3-pro-preview", "Gemini 3 Pro (Preview)"),
-            model("gemini-3-flash-preview", "Gemini 3 Flash (Preview)"),
+            model("gemini-3.1-pro", "Gemini 3.1 Pro"),
+            model("gemini-3-flash", "Gemini 3 Flash"),
             model("gemini-2.5-pro", "Gemini 2.5 Pro"),
             model("gemini-2.5-flash", "Gemini 2.5 Flash"),
             model("gemini-2.5-flash-lite", "Gemini 2.5 Flash Lite"),

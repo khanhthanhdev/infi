@@ -6,7 +6,7 @@ rust-version = "1.85"
 default-run = "infi"
 license = "MIT OR Apache-2.0"
 description = "Infi is an ACP-powered local stock market analysis workbench."
-repository = "https://github.com/puemos/infi"
+repository = "https://github.com/khanhthanhdev/infi"
 keywords = ["stocks", "analysis", "ai", "acp", "tauri"]
 categories = ["finance", "gui"]
 

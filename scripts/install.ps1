@@ -1,7 +1,7 @@
 # Infi installer for Windows (NSIS bundle)
 #
 # Usage:
-#   irm https://puemos.github.io/infi/install.ps1 | iex
+#   irm https://khanhthanhdev.github.io/infi/install.ps1 | iex
 #
 # Environment overrides:
 #   $env:INFI_VERSION   Pin a specific version (e.g. 0.1.0). Defaults to latest release.
@@ -9,7 +9,7 @@
 $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$Repo = 'puemos/infi'
+$Repo = 'khanhthanhdev/infi'
 
 if (-not [Environment]::Is64BitOperatingSystem) {
     throw 'Infi requires 64-bit Windows.'

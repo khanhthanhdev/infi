@@ -186,6 +186,9 @@ fn submitted_event_for(tool_name: Option<&str>) -> Option<ProgressEventPayload> 
         "submit_research_plan" => Some(ProgressEventPayload::PlanSubmitted),
         "submit_source" => Some(ProgressEventPayload::SourceSubmitted),
         "submit_metric_snapshot" => Some(ProgressEventPayload::MetricSubmitted),
+        "submit_metric_explanation" => Some(ProgressEventPayload::Log(
+            "Metric explanation submitted".to_string(),
+        )),
         "submit_structured_artifact"
         | "submit_portfolio_scenario_analysis"
         | "submit_portfolio_expected_return_model" => Some(ProgressEventPayload::ArtifactSubmitted),

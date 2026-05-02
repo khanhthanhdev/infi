@@ -2,7 +2,7 @@
 # Infi installer for Linux (AppImage)
 #
 # Usage:
-#   curl -fsSL https://puemos.github.io/infi/install.sh | sh
+#   curl -fsSL https://khanhthanhdev.github.io/infi/install.sh | sh
 #
 # Environment overrides:
 #   INFI_VERSION       Pin a specific version (e.g. 0.1.0). Defaults to latest release.
@@ -10,7 +10,7 @@
 
 set -eu
 
-REPO="puemos/infi"
+REPO="khanhthanhdev/infi"
 BIN_NAME="infi"
 INSTALL_DIR="${INFI_INSTALL_DIR:-$HOME/.local/bin}"
 
@@ -19,7 +19,7 @@ case "$OS" in
     Linux) ;;
     *)
         echo "Error: this installer only supports Linux. Detected: $OS" >&2
-        echo "       For macOS use: brew install --cask puemos/tap/infi" >&2
+        echo "       For macOS use: brew install --cask khanhthanhdev/tap/infi" >&2
         exit 1
         ;;
 esac

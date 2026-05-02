@@ -742,9 +742,13 @@ pub async fn generate_analysis(
             log::info!(
                 "main pass completed; suppress_child_completed={suppress_child_completed}, will run explanation pass: {suppress_child_completed}"
             );
-            if !suppress_child_completed {
+            if suppress_child_completed {
                 let _ = on_progress.send(ProgressEventPayload::Log(
-                    "Explainable pass skipped (toggle was off).".to_string(),
+                    "Explanation pass enabled - running after main analysis.".to_string(),
+                ));
+            } else {
+                let _ = on_progress.send(ProgressEventPayload::Log(
+                    "Explanation pass skipped (toggle was off).".to_string(),
                 ));
             }
 
@@ -908,18 +912,16 @@ async fn run_explanation_pass(
     };
 
     let db_path = state.db.path().clone();
-    let cancel_token = match state.active_runs.lock() {
-        Ok(active) => active.get(&main_run_id).cloned(),
-        Err(err) => {
-            emit_explain_log(
-                db,
-                &main_run_id,
-                &on_progress,
-                format!("Failed to access cancellation state for explanation pass: {err}"),
-            );
-            None
+    // Create a fresh cancellation token for the explanation pass.
+    // The main run's token was already cancelled when its CancelOnDrop guard
+    // was dropped, so we can't reuse it.
+    let cancel_token = CancellationToken::new();
+    {
+        if let Ok(mut active) = state.active_runs.lock() {
+            // Replace the old (cancelled) token with the new one so stop_analysis works
+            active.insert(main_run_id.clone(), cancel_token.clone());
         }
-    };
+    }
 
     let mut remaining_targets: Vec<crate::prompts::ExplanationTarget> = targets.clone();
 
@@ -991,13 +993,12 @@ async fn run_explanation_pass(
             mcp_server_binary: None,
             db_path: db_path.clone(),
             timeout_secs: Some(300),
-            cancel_token: cancel_token.clone(),
+            cancel_token: Some(cancel_token.clone()),
             source_keys: HashMap::new(),
         })
         .await;
-
         match result {
-            Ok(_) => {
+            Ok(_agent_result) => {
                 let missing = missing_explanation_targets(&state.db, &main_run_id, &targets);
                 if missing.is_empty() {
                     emit_explain_log(db, &main_run_id, &on_progress, "Explanation pass completed");
@@ -1066,6 +1067,10 @@ async fn run_explanation_pass(
             kind: "explanations".to_string(),
         },
     );
+
+    if let Ok(mut active) = state.active_runs.lock() {
+        active.remove(&main_run_id);
+    }
 }
 
 fn preferred_explanation_model_id(agent_id: &str) -> Option<String> {
