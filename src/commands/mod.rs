@@ -38,6 +38,21 @@ pub struct DataChangedPayload {
     pub kind: String,
 }
 
+/// Run a synchronous DB / keystore call on tokio's blocking thread pool so
+/// the Tauri async IPC executor stays free for other commands. Use this for
+/// any `rusqlite` or `keyring` operation invoked from a `#[tauri::command]`.
+async fn spawn_blocking<T, E, F>(f: F) -> Result<T, CommandError>
+where
+    F: FnOnce() -> Result<T, E> + Send + 'static,
+    T: Send + 'static,
+    E: Send + 'static,
+    CommandError: From<E>,
+{
+    tokio::task::spawn_blocking(f)
+        .await?
+        .map_err(CommandError::from)
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct GenerateAnalysisResult {
     pub analysis_id: String,
@@ -56,21 +71,24 @@ pub async fn get_agents() -> Result<Vec<AgentCandidate>, CommandError> {
 
 #[tauri::command]
 pub async fn get_settings() -> Result<AppConfig, CommandError> {
-    Ok(load_config())
+    spawn_blocking(|| Ok::<_, CommandError>(load_config())).await
 }
 
 #[tauri::command]
 pub async fn update_settings(config: AppConfig) -> Result<AppConfig, CommandError> {
-    save_config(&config)?;
-    Ok(config)
+    spawn_blocking(move || {
+        save_config(&config)?;
+        Ok::<_, CommandError>(config)
+    })
+    .await
 }
 
 #[tauri::command]
 pub async fn get_all_analyses(
     state: State<'_, AppState>,
 ) -> Result<Vec<AnalysisSummary>, CommandError> {
-    let db = &state.db;
-    Ok(db.list_analyses()?)
+    let db = state.db.clone();
+    spawn_blocking(move || db.list_analyses()).await
 }
 
 #[tauri::command]
@@ -79,8 +97,8 @@ pub async fn get_analysis_report(
     analysis_id: String,
     run_id: Option<String>,
 ) -> Result<Option<AnalysisReport>, CommandError> {
-    let db = &state.db;
-    Ok(db.get_report(&analysis_id, run_id.as_deref())?)
+    let db = state.db.clone();
+    spawn_blocking(move || db.get_report(&analysis_id, run_id.as_deref())).await
 }
 
 /// Names of metrics whose source is cited by the stance's evidence graph
@@ -93,8 +111,9 @@ pub async fn get_stance_stale_metrics(
     analysis_id: String,
     run_id: Option<String>,
 ) -> Result<Vec<String>, CommandError> {
-    let db = &state.db;
-    let Some(report) = db.get_report(&analysis_id, run_id.as_deref())? else {
+    let db = state.db.clone();
+    let report = spawn_blocking(move || db.get_report(&analysis_id, run_id.as_deref())).await?;
+    let Some(report) = report else {
         return Ok(Vec::new());
     };
     Ok(stance_stale_metric_names(&report, chrono::Utc::now()))
@@ -105,8 +124,8 @@ pub async fn delete_analysis(
     state: State<'_, AppState>,
     analysis_id: String,
 ) -> Result<(), CommandError> {
-    let db = &state.db;
-    Ok(db.delete_analysis(&analysis_id)?)
+    let db = state.db.clone();
+    spawn_blocking(move || db.delete_analysis(&analysis_id)).await
 }
 
 #[tauri::command]
@@ -115,16 +134,16 @@ pub async fn create_portfolio(
     name: String,
     base_currency: String,
 ) -> Result<Portfolio, CommandError> {
-    let db = &state.db;
-    Ok(db.create_portfolio(&name, &base_currency)?)
+    let db = state.db.clone();
+    spawn_blocking(move || db.create_portfolio(&name, &base_currency)).await
 }
 
 #[tauri::command]
 pub async fn get_portfolios(
     state: State<'_, AppState>,
 ) -> Result<Vec<PortfolioSummary>, CommandError> {
-    let db = &state.db;
-    Ok(db.list_portfolios()?)
+    let db = state.db.clone();
+    spawn_blocking(move || db.list_portfolios()).await
 }
 
 #[tauri::command]
@@ -132,8 +151,8 @@ pub async fn get_portfolio_detail(
     state: State<'_, AppState>,
     portfolio_id: String,
 ) -> Result<Option<PortfolioDetail>, CommandError> {
-    let db = &state.db;
-    Ok(db.get_portfolio_detail(&portfolio_id)?)
+    let db = state.db.clone();
+    spawn_blocking(move || db.get_portfolio_detail(&portfolio_id)).await
 }
 
 #[tauri::command]
@@ -153,8 +172,8 @@ pub async fn import_portfolio_csv(
             }
         }
     }
-    let db = &state.db;
-    Ok(db.import_portfolio_csv(&input)?)
+    let db = state.db.clone();
+    spawn_blocking(move || db.import_portfolio_csv(&input)).await
 }
 
 #[tauri::command]
@@ -162,8 +181,8 @@ pub async fn delete_portfolio(
     state: State<'_, AppState>,
     portfolio_id: String,
 ) -> Result<(), CommandError> {
-    let db = &state.db;
-    Ok(db.delete_portfolio(&portfolio_id)?)
+    let db = state.db.clone();
+    spawn_blocking(move || db.delete_portfolio(&portfolio_id)).await
 }
 
 #[tauri::command]
@@ -172,8 +191,8 @@ pub async fn rename_portfolio(
     portfolio_id: String,
     name: String,
 ) -> Result<Portfolio, CommandError> {
-    let db = &state.db;
-    Ok(db.rename_portfolio(&portfolio_id, &name)?)
+    let db = state.db.clone();
+    spawn_blocking(move || db.rename_portfolio(&portfolio_id, &name)).await
 }
 
 #[tauri::command]
@@ -258,8 +277,9 @@ pub async fn export_analysis_html(
     use tauri_plugin_dialog::DialogExt;
 
     let report = {
-        let db = &state.db;
-        db.get_report(&analysis_id, None)?
+        let db = state.db.clone();
+        let id = analysis_id.clone();
+        spawn_blocking(move || db.get_report(&id, None)).await?
     };
     let Some(report) = report else {
         return Err("analysis not found".into());
@@ -286,8 +306,13 @@ pub async fn export_analysis_html(
         .map_err(|err| CommandError::new(format!("invalid save path: {err}")))?;
 
     let size_bytes = html.len();
-    std::fs::write(&path_buf, html.as_bytes())
-        .map_err(|err| CommandError::new(format!("write failed: {err}")))?;
+    let path_for_write = path_buf.clone();
+    let html_bytes = html.into_bytes();
+    spawn_blocking(move || {
+        std::fs::write(&path_for_write, &html_bytes)
+            .map_err(|err| CommandError::new(format!("write failed: {err}")))
+    })
+    .await?;
 
     Ok(Some(ExportedHtml {
         path: path_buf.display().to_string(),
@@ -312,8 +337,9 @@ pub async fn publish_analysis_html(
     analysis_id: String,
 ) -> Result<PublishedReport, CommandError> {
     let report = {
-        let db = &state.db;
-        db.get_report(&analysis_id, None)?
+        let db = state.db.clone();
+        let id = analysis_id.clone();
+        spawn_blocking(move || db.get_report(&id, None)).await?
     };
     let Some(report) = report else {
         return Err("analysis not found".into());
@@ -414,8 +440,9 @@ pub async fn export_analysis_markdown(
     analysis_id: String,
 ) -> Result<String, CommandError> {
     let report = {
-        let db = &state.db;
-        db.get_report(&analysis_id, None)?
+        let db = state.db.clone();
+        let id = analysis_id.clone();
+        spawn_blocking(move || db.get_report(&id, None)).await?
     };
     let Some(report) = report else {
         return Err("analysis not found".into());
@@ -435,10 +462,11 @@ pub async fn create_analysis(
     user_prompt: String,
     portfolio_id: Option<String>,
 ) -> Result<CreateAnalysisResult, CommandError> {
-    let db = &state.db;
-
-    let (intent, title, effective_prompt, persisted_portfolio_id) =
-        if let Some(portfolio_id) = portfolio_id {
+    let db = state.db.clone();
+    spawn_blocking(move || {
+        let (intent, title, effective_prompt, persisted_portfolio_id) = if let Some(portfolio_id) =
+            portfolio_id
+        {
             let detail = db
                 .get_portfolio_detail(&portfolio_id)?
                 .ok_or_else(|| CommandError::new("Portfolio not found"))?;
@@ -462,7 +490,9 @@ pub async fn create_analysis(
         } else {
             let trimmed = user_prompt.trim();
             if trimmed.is_empty() {
-                return Err("Enter a research request before starting analysis.".into());
+                return Err::<CreateAnalysisResult, CommandError>(
+                    "Enter a research request before starting analysis.".into(),
+                );
             }
             (
                 AnalysisIntent::GeneralResearch,
@@ -472,24 +502,26 @@ pub async fn create_analysis(
             )
         };
 
-    let id = Uuid::new_v4().to_string();
-    let now = chrono::Utc::now().to_rfc3339();
-    let analysis = Analysis {
-        id: id.clone(),
-        title,
-        user_prompt: effective_prompt.clone(),
-        intent,
-        status: AnalysisStatus::Running,
-        active_run_id: None,
-        portfolio_id: persisted_portfolio_id,
-        created_at: now.clone(),
-        updated_at: now,
-    };
-    db.save_analysis(&analysis)?;
-    Ok(CreateAnalysisResult {
-        analysis_id: id,
-        effective_prompt,
+        let id = Uuid::new_v4().to_string();
+        let now = chrono::Utc::now().to_rfc3339();
+        let analysis = Analysis {
+            id: id.clone(),
+            title,
+            user_prompt: effective_prompt.clone(),
+            intent,
+            status: AnalysisStatus::Running,
+            active_run_id: None,
+            portfolio_id: persisted_portfolio_id,
+            created_at: now.clone(),
+            updated_at: now,
+        };
+        db.save_analysis(&analysis)?;
+        Ok(CreateAnalysisResult {
+            analysis_id: id,
+            effective_prompt,
+        })
     })
+    .await
 }
 
 #[tauri::command]
@@ -498,17 +530,20 @@ pub async fn set_active_run(
     analysis_id: String,
     run_id: String,
 ) -> Result<(), CommandError> {
-    let db = &state.db;
-    let analysis = db
-        .get_report(&analysis_id, None)?
-        .ok_or_else(|| CommandError::new("Analysis not found"))?
-        .analysis;
-    db.save_analysis(&Analysis {
-        active_run_id: Some(run_id),
-        updated_at: chrono::Utc::now().to_rfc3339(),
-        ..analysis
-    })?;
-    Ok(())
+    let db = state.db.clone();
+    spawn_blocking(move || {
+        let analysis = db
+            .get_report(&analysis_id, None)?
+            .ok_or_else(|| CommandError::new("Analysis not found"))?
+            .analysis;
+        db.save_analysis(&Analysis {
+            active_run_id: Some(run_id),
+            updated_at: chrono::Utc::now().to_rfc3339(),
+            ..analysis
+        })?;
+        Ok::<_, CommandError>(())
+    })
+    .await
 }
 
 #[tauri::command]
@@ -516,8 +551,8 @@ pub async fn get_run_progress(
     state: State<'_, AppState>,
     run_id: String,
 ) -> Result<Vec<ProgressEventPayload>, CommandError> {
-    let db = &state.db;
-    Ok(db.get_run_progress(&run_id)?)
+    let db = state.db.clone();
+    spawn_blocking(move || db.get_run_progress(&run_id)).await
 }
 
 #[tauri::command]
@@ -565,7 +600,7 @@ pub async fn generate_analysis(
         error: None,
     };
 
-    let config = load_config();
+    let config = spawn_blocking(|| Ok::<_, CommandError>(load_config())).await?;
     let resolved_sources: Vec<String> = match enabled_sources {
         Some(list) => list
             .into_iter()
@@ -577,32 +612,38 @@ pub async fn generate_analysis(
         serde_json::to_string(&resolved_sources).unwrap_or_else(|_| "[]".to_string());
 
     let db_path = {
-        let db = &state.db;
-        db.with_tx(|tx| {
-            tx.execute(
-                "INSERT OR REPLACE INTO analysis_runs
-                (id, analysis_id, agent_id, model_id, prompt_text, status, started_at, completed_at, error, enabled_sources)
-                VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
-                rusqlite::params![
-                    run.id,
-                    run.analysis_id,
-                    run.agent_id,
-                    run.model_id,
-                    run.prompt_text,
-                    run.status.to_string(),
-                    run.started_at,
-                    run.completed_at,
-                    run.error,
-                    enabled_sources_json,
-                ],
-            )?;
-            tx.execute(
-                "UPDATE analyses SET active_run_id = ?1 WHERE id = ?2 AND active_run_id IS NULL",
-                rusqlite::params![run_id, analysis_id],
-            )?;
-            Ok(())
-        })?;
-        db.path().clone()
+        let db = state.db.clone();
+        let run_clone = run.clone();
+        let analysis_id_clone = analysis_id.clone();
+        let run_id_clone = run_id.clone();
+        spawn_blocking(move || {
+            db.with_tx(|tx| {
+                tx.execute(
+                    "INSERT OR REPLACE INTO analysis_runs
+                    (id, analysis_id, agent_id, model_id, prompt_text, status, started_at, completed_at, error, enabled_sources)
+                    VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+                    rusqlite::params![
+                        run_clone.id,
+                        run_clone.analysis_id,
+                        run_clone.agent_id,
+                        run_clone.model_id,
+                        run_clone.prompt_text,
+                        run_clone.status.to_string(),
+                        run_clone.started_at,
+                        run_clone.completed_at,
+                        run_clone.error,
+                        enabled_sources_json,
+                    ],
+                )?;
+                tx.execute(
+                    "UPDATE analyses SET active_run_id = ?1 WHERE id = ?2 AND active_run_id IS NULL",
+                    rusqlite::params![run_id_clone, analysis_id_clone],
+                )?;
+                Ok(())
+            })?;
+            Ok::<_, CommandError>(db.path().clone())
+        })
+        .await?
     };
 
     let _ = app.emit(
@@ -629,17 +670,32 @@ pub async fn generate_analysis(
         is_explanation_pass: false,
     };
 
+    // Collect provider ids that require a key off the async thread, then
+    // resolve all keychain lookups in one blocking task to avoid hopping
+    // back to the async runtime per-key.
+    let key_ids: Vec<String> = resolved_sources
+        .iter()
+        .filter(|id| sources::get(id).is_some_and(|p| p.descriptor().requires_key))
+        .cloned()
+        .collect();
+    let key_results: Vec<(String, Result<Option<String>, String>)> = spawn_blocking(move || {
+        Ok::<_, CommandError>(
+            key_ids
+                .into_iter()
+                .map(|id| {
+                    let res =
+                        keystore::get_key(&sources::key_account(&id)).map_err(|e| e.to_string());
+                    (id, res)
+                })
+                .collect(),
+        )
+    })
+    .await?;
     let mut source_keys: HashMap<String, String> = HashMap::new();
-    for id in &resolved_sources {
-        let Some(provider) = sources::get(id) else {
-            continue;
-        };
-        if !provider.descriptor().requires_key {
-            continue;
-        }
-        match keystore::get_key(&sources::key_account(id)) {
+    for (id, res) in key_results {
+        match res {
             Ok(Some(value)) => {
-                source_keys.insert(id.clone(), value);
+                source_keys.insert(id, value);
             }
             Ok(None) => {
                 let _ = on_progress.send(ProgressEventPayload::Log(format!(
@@ -693,8 +749,21 @@ pub async fn generate_analysis(
                 ProgressEventPayload::Completed => Some("completed"),
                 _ => None,
             };
-            if let Err(err) = db_clone.append_progress_event(&run_id_clone, &payload) {
-                log::warn!("progress persist dropped ({run_id_clone}): {err:#}");
+            let db_for_persist = db_clone.clone();
+            let run_id_for_persist = run_id_clone.clone();
+            let payload_for_persist = payload.clone();
+            let persist_result = tokio::task::spawn_blocking(move || {
+                db_for_persist.append_progress_event(&run_id_for_persist, &payload_for_persist)
+            })
+            .await;
+            match persist_result {
+                Ok(Ok(())) => {}
+                Ok(Err(err)) => {
+                    log::warn!("progress persist dropped ({run_id_clone}): {err:#}");
+                }
+                Err(err) => {
+                    log::warn!("progress persist task failed ({run_id_clone}): {err}");
+                }
             }
             if data_kind.is_some() && coalesce_tx.send(()).is_err() {
                 log::warn!(
@@ -713,12 +782,18 @@ pub async fn generate_analysis(
     )));
 
     let prompt_text = {
-        let db = &state.db;
-        let analysis = db
-            .get_report(&analysis_id, None)?
-            .ok_or_else(|| CommandError::new("Analysis not found"))?
-            .analysis;
-        crate::prompts::build_prompt_for(&analysis, &context, db)?
+        let db = state.db.clone();
+        let analysis_id_clone = analysis_id.clone();
+        let context_clone = context.clone();
+        spawn_blocking(move || {
+            let analysis = db
+                .get_report(&analysis_id_clone, None)?
+                .ok_or_else(|| CommandError::new("Analysis not found"))?
+                .analysis;
+            let prompt = crate::prompts::build_prompt_for(&analysis, &context_clone, &db)?;
+            Ok::<_, CommandError>(prompt)
+        })
+        .await?
     };
     let generation_result = generate_with_acp(GenerateAnalysisInput {
         run_context: context,
@@ -765,9 +840,17 @@ pub async fn generate_analysis(
                 .await;
             }
 
-            let db = &state.db;
-            db.update_run_status(&run_id, AnalysisStatus::Completed, None)?;
-            db.recompute_analysis_status(&analysis_id)?;
+            {
+                let db = state.db.clone();
+                let run_id_clone = run_id.clone();
+                let analysis_id_clone = analysis_id.clone();
+                spawn_blocking(move || {
+                    db.update_run_status(&run_id_clone, AnalysisStatus::Completed, None)?;
+                    db.recompute_analysis_status(&analysis_id_clone)?;
+                    Ok::<_, CommandError>(())
+                })
+                .await?;
+            }
             let _ = on_progress.send(ProgressEventPayload::Completed);
         }
 
@@ -787,9 +870,18 @@ pub async fn generate_analysis(
                 CommandErrorKind::Cancelled => AnalysisStatus::Cancelled,
                 _ => AnalysisStatus::Failed,
             };
-            let db = &state.db;
-            db.update_run_status(&run_id, status, Some(&message))?;
-            db.recompute_analysis_status(&analysis_id)?;
+            {
+                let db = state.db.clone();
+                let run_id_clone = run_id.clone();
+                let analysis_id_clone = analysis_id.clone();
+                let msg_clone = message.clone();
+                spawn_blocking(move || {
+                    db.update_run_status(&run_id_clone, status, Some(&msg_clone))?;
+                    db.recompute_analysis_status(&analysis_id_clone)?;
+                    Ok::<_, CommandError>(())
+                })
+                .await?;
+            }
             let _ = on_progress.send(ProgressEventPayload::Error {
                 message: message.clone(),
             });
@@ -841,10 +933,25 @@ async fn run_explanation_pass(
     let max_attempts = 3;
 
     let db = &state.db;
-    let report = match db.get_report(&analysis_id, Some(&main_run_id)) {
-        Ok(Some(report)) => report,
-        Ok(None) => {
+    let report = {
+        let db = state.db.clone();
+        let analysis_id = analysis_id.clone();
+        let main_run_id = main_run_id.clone();
+        tokio::task::spawn_blocking(move || db.get_report(&analysis_id, Some(&main_run_id))).await
+    };
+    let report = match report {
+        Ok(Ok(Some(report))) => report,
+        Ok(Ok(None)) => {
             emit_explain_log(db, &main_run_id, &on_progress, "Analysis not found");
+            return;
+        }
+        Ok(Err(e)) => {
+            emit_explain_log(
+                db,
+                &main_run_id,
+                &on_progress,
+                format!("Failed to get metrics for explanation pass: {e}"),
+            );
             return;
         }
         Err(e) => {
@@ -852,7 +959,7 @@ async fn run_explanation_pass(
                 db,
                 &main_run_id,
                 &on_progress,
-                format!("Failed to get metrics for explanation pass: {e}"),
+                format!("Explanation pass blocking task panicked: {e}"),
             );
             return;
         }
@@ -972,10 +1079,25 @@ async fn run_explanation_pass(
                 // Persist every other event against the main run so the
                 // explanation-pass tool calls and logs survive a reload and
                 // show up in get_run_progress alongside the main pass.
-                if let Err(err) =
-                    db_for_forward.append_progress_event(&run_id_for_forward, &payload)
-                {
-                    log::warn!("explain progress persist dropped ({run_id_for_forward}): {err:#}");
+                let db_for_persist = db_for_forward.clone();
+                let run_id_for_persist = run_id_for_forward.clone();
+                let payload_for_persist = payload.clone();
+                let persist_result = tokio::task::spawn_blocking(move || {
+                    db_for_persist.append_progress_event(&run_id_for_persist, &payload_for_persist)
+                })
+                .await;
+                match persist_result {
+                    Ok(Ok(())) => {}
+                    Ok(Err(err)) => {
+                        log::warn!(
+                            "explain progress persist dropped ({run_id_for_forward}): {err:#}"
+                        );
+                    }
+                    Err(err) => {
+                        log::warn!(
+                            "explain progress persist task failed ({run_id_for_forward}): {err}"
+                        );
+                    }
                 }
                 if progress_channel.send(payload).is_err() {
                     break;
@@ -1153,40 +1275,48 @@ fn describe(d: &ProviderDescriptor, has_key: bool, enabled: bool) -> SourceDescr
 
 #[tauri::command]
 pub async fn list_sources() -> Result<Vec<SourceDescriptor>, CommandError> {
-    let config = load_config();
-    Ok(sources::all()
-        .iter()
-        .map(|p| {
-            let d = p.descriptor();
-            let has_key = config.sources_with_keys.contains(d.id);
-            let enabled = config.enabled_sources.contains(d.id);
-            describe(&d, has_key, enabled)
-        })
-        .collect())
+    spawn_blocking(|| {
+        let config = load_config();
+        Ok::<_, CommandError>(
+            sources::all()
+                .iter()
+                .map(|p| {
+                    let d = p.descriptor();
+                    let has_key = config.sources_with_keys.contains(d.id);
+                    let enabled = config.enabled_sources.contains(d.id);
+                    describe(&d, has_key, enabled)
+                })
+                .collect(),
+        )
+    })
+    .await
 }
 
 #[tauri::command]
 pub async fn refresh_source_key_status() -> Result<Vec<SourceDescriptor>, CommandError> {
-    let mut config = load_config();
-    let mut result = Vec::new();
-    for p in sources::all() {
-        let d = p.descriptor();
-        let id = d.id;
-        let has_key = if d.requires_key {
-            keystore::has_key(&sources::key_account(id)).unwrap_or(false)
-        } else {
-            false
-        };
-        if has_key {
-            config.sources_with_keys.insert(id.to_string());
-        } else {
-            config.sources_with_keys.remove(id);
+    spawn_blocking(|| {
+        let mut config = load_config();
+        let mut result = Vec::new();
+        for p in sources::all() {
+            let d = p.descriptor();
+            let id = d.id;
+            let has_key = if d.requires_key {
+                keystore::has_key(&sources::key_account(id)).unwrap_or(false)
+            } else {
+                false
+            };
+            if has_key {
+                config.sources_with_keys.insert(id.to_string());
+            } else {
+                config.sources_with_keys.remove(id);
+            }
+            let enabled = config.enabled_sources.contains(id);
+            result.push(describe(&d, has_key, enabled));
         }
-        let enabled = config.enabled_sources.contains(id);
-        result.push(describe(&d, has_key, enabled));
-    }
-    save_config(&config)?;
-    Ok(result)
+        save_config(&config)?;
+        Ok::<_, CommandError>(result)
+    })
+    .await
 }
 
 #[derive(Debug, Deserialize)]
@@ -1206,16 +1336,19 @@ pub async fn set_source_key(args: SetSourceKeyArgs) -> Result<(), CommandError> 
             d.id
         )));
     }
-    let trimmed = args.key.trim();
+    let trimmed = args.key.trim().to_string();
     if trimmed.is_empty() {
         return Err(CommandError::new("api key is empty"));
     }
-    keystore::set_key(&sources::key_account(d.id), trimmed)
-        .map_err(|err| CommandError::new(format!("keychain error: {err}")))?;
-    let mut config = load_config();
-    config.sources_with_keys.insert(d.id.to_string());
-    save_config(&config)?;
-    Ok(())
+    let provider_id = d.id.to_string();
+    spawn_blocking(move || {
+        keystore::set_key(&sources::key_account(&provider_id), &trimmed)?;
+        let mut config = load_config();
+        config.sources_with_keys.insert(provider_id);
+        save_config(&config)?;
+        Ok::<_, CommandError>(())
+    })
+    .await
 }
 
 #[tauri::command]
@@ -1223,12 +1356,15 @@ pub async fn clear_source_key(provider_id: String) -> Result<(), CommandError> {
     let provider = sources::get(&provider_id)
         .ok_or_else(|| CommandError::new(format!("unknown provider '{provider_id}'")))?;
     let d = provider.descriptor();
-    keystore::delete_key(&sources::key_account(d.id))
-        .map_err(|err| CommandError::new(format!("keychain error: {err}")))?;
-    let mut config = load_config();
-    config.sources_with_keys.remove(d.id);
-    save_config(&config)?;
-    Ok(())
+    let provider_id = d.id.to_string();
+    spawn_blocking(move || {
+        keystore::delete_key(&sources::key_account(&provider_id))?;
+        let mut config = load_config();
+        config.sources_with_keys.remove(provider_id.as_str());
+        save_config(&config)?;
+        Ok::<_, CommandError>(())
+    })
+    .await
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -1246,8 +1382,9 @@ pub async fn test_source_key(provider_id: String) -> Result<SourceKeyTestResult,
     let d = provider.descriptor();
 
     let key = if d.requires_key {
-        let stored = keystore::get_key(&sources::key_account(d.id))
-            .map_err(|err| CommandError::new(format!("keychain error: {err}")))?;
+        let provider_id = d.id.to_string();
+        let stored =
+            spawn_blocking(move || keystore::get_key(&sources::key_account(&provider_id))).await?;
         match stored {
             Some(value) => Some(value),
             None => {
@@ -1321,10 +1458,13 @@ pub async fn set_enabled_sources(ids: Vec<String>) -> Result<Vec<String>, Comman
         .into_iter()
         .filter(|id| sources::get(id).is_some())
         .collect();
-    let mut config = load_config();
-    config.enabled_sources.clone_from(&valid);
-    save_config(&config)?;
-    Ok(valid.into_iter().collect())
+    spawn_blocking(move || {
+        let mut config = load_config();
+        config.enabled_sources.clone_from(&valid);
+        save_config(&config)?;
+        Ok::<_, CommandError>(valid.into_iter().collect())
+    })
+    .await
 }
 
 fn derive_title(prompt: &str) -> String {

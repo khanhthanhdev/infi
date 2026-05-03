@@ -3,10 +3,22 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
+// Tauri exposes the target platform via `TAURI_PLATFORM`. Pin Vite's build
+// target to the actual WebView engine family (Edge WebView2 on Windows,
+// WKWebView/WebKit elsewhere) so we ship smaller bundles and avoid
+// unnecessary polyfills.
+const tauriPlatform = process.env.TAURI_PLATFORM;
+const tauriDebug = !!process.env.TAURI_DEBUG;
+const buildTarget =
+  tauriPlatform === 'windows' ? 'chrome105' : 'safari15';
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   clearScreen: false,
   build: {
+    target: buildTarget,
+    minify: tauriDebug ? false : 'esbuild',
+    sourcemap: tauriDebug,
     rollupOptions: {
       output: {
         manualChunks(id) {

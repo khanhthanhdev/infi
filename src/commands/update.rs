@@ -1,5 +1,5 @@
 use crate::commands::CommandError;
-use crate::infra::shell::find_bin;
+use crate::infra::shell::{find_bin, suppress_windows_console_tokio};
 use serde::Serialize;
 use std::process::Stdio;
 use tauri::{AppHandle, Emitter};
@@ -45,13 +45,15 @@ pub async fn run_self_update(app: AppHandle) -> Result<(), CommandError> {
         format!("$ {} upgrade --cask infi", brew.display()),
     );
 
-    let mut child = match Command::new(&brew)
+    let mut command = Command::new(&brew);
+    command
         .args(["upgrade", "--cask", "infi"])
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-    {
+        .stderr(Stdio::piped());
+    suppress_windows_console_tokio(&mut command);
+
+    let mut child = match command.spawn() {
         Ok(child) => child,
         Err(err) => {
             let msg = format!("Failed to spawn brew: {err}");

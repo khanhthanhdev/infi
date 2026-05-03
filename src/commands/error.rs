@@ -1,4 +1,5 @@
 use crate::infra::acp::analysis_generator::{AcpCancelled, AcpTimeout};
+use crate::infra::keystore::KeystoreError;
 use serde::Serialize;
 
 /// Error returned by Tauri IPC commands.
@@ -123,5 +124,23 @@ impl From<reqwest::Error> for CommandError {
 impl From<tokio::sync::oneshot::error::RecvError> for CommandError {
     fn from(err: tokio::sync::oneshot::error::RecvError) -> Self {
         Self::new(err.to_string())
+    }
+}
+
+impl From<tokio::task::JoinError> for CommandError {
+    fn from(err: tokio::task::JoinError) -> Self {
+        Self::new(format!("blocking task panicked: {err}"))
+    }
+}
+
+impl From<KeystoreError> for CommandError {
+    fn from(err: KeystoreError) -> Self {
+        Self::new(format!("keychain error: {err}"))
+    }
+}
+
+impl From<rusqlite::Error> for CommandError {
+    fn from(err: rusqlite::Error) -> Self {
+        Self::new(format!("database error: {err}"))
     }
 }
