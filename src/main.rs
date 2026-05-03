@@ -1,3 +1,8 @@
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+)]
+
 use infi::commands;
 use infi::infra::acp::analysis_mcp_server;
 use infi::state::AppState;

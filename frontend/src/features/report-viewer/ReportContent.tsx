@@ -1,6 +1,7 @@
 import { ChartLineUp } from "@phosphor-icons/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SectionHeader } from "@/components/ui/editorial";
+import { MetricExplanationTooltip } from "@/components/ui/MetricExplanationTooltip";
 import { getAnalysisReport, getStanceStaleMetrics, setActiveRun } from "@/shared/api/commands";
 import { setSelectedReport, useAppStore } from "@/store";
 import type {
@@ -8,6 +9,7 @@ import type {
   AnalysisReport,
   Entity,
   HoldingReview,
+  MetricExplanation,
   PortfolioExpectedReturnModel,
   PortfolioRisk,
   PortfolioScenarioAnalysis,
@@ -16,6 +18,7 @@ import type {
 } from "@/types";
 import { AnalysisSection } from "./AnalysisSection";
 import { ArgumentSpine } from "./ArgumentSpine";
+import { buildExplanationLookup } from "./explanation-utils";
 import { MetricList } from "./MetricList";
 import { ProjectionView } from "./ProjectionView";
 import { ReportContextTray } from "./ReportContextTray";
@@ -173,6 +176,7 @@ export function ReportContent({ onAskFollowUp }: ReportContentProps = {}) {
               sourceMap={sourceMap}
               selectedId={selectedId}
               onSelect={setSelection}
+              explanations={report.explanations}
             />
           </section>
         )}
@@ -191,7 +195,11 @@ export function ReportContent({ onAskFollowUp }: ReportContentProps = {}) {
               id="holdings"
               className={sectionHeaderClass("holdings")}
             />
-            <HoldingReviewList reviews={report.holding_reviews} entityMap={entityMap} />
+            <HoldingReviewList
+              reviews={report.holding_reviews}
+              entityMap={entityMap}
+              explanations={report.explanations}
+            />
           </section>
         )}
 
@@ -205,7 +213,11 @@ export function ReportContent({ onAskFollowUp }: ReportContentProps = {}) {
               className={sectionHeaderClass("allocation")}
             />
             {report.allocation_reviews.map((review) => (
-              <AllocationReviewView key={review.id} review={review} />
+              <AllocationReviewView
+                key={review.id}
+                review={review}
+                explanations={report.explanations}
+              />
             ))}
           </section>
         )}
@@ -220,7 +232,7 @@ export function ReportContent({ onAskFollowUp }: ReportContentProps = {}) {
               className={sectionHeaderClass("risk")}
             />
             {report.portfolio_risks.map((risk) => (
-              <PortfolioRiskView key={risk.id} risk={risk} />
+              <PortfolioRiskView key={risk.id} risk={risk} explanations={report.explanations} />
             ))}
           </section>
         )}
@@ -235,7 +247,11 @@ export function ReportContent({ onAskFollowUp }: ReportContentProps = {}) {
               className={sectionHeaderClass("rebalancing")}
             />
             {report.rebalancing_suggestions.map((suggestion) => (
-              <RebalancingView key={suggestion.id} suggestion={suggestion} />
+              <RebalancingView
+                key={suggestion.id}
+                suggestion={suggestion}
+                explanations={report.explanations}
+              />
             ))}
           </section>
         )}
@@ -287,6 +303,7 @@ export function ReportContent({ onAskFollowUp }: ReportContentProps = {}) {
                   isFirst={index === 0}
                   selectedId={selectedId}
                   onSelect={setSelection}
+                  explanations={report.explanations}
                 />
               ))}
             </div>
@@ -777,10 +794,13 @@ function formatSignedPercent(value: number) {
 function HoldingReviewList({
   reviews,
   entityMap,
+  explanations = [],
 }: {
   reviews: HoldingReview[];
   entityMap: Map<string, Entity>;
+  explanations?: MetricExplanation[];
 }) {
+  const explanationLookup = useMemo(() => buildExplanationLookup(explanations), [explanations]);
   const sorted = [...reviews].sort((a, b) => a.display_order - b.display_order);
   return (
     <div className="rounded-[10px] border border-[#e7e9ee] bg-white">
@@ -788,6 +808,7 @@ function HoldingReviewList({
         const entity = entityMap.get(review.entity_id);
         const heading = entity?.name ?? review.entity_id;
         const symbol = entity?.symbol ?? review.entity_id;
+        const stanceExplanation = explanationLookup.get(`portfolio:${review.id}:stance`);
         return (
           <article key={review.id} className="border-t border-[#e7e9ee] p-6 first:border-0">
             <header className="flex flex-wrap items-baseline justify-between gap-3">
@@ -798,9 +819,17 @@ function HoldingReviewList({
                 <h3 className="text-[17px] font-medium leading-[1.3] text-[#111827]">{heading}</h3>
               </div>
               <div className="flex items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
-                <span className="rounded-full border border-[#155dff] bg-[#e4ecff] px-2.5 py-0.5 text-[#155dff]">
-                  {review.stance}
-                </span>
+                {stanceExplanation ? (
+                  <MetricExplanationTooltip explanation={stanceExplanation}>
+                    <span className="cursor-help rounded-full border border-[#155dff] bg-[#e4ecff] px-2.5 py-0.5 text-[#155dff] underline decoration-dotted underline-offset-2">
+                      {review.stance}
+                    </span>
+                  </MetricExplanationTooltip>
+                ) : (
+                  <span className="rounded-full border border-[#155dff] bg-[#e4ecff] px-2.5 py-0.5 text-[#155dff]">
+                    {review.stance}
+                  </span>
+                )}
                 <span className="tabular-nums">conf {(review.confidence * 100).toFixed(0)}%</span>
                 <span>{review.importance}</span>
               </div>
@@ -856,60 +885,89 @@ function ReasonRiskGrid({ reasons, risks }: { reasons: string[]; risks: string[]
   );
 }
 
-function AllocationReviewView({ review }: { review: AllocationReview }) {
+function AllocationReviewView({
+  review,
+  explanations = [],
+}: {
+  review: AllocationReview;
+  explanations?: MetricExplanation[];
+}) {
+  const explanationLookup = useMemo(() => buildExplanationLookup(explanations), [explanations]);
   return (
     <div className="space-y-6 rounded-[10px] border border-[#e7e9ee] bg-white p-6">
       <p>{review.summary}</p>
       <div className="space-y-8">
-        {review.dimensions.map((dimension) => (
-          <div key={dimension.dimension} className="space-y-3">
-            <div className="flex flex-wrap items-baseline justify-between gap-3">
-              <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
-                {dimension.dimension.replace("_", " ")}
-              </span>
-              {dimension.concentration_flags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {dimension.concentration_flags.map((flag) => (
-                    <span
-                      key={flag}
-                      className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]"
-                    >
-                      {flag}
+        {review.dimensions.map((dimension) => {
+          const dimensionExplanation = explanationLookup.get(
+            `portfolio:allocation:${review.id}:${dimension.dimension}`,
+          );
+          return (
+            <div key={dimension.dimension} className="space-y-3">
+              <div className="flex flex-wrap items-baseline justify-between gap-3">
+                {dimensionExplanation ? (
+                  <MetricExplanationTooltip explanation={dimensionExplanation}>
+                    <span className="cursor-help font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad] underline decoration-dotted underline-offset-2">
+                      {dimension.dimension.replaceAll("_", " ")}
                     </span>
-                  ))}
+                  </MetricExplanationTooltip>
+                ) : (
+                  <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+                    {dimension.dimension.replaceAll("_", " ")}
+                  </span>
+                )}
+                {dimension.concentration_flags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {dimension.concentration_flags.map((flag) => (
+                      <span
+                        key={flag}
+                        className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]"
+                      >
+                        {flag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="divide-y divide-[#dfe5ee] rounded-[6px] border border-[#e7e9ee]">
+                <div className="grid grid-cols-[minmax(160px,1fr)_90px_minmax(0,1fr)] gap-4 px-4 py-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+                  <span>Bucket</span>
+                  <span className="text-right">Weight</span>
+                  <span>Notes</span>
                 </div>
+                {dimension.breakdown.map((bucket) => (
+                  <div
+                    key={bucket.label}
+                    className="grid grid-cols-[minmax(160px,1fr)_90px_minmax(0,1fr)] gap-4 px-4 py-3 text-[13.5px]"
+                  >
+                    <span className="text-[#111827]">{bucket.label}</span>
+                    <span className="text-right font-mono tabular-nums text-[#111827]">
+                      {(bucket.weight * 100).toFixed(1)}%
+                    </span>
+                    <span className="text-[#111827]/75">{bucket.commentary ?? ""}</span>
+                  </div>
+                ))}
+              </div>
+              {dimension.overlap_notes && (
+                <p className="text-[13px] leading-[1.55] text-[#3f4653]">
+                  {dimension.overlap_notes}
+                </p>
               )}
             </div>
-            <div className="divide-y divide-[#dfe5ee] rounded-[6px] border border-[#e7e9ee]">
-              <div className="grid grid-cols-[minmax(160px,1fr)_90px_minmax(0,1fr)] gap-4 px-4 py-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
-                <span>Bucket</span>
-                <span className="text-right">Weight</span>
-                <span>Notes</span>
-              </div>
-              {dimension.breakdown.map((bucket) => (
-                <div
-                  key={bucket.label}
-                  className="grid grid-cols-[minmax(160px,1fr)_90px_minmax(0,1fr)] gap-4 px-4 py-3 text-[13.5px]"
-                >
-                  <span className="text-[#111827]">{bucket.label}</span>
-                  <span className="text-right font-mono tabular-nums text-[#111827]">
-                    {(bucket.weight * 100).toFixed(1)}%
-                  </span>
-                  <span className="text-[#111827]/75">{bucket.commentary ?? ""}</span>
-                </div>
-              ))}
-            </div>
-            {dimension.overlap_notes && (
-              <p className="text-[13px] leading-[1.55] text-[#3f4653]">{dimension.overlap_notes}</p>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 }
 
-function PortfolioRiskView({ risk }: { risk: PortfolioRisk }) {
+function PortfolioRiskView({
+  risk,
+  explanations = [],
+}: {
+  risk: PortfolioRisk;
+  explanations?: MetricExplanation[];
+}) {
+  const explanationLookup = useMemo(() => buildExplanationLookup(explanations), [explanations]);
   return (
     <div className="space-y-6 rounded-[10px] border border-[#e7e9ee] bg-white p-6">
       <p>{risk.summary}</p>
@@ -920,18 +978,31 @@ function PortfolioRiskView({ risk }: { risk: PortfolioRisk }) {
             Factor exposures
           </span>
           <div className="divide-y divide-[#dfe5ee] rounded-[6px] border border-[#e7e9ee]">
-            {risk.factor_exposures.map((exposure) => (
-              <div
-                key={exposure.factor}
-                className="grid grid-cols-[minmax(180px,1fr)_80px_minmax(0,1fr)] gap-4 px-4 py-2.5 text-[13.5px]"
-              >
-                <span className="text-[#111827]">{exposure.factor}</span>
-                <span className="text-right font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#111827]">
-                  {exposure.level}
-                </span>
-                <span className="text-[#111827]/75">{exposure.commentary ?? ""}</span>
-              </div>
-            ))}
+            {risk.factor_exposures.map((exposure, idx) => {
+              const factorExplanation = explanationLookup.get(
+                `portfolio:risk:${risk.id}:factor_${idx}`,
+              );
+              return (
+                <div
+                  key={`${exposure.factor}-${idx}`}
+                  className="grid grid-cols-[minmax(180px,1fr)_80px_minmax(0,1fr)] gap-4 px-4 py-2.5 text-[13.5px]"
+                >
+                  {factorExplanation ? (
+                    <MetricExplanationTooltip explanation={factorExplanation}>
+                      <span className="cursor-help text-[#111827] underline decoration-dotted underline-offset-2">
+                        {exposure.factor}
+                      </span>
+                    </MetricExplanationTooltip>
+                  ) : (
+                    <span className="text-[#111827]">{exposure.factor}</span>
+                  )}
+                  <span className="text-right font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#111827]">
+                    {exposure.level}
+                  </span>
+                  <span className="text-[#111827]/75">{exposure.commentary ?? ""}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -963,7 +1034,14 @@ function RiskList({ label, items }: { label: string; items: string[] }) {
   );
 }
 
-function RebalancingView({ suggestion }: { suggestion: RebalancingSuggestion }) {
+function RebalancingView({
+  suggestion,
+  explanations = [],
+}: {
+  suggestion: RebalancingSuggestion;
+  explanations?: MetricExplanation[];
+}) {
+  const explanationLookup = useMemo(() => buildExplanationLookup(explanations), [explanations]);
   return (
     <div className="space-y-6 rounded-[10px] border border-[#e7e9ee] bg-white p-6">
       <p>{suggestion.rationale}</p>
@@ -975,24 +1053,37 @@ function RebalancingView({ suggestion }: { suggestion: RebalancingSuggestion }) 
           <span className="text-right">Δ</span>
           <span>Notes</span>
         </div>
-        {suggestion.rows.map((row) => (
-          <div
-            key={row.label}
-            className="grid grid-cols-[minmax(180px,1.2fr)_90px_90px_90px_minmax(0,1fr)] gap-4 px-4 py-3 text-[13.5px]"
-          >
-            <span className="text-[#111827]">{row.label}</span>
-            <span className="text-right font-mono tabular-nums text-[#111827]">
-              {(row.current_weight * 100).toFixed(1)}%
-            </span>
-            <span className="text-right font-mono tabular-nums text-[#111827]">
-              {(row.suggested_weight * 100).toFixed(1)}%
-            </span>
-            <span className="text-right font-mono tabular-nums text-[#111827]">
-              {(row.delta * 100 >= 0 ? "+" : "") + (row.delta * 100).toFixed(1)}%
-            </span>
-            <span className="text-[#111827]/75">{row.commentary ?? ""}</span>
-          </div>
-        ))}
+        {suggestion.rows.map((row, idx) => {
+          const rowExplanation = explanationLookup.get(
+            `portfolio:rebalancing:${suggestion.id}:row_${idx}`,
+          );
+          return (
+            <div
+              key={row.label}
+              className="grid grid-cols-[minmax(180px,1.2fr)_90px_90px_90px_minmax(0,1fr)] gap-4 px-4 py-3 text-[13.5px]"
+            >
+              {rowExplanation ? (
+                <MetricExplanationTooltip explanation={rowExplanation}>
+                  <span className="cursor-help text-[#111827] underline decoration-dotted underline-offset-2">
+                    {row.label}
+                  </span>
+                </MetricExplanationTooltip>
+              ) : (
+                <span className="text-[#111827]">{row.label}</span>
+              )}
+              <span className="text-right font-mono tabular-nums text-[#111827]">
+                {(row.current_weight * 100).toFixed(1)}%
+              </span>
+              <span className="text-right font-mono tabular-nums text-[#111827]">
+                {(row.suggested_weight * 100).toFixed(1)}%
+              </span>
+              <span className="text-right font-mono tabular-nums text-[#111827]">
+                {(row.delta * 100 >= 0 ? "+" : "") + (row.delta * 100).toFixed(1)}%
+              </span>
+              <span className="text-[#111827]/75">{row.commentary ?? ""}</span>
+            </div>
+          );
+        })}
       </div>
       {suggestion.scenarios.length > 0 && (
         <div className="flex flex-wrap gap-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">

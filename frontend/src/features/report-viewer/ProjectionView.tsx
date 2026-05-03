@@ -1,7 +1,9 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
+import { MetricExplanationTooltip } from "@/components/ui/MetricExplanationTooltip";
 import { cn } from "@/lib/utils";
-import type { Entity, Projection, ProjectionScenario, Source } from "@/types";
+import type { Entity, MetricExplanation, Projection, ProjectionScenario, Source } from "@/types";
 import { ConfidenceRail } from "./badge-styles";
+import { buildExplanationLookup } from "./explanation-utils";
 import {
   formatProjectionMovement,
   formatProjectionTargetLabel,
@@ -18,6 +20,7 @@ interface ProjectionViewProps extends SelectionProps {
   projections: Projection[];
   entityMap: Map<string, Entity>;
   sourceMap: Map<string, Source>;
+  explanations?: MetricExplanation[];
 }
 
 export const ProjectionView = memo(function ProjectionView({
@@ -26,6 +29,7 @@ export const ProjectionView = memo(function ProjectionView({
   sourceMap,
   selectedId,
   onSelect,
+  explanations = [],
 }: ProjectionViewProps) {
   if (projections.length === 0) return null;
 
@@ -40,6 +44,7 @@ export const ProjectionView = memo(function ProjectionView({
           isFirst={index === 0}
           selectedId={selectedId}
           onSelect={onSelect}
+          explanations={explanations}
         />
       ))}
     </div>
@@ -53,6 +58,7 @@ function ProjectionCard({
   isFirst,
   selectedId,
   onSelect,
+  explanations = [],
 }: {
   projection: Projection;
   entity: Entity | null;
@@ -60,6 +66,7 @@ function ProjectionCard({
   isFirst: boolean;
   selectedId?: string | null;
   onSelect?: (selection: ReportSelection) => void;
+  explanations?: MetricExplanation[];
 }) {
   const orderedScenarios = orderScenarios(projection.scenarios);
   const label = entity?.symbol || entity?.name || projection.entity_id;
@@ -83,9 +90,7 @@ function ProjectionCard({
               {projection.horizon}
             </span>
             <span className="h-1 w-1 rounded-full bg-border" aria-hidden />
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
-              {formatMetric(projection.metric)}
-            </span>
+            <ProjectionMetricLabel projection={projection} explanations={explanations} />
           </div>
           <h3 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.02em] sm:text-[40px]">
             {label}
@@ -538,6 +543,34 @@ function scenarioTone(label: string): string {
     default:
       return "report-tone-info";
   }
+}
+
+function ProjectionMetricLabel({
+  projection,
+  explanations = [],
+}: {
+  projection: Projection;
+  explanations?: MetricExplanation[];
+}) {
+  const metricName = formatMetric(projection.metric);
+  const explanationLookup = useMemo(() => buildExplanationLookup(explanations), [explanations]);
+  const explanation = explanationLookup.get(`projection:${projection.id}:metric`);
+
+  if (explanation) {
+    return (
+      <MetricExplanationTooltip explanation={explanation}>
+        <span className="cursor-help font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] underline decoration-dotted underline-offset-2">
+          {metricName}
+        </span>
+      </MetricExplanationTooltip>
+    );
+  }
+
+  return (
+    <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+      {metricName}
+    </span>
+  );
 }
 
 function formatMetric(metric: string) {

@@ -1,24 +1,18 @@
-import {
-  cloneElement,
-  isValidElement,
-  memo,
-  type ReactElement,
-  type ReactNode,
-  useMemo,
-} from "react";
+import { memo, useMemo } from "react";
 import type { Components } from "react-markdown";
 import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CopyButton } from "@/components/ui/copy-button";
+import { preprocessHighlightSyntax, processNumberHighlights } from "@/lib/markdown-highlights";
 import { cn } from "@/lib/utils";
 
-function extractTextFromChildren(children: ReactNode): string {
+function extractTextFromChildren(children: React.ReactNode): string {
   if (typeof children === "string") return children;
   if (typeof children === "number") return String(children);
   if (!children) return "";
   if (Array.isArray(children)) return children.map(extractTextFromChildren).join("");
   if (typeof children === "object" && "props" in children) {
-    const props = children.props as { children?: ReactNode };
+    const props = children.props as { children?: React.ReactNode };
     return extractTextFromChildren(props.children);
   }
   return "";
@@ -29,57 +23,6 @@ function urlTransform(url: string): string {
   return defaultUrlTransform(url);
 }
 
-function highlightNumberText(text: string, keyPrefix: string): ReactNode {
-  const parts: ReactNode[] = [];
-  const pattern = /\[\[([^[\]]+?)\]\](%?)/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = pattern.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
-    }
-
-    parts.push(
-      <span
-        key={`${keyPrefix}-${match.index}`}
-        className="rounded-sm bg-primary/10 px-0.5 font-mono tabular-nums text-[0.92em] text-primary"
-      >
-        {match[1]}
-        {match[2]}
-      </span>,
-    );
-    lastIndex = pattern.lastIndex;
-  }
-
-  if (parts.length === 0) return text;
-  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
-  return parts;
-}
-
-function NumberHighlights({ children }: { children: ReactNode }) {
-  return <>{processNumberHighlights(children)}</>;
-}
-
-function processNumberHighlights(children: ReactNode): ReactNode {
-  if (typeof children === "string") return highlightNumberText(children, "number");
-  if (Array.isArray(children)) {
-    return children.map((child, index) => processNumberHighlightsWithKey(child, `number-${index}`));
-  }
-  if (isValidElement(children)) {
-    const element = children as ReactElement<{ children?: ReactNode }>;
-    return cloneElement(element, {
-      children: processNumberHighlights(element.props.children),
-    });
-  }
-  return children;
-}
-
-function processNumberHighlightsWithKey(children: ReactNode, keyPrefix: string): ReactNode {
-  if (typeof children === "string") return highlightNumberText(children, keyPrefix);
-  return processNumberHighlights(children);
-}
-
 interface MarkdownMessageProps {
   text: string;
   streaming?: boolean;
@@ -87,12 +30,14 @@ interface MarkdownMessageProps {
 }
 
 function MarkdownMessage({ text }: MarkdownMessageProps) {
+  const preprocessed = useMemo(() => preprocessHighlightSyntax(text), [text]);
+
   const components = useMemo<Components>(() => {
     return {
       a({ href, children }) {
         return (
           <a href={href} target="_blank" rel="noopener noreferrer">
-            <NumberHighlights>{children}</NumberHighlights>
+            {processNumberHighlights(children)}
           </a>
         );
       },
@@ -109,14 +54,14 @@ function MarkdownMessage({ text }: MarkdownMessageProps) {
       th({ children }) {
         return (
           <th className="border-b border-border px-3 py-2 text-left text-xs font-semibold text-foreground">
-            <NumberHighlights>{children}</NumberHighlights>
+            {processNumberHighlights(children)}
           </th>
         );
       },
       td({ children }) {
         return (
           <td className="border-b border-border/50 px-3 py-2 text-muted-foreground">
-            <NumberHighlights>{children}</NumberHighlights>
+            {processNumberHighlights(children)}
           </td>
         );
       },
@@ -126,28 +71,26 @@ function MarkdownMessage({ text }: MarkdownMessageProps) {
       h1({ children }) {
         return (
           <h1 className="mt-6 mb-3 text-xl font-bold tracking-tight">
-            <NumberHighlights>{children}</NumberHighlights>
+            {processNumberHighlights(children)}
           </h1>
         );
       },
       h2({ children }) {
         return (
           <h2 className="mt-5 mb-2 text-lg font-semibold tracking-tight">
-            <NumberHighlights>{children}</NumberHighlights>
+            {processNumberHighlights(children)}
           </h2>
         );
       },
       h3({ children }) {
         return (
-          <h3 className="mt-4 mb-2 text-base font-semibold">
-            <NumberHighlights>{children}</NumberHighlights>
-          </h3>
+          <h3 className="mt-4 mb-2 text-base font-semibold">{processNumberHighlights(children)}</h3>
         );
       },
       blockquote({ children }) {
         return (
           <blockquote className="my-3 border-l-2 border-primary/40 pl-4 text-muted-foreground italic">
-            <NumberHighlights>{children}</NumberHighlights>
+            {processNumberHighlights(children)}
           </blockquote>
         );
       },
@@ -169,25 +112,17 @@ function MarkdownMessage({ text }: MarkdownMessageProps) {
         );
       },
       li({ children }) {
-        return (
-          <li>
-            <NumberHighlights>{children}</NumberHighlights>
-          </li>
-        );
+        return <li>{processNumberHighlights(children)}</li>;
       },
       p({ children }) {
-        return (
-          <p>
-            <NumberHighlights>{children}</NumberHighlights>
-          </p>
-        );
+        return <p>{processNumberHighlights(children)}</p>;
       },
       pre({ children }) {
-        const text = extractTextFromChildren(children);
+        const textContent = extractTextFromChildren(children);
         return (
           <div className="relative group/code">
             <div className="absolute top-2 right-2 opacity-0 group-hover/code:opacity-100 transition-opacity z-10">
-              <CopyButton text={text} />
+              <CopyButton text={textContent} />
             </div>
             <pre>{children}</pre>
           </div>
@@ -214,7 +149,7 @@ function MarkdownMessage({ text }: MarkdownMessageProps) {
           components={components}
           urlTransform={urlTransform}
         >
-          {text}
+          {preprocessed}
         </ReactMarkdown>
       </div>
     </div>

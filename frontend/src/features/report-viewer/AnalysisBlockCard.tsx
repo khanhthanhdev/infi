@@ -1,6 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { preprocessHighlightSyntax } from "@/lib/markdown-highlights";
 import { cn } from "@/lib/utils";
 import type { AnalysisBlock, MetricExplanation, Source } from "@/types";
 import { ConfidenceBadge } from "./badge-styles";
@@ -57,7 +58,7 @@ export function AnalysisBlockCard({
       <div className="min-w-0 space-y-5">
         <div className="max-w-[88ch] text-[15px] leading-[1.65] text-[#111827]/90 [&>*+*]:mt-4">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-            {block.body}
+            {preprocessHighlightSyntax(block.body)}
           </ReactMarkdown>
         </div>
         {block.evidence_ids.length > 0 && (

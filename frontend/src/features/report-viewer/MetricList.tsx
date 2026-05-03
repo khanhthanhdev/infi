@@ -1,8 +1,9 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { FreshnessChip } from "@/components/ui/editorial";
 import { MetricExplanationTooltip } from "@/components/ui/MetricExplanationTooltip";
 import { cn } from "@/lib/utils";
 import type { Entity, MetricExplanation, MetricSnapshot, Source } from "@/types";
+import { normalizeExplanationKey } from "./explanation-utils";
 import { MetricDelta } from "./MetricDelta";
 import { metricSelection, type SelectionProps } from "./selection";
 
@@ -21,10 +22,14 @@ export const MetricList = memo(function MetricList({
   onSelect,
   explanations = [],
 }: MetricListProps) {
-  const explanationMap = new Map(
-    explanations
-      .filter((e) => e.target_type === "metric")
-      .map((e) => [e.target_key || normalizeExplanationKey(e.metric_name), e]),
+  const explanationMap = useMemo(
+    () =>
+      new Map(
+        explanations
+          .filter((e) => e.target_type === "metric")
+          .map((e) => [e.target_key || normalizeExplanationKey(e.metric_name), e]),
+      ),
+    [explanations],
   );
 
   if (metrics.length === 0) return null;
@@ -112,14 +117,6 @@ function metricTone(changePct: number | null): string {
 
 function formatMetric(metric: string) {
   return metric.replace(/_/g, " ");
-}
-
-function normalizeExplanationKey(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
 }
 
 function formatNumeric(value: number): string {

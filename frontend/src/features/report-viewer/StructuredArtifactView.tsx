@@ -1,4 +1,5 @@
-import { memo, type ReactElement } from "react";
+import { memo, type ReactElement, useMemo } from "react";
+import { MetricExplanationTooltip } from "@/components/ui/MetricExplanationTooltip";
 import {
   Table,
   TableBody,
@@ -9,7 +10,8 @@ import {
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import type { ArtifactPoint, StructuredArtifact } from "@/types";
+import type { ArtifactPoint, MetricExplanation, StructuredArtifact } from "@/types";
+import { buildExplanationLookup } from "./explanation-utils";
 import {
   artifactPointSelection,
   artifactRowSelection,
@@ -23,6 +25,7 @@ import {
 interface StructuredArtifactViewProps extends SelectionProps {
   artifact: StructuredArtifact;
   isFirst?: boolean;
+  explanations?: MetricExplanation[];
 }
 
 export const StructuredArtifactView = memo(function StructuredArtifactView({
@@ -30,6 +33,7 @@ export const StructuredArtifactView = memo(function StructuredArtifactView({
   isFirst,
   selectedId,
   onSelect,
+  explanations = [],
 }: StructuredArtifactViewProps) {
   const Renderer = rendererByKind[artifact.kind] ?? DefaultArtifactRenderer;
   const active = selectedId === `artifact:${artifact.id}`;
@@ -68,7 +72,12 @@ export const StructuredArtifactView = memo(function StructuredArtifactView({
           )}
         </header>
       </button>
-      <Renderer artifact={artifact} selectedId={selectedId} onSelect={onSelect} />
+      <Renderer
+        artifact={artifact}
+        selectedId={selectedId}
+        onSelect={onSelect}
+        explanations={explanations}
+      />
     </article>
   );
 });
@@ -77,6 +86,7 @@ type ArtifactRenderer = (props: {
   artifact: StructuredArtifact;
   selectedId?: string | null;
   onSelect?: (selection: ReturnType<typeof artifactSelection>) => void;
+  explanations?: MetricExplanation[];
 }) => ReactElement | null;
 
 const rendererByKind: Partial<Record<StructuredArtifact["kind"], ArtifactRenderer>> = {
@@ -90,9 +100,19 @@ const rendererByKind: Partial<Record<StructuredArtifact["kind"], ArtifactRendere
   area_chart: LegacyAreaChart,
 };
 
-function DefaultArtifactRenderer({ artifact, selectedId, onSelect }: RendererProps) {
+function DefaultArtifactRenderer({
+  artifact,
+  selectedId,
+  onSelect,
+  explanations = [],
+}: RendererProps) {
   return artifact.columns.length > 0 && artifact.rows.length > 0 ? (
-    <ArtifactTable artifact={artifact} selectedId={selectedId} onSelect={onSelect} />
+    <ArtifactTable
+      artifact={artifact}
+      selectedId={selectedId}
+      onSelect={onSelect}
+      explanations={explanations}
+    />
   ) : null;
 }
 
@@ -100,15 +120,18 @@ type RendererProps = {
   artifact: StructuredArtifact;
   selectedId?: string | null;
   onSelect?: (selection: ReturnType<typeof artifactSelection>) => void;
+  explanations?: MetricExplanation[];
 };
 
-function KpiGrid({ artifact, selectedId, onSelect }: RendererProps) {
+function KpiGrid({ artifact, selectedId, onSelect, explanations = [] }: RendererProps) {
+  const explanationLookup = useMemo(() => buildExplanationLookup(explanations), [explanations]);
   return (
     <div className="grid gap-px border-y border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
       {artifact.rows.map((row, index) => {
         const title = textValue(row.metric) || textValue(row.label) || `KPI ${index + 1}`;
         const value = row.value ?? row.numeric_value;
         const selected = selectedId === `artifact_row:${artifact.id}:${index}`;
+        const explanation = explanationLookup.get(`artifact:${artifact.id}:row_${index}`);
         return (
           <TooltipProvider key={`${artifact.id}-kpi-${index}`} delayDuration={150}>
             <Tooltip>
@@ -133,7 +156,14 @@ function KpiGrid({ artifact, selectedId, onSelect }: RendererProps) {
                       </span>
                     ) : null}
                   </div>
-                  <div className="mt-2 text-[13px] leading-snug text-foreground/80">{title}</div>
+                  <div
+                    className={cn(
+                      "mt-2 text-[13px] leading-snug text-foreground/80",
+                      explanation && "cursor-help underline decoration-dotted underline-offset-2",
+                    )}
+                  >
+                    {title}
+                  </div>
                   <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10.5px] tabular-nums text-muted-foreground">
                     {row.prior_value != null && <span>prior {formatValue(row.prior_value)}</span>}
                     {row.change_pct != null && <span>chg {formatValue(row.change_pct)}%</span>}
@@ -141,6 +171,17 @@ function KpiGrid({ artifact, selectedId, onSelect }: RendererProps) {
                 </button>
               </TooltipTrigger>
               <TooltipContent variant="editorial" className="max-w-xs space-y-1.5 text-left">
+                {explanation && (
+                  <div className="space-y-1.5 border-b border-border pb-2">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                      {explanation.display_name || explanation.metric_name}
+                    </span>
+                    <p className="text-[13px] font-medium leading-snug">{explanation.definition}</p>
+                    <p className="text-[12px] text-muted-foreground leading-relaxed">
+                      {explanation.meaning}
+                    </p>
+                  </div>
+                )}
                 <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
                   Details
                 </span>
@@ -165,7 +206,8 @@ function FinancialStatement(props: RendererProps) {
   return <ArtifactTable {...props} dense />;
 }
 
-function RatioSnapshot({ artifact, selectedId, onSelect }: RendererProps) {
+function RatioSnapshot({ artifact, selectedId, onSelect, explanations = [] }: RendererProps) {
+  const explanationLookup = useMemo(() => buildExplanationLookup(explanations), [explanations]);
   const groups = groupRows(artifact.rows, "group");
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -178,6 +220,8 @@ function RatioSnapshot({ artifact, selectedId, onSelect }: RendererProps) {
             {rows.map((row) => {
               const index = artifact.rows.indexOf(row);
               const selected = selectedId === `artifact_row:${artifact.id}:${index}`;
+              const metricName = textValue(row.metric) || "Ratio";
+              const explanation = explanationLookup.get(`artifact:${artifact.id}:row_${index}`);
               return (
                 <button
                   type="button"
@@ -189,7 +233,15 @@ function RatioSnapshot({ artifact, selectedId, onSelect }: RendererProps) {
                     selected && "report-selected",
                   )}
                 >
-                  <span className="min-w-0 truncate">{textValue(row.metric) || "Ratio"}</span>
+                  {explanation ? (
+                    <MetricExplanationTooltip explanation={explanation}>
+                      <span className="min-w-0 cursor-help truncate underline decoration-dotted underline-offset-2">
+                        {metricName}
+                      </span>
+                    </MetricExplanationTooltip>
+                  ) : (
+                    <span className="min-w-0 truncate">{metricName}</span>
+                  )}
                   <span className="font-mono tabular-nums">
                     {formatValue(row.value ?? row.numeric_value)}
                     {row.unit ? ` ${formatValue(row.unit)}` : ""}
@@ -204,7 +256,8 @@ function RatioSnapshot({ artifact, selectedId, onSelect }: RendererProps) {
   );
 }
 
-function FactorList({ artifact, selectedId, onSelect }: RendererProps) {
+function FactorList({ artifact, selectedId, onSelect, explanations = [] }: RendererProps) {
+  const explanationLookup = useMemo(() => buildExplanationLookup(explanations), [explanations]);
   const groups = groupRows(artifact.rows, "group");
   return (
     <div className="grid gap-7 md:grid-cols-2">
@@ -217,6 +270,8 @@ function FactorList({ artifact, selectedId, onSelect }: RendererProps) {
             {rows.map((row) => {
               const index = artifact.rows.indexOf(row);
               const selected = selectedId === `artifact_row:${artifact.id}:${index}`;
+              const factorName = textValue(row.factor) || textValue(row.metric) || "Factor";
+              const explanation = explanationLookup.get(`artifact:${artifact.id}:factor_${index}`);
               return (
                 <button
                   type="button"
@@ -229,9 +284,15 @@ function FactorList({ artifact, selectedId, onSelect }: RendererProps) {
                   )}
                 >
                   <div className="flex items-baseline justify-between gap-3">
-                    <span className="text-[14px] font-medium">
-                      {textValue(row.factor) || textValue(row.metric) || "Factor"}
-                    </span>
+                    {explanation ? (
+                      <MetricExplanationTooltip explanation={explanation}>
+                        <span className="cursor-help text-[14px] font-medium underline decoration-dotted underline-offset-2">
+                          {factorName}
+                        </span>
+                      </MetricExplanationTooltip>
+                    ) : (
+                      <span className="text-[14px] font-medium">{factorName}</span>
+                    )}
                     {row.importance ? (
                       <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
                         {formatValue(row.importance)}
@@ -253,15 +314,23 @@ function FactorList({ artifact, selectedId, onSelect }: RendererProps) {
   );
 }
 
-function GroupedBarChart({ artifact, selectedId, onSelect }: RendererProps) {
-  return <SvgBarChart artifact={artifact} grouped selectedId={selectedId} onSelect={onSelect} />;
+function GroupedBarChart({ artifact, selectedId, onSelect, explanations = [] }: RendererProps) {
+  return (
+    <SvgBarChart
+      artifact={artifact}
+      grouped
+      selectedId={selectedId}
+      onSelect={onSelect}
+      explanations={explanations}
+    />
+  );
 }
 
 function LegacyBarChart(props: RendererProps) {
   return <SvgBarChart {...props} />;
 }
 
-function LegacyLineChart({ artifact, selectedId, onSelect }: RendererProps) {
+function LegacyLineChart({ artifact, selectedId, onSelect, explanations = [] }: RendererProps) {
   const points = chartPoints(artifact);
   return points.length > 1 ? (
     <LineAreaChart
@@ -270,13 +339,19 @@ function LegacyLineChart({ artifact, selectedId, onSelect }: RendererProps) {
       selectedId={selectedId}
       onSelect={onSelect}
       area={false}
+      explanations={explanations}
     />
   ) : (
-    <DefaultArtifactRenderer artifact={artifact} selectedId={selectedId} onSelect={onSelect} />
+    <DefaultArtifactRenderer
+      artifact={artifact}
+      selectedId={selectedId}
+      onSelect={onSelect}
+      explanations={explanations}
+    />
   );
 }
 
-function LegacyAreaChart({ artifact, selectedId, onSelect }: RendererProps) {
+function LegacyAreaChart({ artifact, selectedId, onSelect, explanations = [] }: RendererProps) {
   const points = chartPoints(artifact);
   return points.length > 1 ? (
     <LineAreaChart
@@ -285,9 +360,15 @@ function LegacyAreaChart({ artifact, selectedId, onSelect }: RendererProps) {
       selectedId={selectedId}
       onSelect={onSelect}
       area
+      explanations={explanations}
     />
   ) : (
-    <DefaultArtifactRenderer artifact={artifact} selectedId={selectedId} onSelect={onSelect} />
+    <DefaultArtifactRenderer
+      artifact={artifact}
+      selectedId={selectedId}
+      onSelect={onSelect}
+      explanations={explanations}
+    />
   );
 }
 
@@ -296,7 +377,9 @@ function ArtifactTable({
   selectedId,
   onSelect,
   dense = false,
+  explanations = [],
 }: RendererProps & { dense?: boolean }) {
+  const explanationLookup = useMemo(() => buildExplanationLookup(explanations), [explanations]);
   const columnIsNumeric = artifact.columns.map((column) =>
     artifact.rows.every((row) => {
       const value = row[column.key];
@@ -309,23 +392,34 @@ function ArtifactTable({
       <Table className={cn("text-[13px]", dense && "text-[12.5px]")}>
         <TableHeader>
           <TableRow className="border-b border-border">
-            {artifact.columns.map((column, colIndex) => (
-              <TableHead
-                key={column.key}
-                title={column.description ?? undefined}
-                className={cn(
-                  "px-3 align-top text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground",
-                  columnIsNumeric[colIndex]
-                    ? "min-w-[96px] whitespace-nowrap text-right"
-                    : "min-w-[180px] max-w-[420px]",
-                )}
-              >
-                {column.label}
-                {column.unit && (
-                  <span className="ml-1 normal-case tracking-normal">({column.unit})</span>
-                )}
-              </TableHead>
-            ))}
+            {artifact.columns.map((column, colIndex) => {
+              const explanation = explanationLookup.get(`artifact:${artifact.id}:col_${colIndex}`);
+              return (
+                <TableHead
+                  key={column.key}
+                  title={column.description ?? undefined}
+                  className={cn(
+                    "px-3 align-top text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground",
+                    columnIsNumeric[colIndex]
+                      ? "min-w-[96px] whitespace-nowrap text-right"
+                      : "min-w-[180px] max-w-[420px]",
+                  )}
+                >
+                  {explanation ? (
+                    <MetricExplanationTooltip explanation={explanation}>
+                      <span className="cursor-help underline decoration-dotted underline-offset-2">
+                        {column.label}
+                      </span>
+                    </MetricExplanationTooltip>
+                  ) : (
+                    column.label
+                  )}
+                  {column.unit && (
+                    <span className="ml-1 normal-case tracking-normal">({column.unit})</span>
+                  )}
+                </TableHead>
+              );
+            })}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -371,6 +465,7 @@ function SvgBarChart({
   artifact,
   selectedId,
   onSelect,
+  explanations = [],
   grouped = false,
 }: RendererProps & { grouped?: boolean }) {
   const groups = grouped
@@ -381,7 +476,12 @@ function SvgBarChart({
   );
   if (points.length === 0)
     return (
-      <DefaultArtifactRenderer artifact={artifact} selectedId={selectedId} onSelect={onSelect} />
+      <DefaultArtifactRenderer
+        artifact={artifact}
+        selectedId={selectedId}
+        onSelect={onSelect}
+        explanations={explanations}
+      />
     );
 
   const max = Math.max(...points.map((point) => Math.abs(point.value)), 1);

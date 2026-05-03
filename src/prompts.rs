@@ -88,6 +88,7 @@ pub fn explanation_targets_from_report(report: &AnalysisReport) -> Vec<Explanati
     let mut seen = HashSet::new();
     let mut targets = Vec::new();
 
+    // Metric targets from snapshot data
     for metric in &report.metrics {
         let target_key = normalize_explanation_key(&metric.metric);
         if seen.insert(("metric".to_string(), target_key.clone())) {
@@ -103,6 +104,7 @@ pub fn explanation_targets_from_report(report: &AnalysisReport) -> Vec<Explanati
         }
     }
 
+    // Term targets from prose blocks
     let body = report
         .blocks
         .iter()
@@ -129,11 +131,166 @@ pub fn explanation_targets_from_report(report: &AnalysisReport) -> Vec<Explanati
         }
     }
 
+    // Artifact targets from structured artifacts
+    for artifact in &report.artifacts {
+        // KPI grid and ratio snapshot row labels (metric names)
+        for (idx, row) in artifact.rows.iter().enumerate() {
+            if let Some(metric_name) = row.get("metric").and_then(|v| v.as_str()) {
+                let target_key = format!("artifact:{}:row_{}", artifact.id, idx);
+                let display_name = metric_name.replace('_', " ");
+                if seen.insert(("artifact".to_string(), target_key.clone())) {
+                    let value = row
+                        .get("value")
+                        .or_else(|| row.get("numeric_value"))
+                        .and_then(serde_json::Value::as_f64);
+                    let unit = row.get("unit").and_then(|v| v.as_str()).map(String::from);
+                    targets.push(ExplanationTarget {
+                        target_type: "artifact".to_string(),
+                        target_key,
+                        display_name: display_name.clone(),
+                        metric_name: display_name,
+                        value,
+                        unit,
+                        as_of: None,
+                    });
+                }
+            }
+            // Factor list factor names
+            if let Some(factor_name) = row.get("factor").and_then(|v| v.as_str()) {
+                let target_key = format!("artifact:{}:factor_{}", artifact.id, idx);
+                let display_name = factor_name.replace('_', " ");
+                if seen.insert(("artifact".to_string(), target_key.clone())) {
+                    targets.push(ExplanationTarget {
+                        target_type: "artifact".to_string(),
+                        target_key,
+                        display_name: display_name.clone(),
+                        metric_name: display_name,
+                        value: None,
+                        unit: None,
+                        as_of: None,
+                    });
+                }
+            }
+        }
+
+        // Column headers from artifacts
+        for (idx, column) in artifact.columns.iter().enumerate() {
+            let target_key = format!("artifact:{}:col_{}", artifact.id, idx);
+            if seen.insert(("artifact".to_string(), target_key.clone())) {
+                targets.push(ExplanationTarget {
+                    target_type: "artifact".to_string(),
+                    target_key,
+                    display_name: column.label.clone(),
+                    metric_name: column.label.clone(),
+                    value: None,
+                    unit: column.unit.clone(),
+                    as_of: None,
+                });
+            }
+        }
+    }
+
+    // Projection targets
+    for projection in &report.projections {
+        // Projected metric name
+        let metric_key = format!("projection:{}:metric", projection.id);
+        if seen.insert(("projection".to_string(), metric_key.clone())) {
+            targets.push(ExplanationTarget {
+                target_type: "projection".to_string(),
+                target_key: metric_key,
+                display_name: projection.metric.replace('_', " "),
+                metric_name: projection.metric.clone(),
+                value: Some(projection.current_value),
+                unit: Some(projection.unit.clone()),
+                as_of: None,
+            });
+        }
+    }
+
+    // Portfolio holding review targets
+    for review in &report.holding_reviews {
+        // Stance labels
+        let stance_key = format!("portfolio:{}:stance", review.id);
+        if seen.insert(("portfolio".to_string(), stance_key.clone())) {
+            targets.push(ExplanationTarget {
+                target_type: "portfolio".to_string(),
+                target_key: stance_key,
+                display_name: format!("{} stance", review.stance),
+                metric_name: review.stance.to_string(),
+                value: Some(review.confidence),
+                unit: Some("confidence".to_string()),
+                as_of: None,
+            });
+        }
+    }
+
+    // Portfolio allocation targets — scoped by review.id so multiple reviews
+    // sharing the same dimension each get their own explanation.
+    for review in &report.allocation_reviews {
+        for dimension in &review.dimensions {
+            let dim_key = format!("portfolio:allocation:{}:{}", review.id, dimension.dimension);
+            if seen.insert(("portfolio".to_string(), dim_key.clone())) {
+                targets.push(ExplanationTarget {
+                    target_type: "portfolio".to_string(),
+                    target_key: dim_key,
+                    display_name: format!("{} allocation", dimension.dimension).replace('_', " "),
+                    metric_name: dimension.dimension.to_string(),
+                    value: None,
+                    unit: None,
+                    as_of: None,
+                });
+            }
+        }
+    }
+
+    // Portfolio risk targets
+    for risk in &report.portfolio_risks {
+        for (idx, exposure) in risk.factor_exposures.iter().enumerate() {
+            let factor_key = format!("portfolio:risk:{}:factor_{}", risk.id, idx);
+            if seen.insert(("portfolio".to_string(), factor_key.clone())) {
+                targets.push(ExplanationTarget {
+                    target_type: "portfolio".to_string(),
+                    target_key: factor_key,
+                    display_name: exposure.factor.clone(),
+                    metric_name: exposure.factor.clone(),
+                    value: None,
+                    unit: Some(exposure.level.to_string()),
+                    as_of: None,
+                });
+            }
+        }
+    }
+
+    // Rebalancing suggestion targets
+    for suggestion in &report.rebalancing_suggestions {
+        for (idx, row) in suggestion.rows.iter().enumerate() {
+            let row_key = format!("portfolio:rebalancing:{}:row_{}", suggestion.id, idx);
+            if seen.insert(("portfolio".to_string(), row_key.clone())) {
+                targets.push(ExplanationTarget {
+                    target_type: "portfolio".to_string(),
+                    target_key: row_key,
+                    display_name: row.label.clone(),
+                    metric_name: row.label.clone(),
+                    value: Some(row.delta),
+                    unit: Some("delta".to_string()),
+                    as_of: None,
+                });
+            }
+        }
+    }
+
     targets
 }
 
 #[must_use]
 pub fn normalize_explanation_key(value: &str) -> String {
+    // Aligned with the TypeScript version in
+    // frontend/src/features/report-viewer/explanation-utils.ts.
+    // Both: trim → lowercase → replace non-alphanumeric runs with "_" → strip leading/trailing "_".
+    // `to_ascii_lowercase` + `is_ascii_alphanumeric` behave identically to
+    // JS `toLowerCase()` + `/[^a-z0-9]/` for all Unicode inputs:
+    // non-ASCII characters (é, ñ, etc.) are neither ASCII alphanumeric nor in [a-z0-9],
+    // so both implementations strip them to "_".
     value
         .trim()
         .to_ascii_lowercase()
@@ -398,5 +555,368 @@ mod tests {
         let generic_prompt = build_prompt_for(&generic_analysis, &run, &db).unwrap();
         assert!(!generic_prompt.contains("<portfolio>"));
         assert!(generic_prompt.contains("submit_research_plan"));
+    }
+
+    #[test]
+    fn normalize_explanation_key_basic_cases() {
+        assert_eq!(normalize_explanation_key("P/E ratio"), "p_e_ratio");
+        assert_eq!(normalize_explanation_key("  spaces  "), "spaces");
+        assert_eq!(normalize_explanation_key("___leading"), "leading");
+        assert_eq!(normalize_explanation_key("trailing___"), "trailing");
+        assert_eq!(normalize_explanation_key("a__b__c"), "a_b_c");
+        assert_eq!(normalize_explanation_key("EBIT DA"), "ebit_da");
+        assert_eq!(normalize_explanation_key("net-profit"), "net_profit");
+        assert_eq!(normalize_explanation_key("a.b/c"), "a_b_c");
+        assert_eq!(normalize_explanation_key("_"), "");
+        assert_eq!(normalize_explanation_key("___"), "");
+        assert_eq!(normalize_explanation_key("revenue"), "revenue");
+    }
+
+    #[test]
+    fn normalize_explanation_key_non_ascii_stripped() {
+        // Non-ASCII alphanumeric chars are stripped by both Rust and TS implementations.
+        assert_eq!(normalize_explanation_key("ÉPS"), "ps");
+        assert_eq!(normalize_explanation_key("café"), "caf");
+    }
+
+    #[test]
+    fn explanation_targets_include_artifact_rows_and_columns() {
+        use crate::domain::{ArtifactColumn, ArtifactKind, StructuredArtifact};
+
+        let mut report = fixture_report();
+        report.artifacts = vec![StructuredArtifact {
+            id: "art-1".into(),
+            run_id: "run-1".into(),
+            kind: ArtifactKind::KpiGrid,
+            title: "Key Metrics".into(),
+            summary: String::new(),
+            columns: vec![
+                ArtifactColumn {
+                    key: "metric".into(),
+                    label: "Metric".into(),
+                    unit: None,
+                    description: None,
+                },
+                ArtifactColumn {
+                    key: "value".into(),
+                    label: "Value".into(),
+                    unit: Some("USD".into()),
+                    description: None,
+                },
+            ],
+            rows: vec![
+                serde_json::json!({
+                    "metric": "Net Interest Margin",
+                    "value": 3.2,
+                    "unit": "%"
+                }),
+                serde_json::json!({
+                    "metric": "Cost to Income",
+                    "value": 42.1,
+                    "unit": "%"
+                }),
+                serde_json::json!({
+                    "factor": "Credit Quality",
+                    "value": "Strong"
+                }),
+            ],
+            series: Vec::new(),
+            evidence_ids: Vec::new(),
+            display_order: 1,
+            created_at: chrono::Utc::now().to_rfc3339(),
+        }];
+
+        let targets = explanation_targets_from_report(&report);
+        let keys: Vec<(&str, &str)> = targets
+            .iter()
+            .map(|t| (t.target_type.as_str(), t.target_key.as_str()))
+            .collect();
+
+        // Row targets for "metric" rows
+        assert!(keys.contains(&("artifact", "artifact:art-1:row_0")));
+        assert!(keys.contains(&("artifact", "artifact:art-1:row_1")));
+        // Factor target for "factor" row
+        assert!(keys.contains(&("artifact", "artifact:art-1:factor_2")));
+        // Column targets
+        assert!(keys.contains(&("artifact", "artifact:art-1:col_0")));
+        assert!(keys.contains(&("artifact", "artifact:art-1:col_1")));
+
+        // Verify display names
+        let row0 = targets
+            .iter()
+            .find(|t| t.target_key == "artifact:art-1:row_0")
+            .unwrap();
+        assert_eq!(row0.display_name, "Net Interest Margin");
+        assert_eq!(row0.value, Some(3.2));
+        assert_eq!(row0.unit.as_deref(), Some("%"));
+
+        let col1 = targets
+            .iter()
+            .find(|t| t.target_key == "artifact:art-1:col_1")
+            .unwrap();
+        assert_eq!(col1.display_name, "Value");
+        assert_eq!(col1.unit.as_deref(), Some("USD"));
+    }
+
+    #[test]
+    fn explanation_targets_include_projection_metric() {
+        use crate::domain::{Projection, ProjectionScenario, ScenarioLabel};
+
+        let mut report = fixture_report();
+        report.projections = vec![Projection {
+            id: "proj-1".into(),
+            run_id: "run-1".into(),
+            entity_id: "AAPL".into(),
+            horizon: "12M".into(),
+            metric: "EPS".into(),
+            current_value: 6.42,
+            current_value_label: "$6.42".into(),
+            unit: "USD".into(),
+            scenarios: vec![ProjectionScenario {
+                label: ScenarioLabel::Bull,
+                target_value: 8.50,
+                target_label: "$8.50".into(),
+                probability: 0.3,
+                rationale: "Strong upgrade cycle".into(),
+                catalysts: Vec::new(),
+                risks: Vec::new(),
+            }],
+            methodology: "DCF".into(),
+            key_assumptions: Vec::new(),
+            evidence_ids: Vec::new(),
+            confidence: 0.7,
+            disclaimer: String::new(),
+            created_at: chrono::Utc::now().to_rfc3339(),
+        }];
+
+        let targets = explanation_targets_from_report(&report);
+        let keys: Vec<(&str, &str)> = targets
+            .iter()
+            .map(|t| (t.target_type.as_str(), t.target_key.as_str()))
+            .collect();
+
+        assert!(keys.contains(&("projection", "projection:proj-1:metric")));
+        // Scenarios are NOT targets (frontend doesn't render scenario explanations)
+        assert!(!keys.contains(&("projection", "projection:proj-1:scenario:bull")));
+
+        let metric_target = targets
+            .iter()
+            .find(|t| t.target_key == "projection:proj-1:metric")
+            .unwrap();
+        assert_eq!(metric_target.display_name, "EPS");
+        assert_eq!(metric_target.value, Some(6.42));
+        assert_eq!(metric_target.unit.as_deref(), Some("USD"));
+    }
+
+    #[test]
+    fn explanation_targets_include_portfolio_stance() {
+        use crate::domain::{HoldingReview, HoldingStance, Importance};
+
+        let mut report = fixture_report();
+        report.holding_reviews = vec![HoldingReview {
+            id: "hr-1".into(),
+            run_id: "run-1".into(),
+            entity_id: "AAPL".into(),
+            stance: HoldingStance::Add,
+            rationale: "Strong fundamentals".into(),
+            key_reasons: Vec::new(),
+            key_risks: Vec::new(),
+            confidence: 0.8,
+            importance: Importance::High,
+            evidence_ids: Vec::new(),
+            display_order: 1,
+            created_at: chrono::Utc::now().to_rfc3339(),
+        }];
+
+        let targets = explanation_targets_from_report(&report);
+        let stance = targets
+            .iter()
+            .find(|t| t.target_key == "portfolio:hr-1:stance")
+            .unwrap();
+        assert_eq!(stance.target_type, "portfolio");
+        assert_eq!(stance.display_name, "add stance");
+        assert_eq!(stance.value, Some(0.8));
+    }
+
+    #[test]
+    fn explanation_targets_include_portfolio_allocation() {
+        use crate::domain::{
+            AllocationAxis, AllocationBucket, AllocationDimension, AllocationReview,
+        };
+
+        let mut report = fixture_report();
+        report.allocation_reviews = vec![AllocationReview {
+            id: "ar-1".into(),
+            run_id: "run-1".into(),
+            summary: String::new(),
+            dimensions: vec![AllocationDimension {
+                dimension: AllocationAxis::Sector,
+                breakdown: vec![
+                    AllocationBucket {
+                        label: "Technology".into(),
+                        weight: 0.45,
+                        commentary: None,
+                    },
+                    AllocationBucket {
+                        label: "Financials".into(),
+                        weight: 0.30,
+                        commentary: None,
+                    },
+                ],
+                concentration_flags: Vec::new(),
+                overlap_notes: None,
+            }],
+            evidence_ids: Vec::new(),
+            confidence: 0.7,
+            created_at: chrono::Utc::now().to_rfc3339(),
+        }];
+
+        let targets = explanation_targets_from_report(&report);
+        let keys: Vec<(&str, &str)> = targets
+            .iter()
+            .filter(|t| t.target_type == "portfolio")
+            .map(|t| (t.target_type.as_str(), t.target_key.as_str()))
+            .collect();
+
+        assert!(keys.contains(&("portfolio", "portfolio:allocation:ar-1:sector")));
+        // Buckets are NOT targets (frontend doesn't render bucket explanations)
+        assert!(keys.iter().all(|(_, k)| !k.contains("bucket")));
+    }
+
+    #[test]
+    fn explanation_targets_include_portfolio_risk_factors() {
+        use crate::domain::{FactorExposure, PortfolioRisk, RiskLevel};
+
+        let mut report = fixture_report();
+        report.portfolio_risks = vec![PortfolioRisk {
+            id: "pr-1".into(),
+            run_id: "run-1".into(),
+            summary: String::new(),
+            factor_exposures: vec![
+                FactorExposure {
+                    factor: "Interest Rate".into(),
+                    level: RiskLevel::High,
+                    commentary: None,
+                },
+                FactorExposure {
+                    factor: "Currency".into(),
+                    level: RiskLevel::Medium,
+                    commentary: None,
+                },
+            ],
+            correlation_notes: None,
+            macro_sensitivities: Vec::new(),
+            single_name_risks: Vec::new(),
+            tail_risks: Vec::new(),
+            evidence_ids: Vec::new(),
+            confidence: 0.6,
+            created_at: chrono::Utc::now().to_rfc3339(),
+        }];
+
+        let targets = explanation_targets_from_report(&report);
+        let keys: Vec<(&str, &str)> = targets
+            .iter()
+            .filter(|t| t.target_type == "portfolio")
+            .map(|t| (t.target_type.as_str(), t.target_key.as_str()))
+            .collect();
+
+        assert!(keys.contains(&("portfolio", "portfolio:risk:pr-1:factor_0")));
+        assert!(keys.contains(&("portfolio", "portfolio:risk:pr-1:factor_1")));
+    }
+
+    #[test]
+    fn explanation_targets_include_rebalancing_rows() {
+        use crate::domain::{RebalancingRow, RebalancingSuggestion};
+
+        let mut report = fixture_report();
+        report.rebalancing_suggestions = vec![RebalancingSuggestion {
+            id: "rs-1".into(),
+            run_id: "run-1".into(),
+            rationale: "Reduce concentration".into(),
+            rows: vec![
+                RebalancingRow {
+                    label: "Trim AAPL".into(),
+                    current_weight: 0.25,
+                    suggested_weight: 0.15,
+                    delta: -0.10,
+                    commentary: None,
+                },
+                RebalancingRow {
+                    label: "Add MSFT".into(),
+                    current_weight: 0.10,
+                    suggested_weight: 0.15,
+                    delta: 0.05,
+                    commentary: None,
+                },
+            ],
+            scenarios: Vec::new(),
+            caveats: Vec::new(),
+            evidence_ids: Vec::new(),
+            confidence: 0.7,
+            created_at: chrono::Utc::now().to_rfc3339(),
+        }];
+
+        let targets = explanation_targets_from_report(&report);
+        let keys: Vec<(&str, &str)> = targets
+            .iter()
+            .filter(|t| t.target_type == "portfolio")
+            .map(|t| (t.target_type.as_str(), t.target_key.as_str()))
+            .collect();
+
+        assert!(keys.contains(&("portfolio", "portfolio:rebalancing:rs-1:row_0")));
+        assert!(keys.contains(&("portfolio", "portfolio:rebalancing:rs-1:row_1")));
+
+        let row0 = targets
+            .iter()
+            .find(|t| t.target_key == "portfolio:rebalancing:rs-1:row_0")
+            .unwrap();
+        assert_eq!(row0.display_name, "Trim AAPL");
+        assert_eq!(row0.value, Some(-0.10));
+    }
+
+    #[test]
+    fn explanation_targets_dedup_by_type_and_key() {
+        use crate::domain::{ArtifactColumn, ArtifactKind, StructuredArtifact};
+
+        let mut report = fixture_report();
+        // Two artifacts with same row structure — their keys include artifact id,
+        // so they should NOT be deduped against each other.
+        let make_artifact = |id: &str| StructuredArtifact {
+            id: id.into(),
+            run_id: "run-1".into(),
+            kind: ArtifactKind::KpiGrid,
+            title: "Grid".into(),
+            summary: String::new(),
+            columns: vec![ArtifactColumn {
+                key: "metric".into(),
+                label: "Metric".into(),
+                unit: None,
+                description: None,
+            }],
+            rows: vec![serde_json::json!({"metric": "Revenue"})],
+            series: Vec::new(),
+            evidence_ids: Vec::new(),
+            display_order: 1,
+            created_at: chrono::Utc::now().to_rfc3339(),
+        };
+        report.artifacts = vec![make_artifact("a-1"), make_artifact("a-2")];
+
+        let targets = explanation_targets_from_report(&report);
+        let art_targets: Vec<&str> = targets
+            .iter()
+            .filter(|t| t.target_type == "artifact")
+            .map(|t| t.target_key.as_str())
+            .collect();
+
+        // Both artifacts generate separate row targets
+        assert!(art_targets.contains(&"artifact:a-1:row_0"));
+        assert!(art_targets.contains(&"artifact:a-2:row_0"));
+
+        // But duplicate metrics from report.metrics and artifacts don't collide
+        // because they have different target_types or different keys.
+        let metric_count = targets.iter().filter(|t| t.target_key == "revenue").count();
+        // "revenue" won't be generated because fixture_report has no metric named "revenue"
+        // but the artifact row key "artifact:a-1:row_0" is distinct from any bare metric key.
+        assert_eq!(metric_count, 0);
     }
 }

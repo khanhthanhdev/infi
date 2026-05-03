@@ -67,7 +67,7 @@ export function SourcesPopover({ sources, selected, onToggle }: SourcesPopoverPr
                   <span className="min-w-0 flex-1">
                     <span className="block text-[13px]">{src.display_name}</span>
                     <span className="block font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
-                      {src.category.replace("_", " ")}
+                      {src.category.replaceAll("_", " ")}
                       {missingKey ? " · no key" : ""}
                     </span>
                   </span>

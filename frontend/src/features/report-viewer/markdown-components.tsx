@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { processNumberHighlights } from "@/lib/markdown-highlights";
 import type { MetricExplanation } from "@/types";
 
 const TERM_ALIASES: Record<string, string[]> = {
@@ -34,69 +35,34 @@ const TERM_ALIASES: Record<string, string[]> = {
   net_profit: ["net profit", "net income"],
 };
 
-function highlightNumberText(text: string, keyPrefix: string): ReactNode {
-  const parts: ReactNode[] = [];
-  const pattern = /\[\[([^[\]]+?)\]\](%?)/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = pattern.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
-    }
-
-    parts.push(
-      <span
-        key={`${keyPrefix}-${match.index}`}
-        className="rounded-sm bg-primary/10 px-0.5 font-mono tabular-nums text-[0.92em] text-primary"
-      >
-        {match[1]}
-        {match[2]}
-      </span>,
-    );
-    lastIndex = pattern.lastIndex;
-  }
-
-  if (parts.length === 0) return text;
-  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
-  return parts;
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function processNumberHighlights(children: ReactNode): ReactNode {
-  if (typeof children === "string") return highlightNumberText(children, "number");
-  if (Array.isArray(children)) {
-    return children.map((child, index) => processNumberHighlightsWithKey(child, `number-${index}`));
-  }
-  if (isValidElement(children)) {
-    const element = children as ReactElement<{ children?: ReactNode }>;
-    return cloneElement(element, {
-      children: processNumberHighlights(element.props.children),
-    });
-  }
-  return children;
-}
-
-function processNumberHighlightsWithKey(children: ReactNode, keyPrefix: string): ReactNode {
-  if (typeof children === "string") return highlightNumberText(children, keyPrefix);
-  return processNumberHighlights(children);
-}
-
+/**
+ * Walk the React node tree and wrap matching metric terms in tooltip spans.
+ * Number highlighting is handled upstream by preprocessing + the
+ * `number-highlight` component, so this only deals with term tooltips.
+ */
 function processHighlights(children: ReactNode, explanations: MetricExplanation[]): ReactNode {
   if (Array.isArray(children)) {
     return children.map((child) => processHighlights(child, explanations));
   }
   if (isValidElement(children)) {
     const element = children as ReactElement<{ children?: ReactNode }>;
+    // Don't recurse into tooltip-wrapped elements to avoid double-wrapping
+    if (element.type === MetricExplanationTooltip) return children;
     return cloneElement(element, {
       children: processHighlights(element.props.children, explanations),
     });
   }
-  if (typeof children !== "string") return processNumberHighlights(children);
+  if (typeof children !== "string") return children;
 
+  // --- String leaf: run term matching ---
   const termExplanations = new Map(
     explanations.filter((e) => e.target_type === "term").map((e) => [e.target_key, e]),
   );
-  if (termExplanations.size === 0) return processNumberHighlights(children);
+  if (termExplanations.size === 0) return children;
 
   const aliases = Array.from(termExplanations.entries())
     .flatMap(([key, explanation]) => {
@@ -108,39 +74,30 @@ function processHighlights(children: ReactNode, explanations: MetricExplanation[
     .filter(({ alias }) => alias.trim().length > 0)
     .sort((a, b) => b.alias.length - a.alias.length);
 
-  if (aliases.length === 0) return processNumberHighlights(children);
+  if (aliases.length === 0) return children;
 
   const pattern = new RegExp(
     `(?<![\\w/])(${aliases.map(({ alias }) => escapeRegExp(alias)).join("|")})(?![\\w/])`,
     "gi",
   );
-  const numberParts = children.split(/(\[\[[^[\]]+?\]\]%?)/g);
 
-  return numberParts.flatMap((part, partIndex) => {
-    if (part.startsWith("[[") && (part.endsWith("]]") || part.endsWith("]]%"))) {
-      return processNumberHighlightsWithKey(part, `number-${partIndex}`);
-    }
+  const parts = children.split(pattern);
+  if (parts.length === 1) return children;
 
-    return part.split(pattern).map((piece, pieceIndex) => {
-      const match = aliases.find(({ alias }) => alias.toLowerCase() === piece.toLowerCase());
-      if (!match) return piece;
-      return (
-        <MetricExplanationTooltip
-          key={`${partIndex}-${pieceIndex}-${piece}`}
-          explanation={match.explanation}
-        >
-          <span className="cursor-help underline decoration-dotted underline-offset-2">
-            {piece}
-          </span>
-        </MetricExplanationTooltip>
-      );
-    });
+  return parts.map((piece, pieceIndex) => {
+    const match = aliases.find(({ alias }) => alias.toLowerCase() === piece.toLowerCase());
+    if (!match) return piece;
+    return (
+      <MetricExplanationTooltip key={`term-${pieceIndex}-${piece}`} explanation={match.explanation}>
+        <span className="cursor-help underline decoration-dotted underline-offset-2">{piece}</span>
+      </MetricExplanationTooltip>
+    );
   });
 }
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+// ---------------------------------------------------------------------------
+// TextWithHighlights — wraps children with term tooltip processing
+// ---------------------------------------------------------------------------
 
 function TextWithHighlights({
   children,
@@ -149,8 +106,14 @@ function TextWithHighlights({
   children: ReactNode;
   explanations?: MetricExplanation[];
 }) {
-  return <>{processHighlights(children, explanations)}</>;
+  const highlighted = processNumberHighlights(children);
+  if (explanations.length === 0) return <>{highlighted}</>;
+  return <>{processHighlights(highlighted, explanations)}</>;
 }
+
+// ---------------------------------------------------------------------------
+// Shared report markdown components
+// ---------------------------------------------------------------------------
 
 export const reportMarkdownComponents: Components = {
   table: ({ children }) => <Table className="text-[13px]">{children}</Table>,
@@ -239,6 +202,10 @@ export const reportMarkdownComponents: Components = {
     </pre>
   ),
 };
+
+// ---------------------------------------------------------------------------
+// Factory — returns a Components map with metric explanations injected
+// ---------------------------------------------------------------------------
 
 export function createReportMarkdownComponents(explanations: MetricExplanation[] = []): Components {
   return {
