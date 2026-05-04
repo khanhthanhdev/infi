@@ -38,15 +38,23 @@ permissions:
 
 jobs:
   check:
-    name: Check & Lint
-    runs-on: ubuntu-latest
+    name: Check & Lint (${{ matrix.platform }})
+    runs-on: ${{ matrix.platform }}
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-latest
+          - platform: macos-latest
+          - platform: windows-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -74,21 +82,32 @@ jobs:
         run: |
           mkdir -p frontend/dist
           touch frontend/dist/index.html
+          mkdir -p frontend/dist-viewer
+          echo '`__INFI_REPORT_JSON__`' > frontend/dist-viewer/viewer.html
+        shell: bash
 
       - name: Lint (default features)
         run: cargo clippy --all-targets --all-features -- -D warnings
 
   test:
-    name: Tests
-    runs-on: ubuntu-latest
+    name: Tests (${{ matrix.platform }})
+    runs-on: ${{ matrix.platform }}
     needs: check
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-latest
+          - platform: macos-latest
+          - platform: windows-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -111,21 +130,32 @@ jobs:
         run: |
           mkdir -p frontend/dist
           touch frontend/dist/index.html
+          mkdir -p frontend/dist-viewer
+          echo '`__INFI_REPORT_JSON__`' > frontend/dist-viewer/viewer.html
+        shell: bash
 
       - name: Run tests
         run: cargo test --verbose
 
   build:
-    name: Build Check
-    runs-on: ubuntu-latest
+    name: Build Check (${{ matrix.platform }})
+    runs-on: ${{ matrix.platform }}
     needs: check
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-latest
+          - platform: macos-latest
+          - platform: windows-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y \

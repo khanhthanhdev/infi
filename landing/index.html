@@ -392,17 +392,33 @@
                     <span id="copy-feedback" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-blue text-white font-medium text-[12px] px-4 py-2.5 opacity-0 transition-opacity whitespace-nowrap pointer-events-none z-50 rounded-full">Copied</span>
                 </div>
 
-                <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-3 mt-8">
-                    <a href="https://github.com/khanhthanhdev/infi/releases/latest" class="inline-flex items-center justify-center gap-2 bg-blue text-white font-semibold text-base md:text-lg px-6 md:px-8 py-3 md:py-3.5 rounded-full hover:bg-blue-deep transition-colors">
-                        Download for macOS
+                <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-3 mt-8" id="download-buttons">
+                    <a
+                        href="https://github.com/khanhthanhdev/infi/releases/latest"
+                        data-asset="dmg-arm"
+                        class="download-btn inline-flex items-center justify-center gap-2 bg-blue text-white font-semibold text-base md:text-lg px-6 md:px-8 py-3 md:py-3.5 rounded-full hover:bg-blue-deep transition-colors">
+                        Download for macOS (Apple Silicon)
                     </a>
-                    <a href="https://github.com/khanhthanhdev/infi/releases/latest" class="inline-flex items-center justify-center gap-2 bg-blue text-white font-semibold text-base md:text-lg px-6 md:px-8 py-3 md:py-3.5 rounded-full hover:bg-blue-deep transition-colors">
-                        Download AppImage
+                    <a
+                        href="https://github.com/khanhthanhdev/infi/releases/latest"
+                        data-asset="dmg-intel"
+                        class="download-btn inline-flex items-center justify-center gap-2 bg-blue text-white font-semibold text-base md:text-lg px-6 md:px-8 py-3 md:py-3.5 rounded-full hover:bg-blue-deep transition-colors">
+                        Download for macOS (Intel)
                     </a>
-                    <a href="https://github.com/khanhthanhdev/infi/releases/latest" class="inline-flex items-center justify-center gap-2 bg-blue text-white font-semibold text-base md:text-lg px-6 md:px-8 py-3 md:py-3.5 rounded-full hover:bg-blue-deep transition-colors">
+                    <a
+                        href="https://github.com/khanhthanhdev/infi/releases/latest"
+                        data-asset="appimage"
+                        class="download-btn inline-flex items-center justify-center gap-2 bg-blue text-white font-semibold text-base md:text-lg px-6 md:px-8 py-3 md:py-3.5 rounded-full hover:bg-blue-deep transition-colors">
+                        Download AppImage (Linux)
+                    </a>
+                    <a
+                        href="https://github.com/khanhthanhdev/infi/releases/latest"
+                        data-asset="exe"
+                        class="download-btn inline-flex items-center justify-center gap-2 bg-blue text-white font-semibold text-base md:text-lg px-6 md:px-8 py-3 md:py-3.5 rounded-full hover:bg-blue-deep transition-colors">
                         Download for Windows
                     </a>
                 </div>
+                <p id="download-version" class="text-[12px] text-muted mt-3"></p>
             </div>
         </section>
     </main>
@@ -471,6 +487,80 @@
                     }
                 });
             });
+        })();
+
+        // Resolve direct download URLs from the GitHub Releases API.
+        // Buttons keep their `/releases/latest` href as a no-JS fallback.
+        (function () {
+            const REPO = "khanhthanhdev/infi";
+            const buttons = document.querySelectorAll(".download-btn[data-asset]");
+            const versionLabel = document.getElementById("download-version");
+            if (!buttons.length) return;
+
+            // Asset filename matchers — keyed by the button's data-asset value.
+            // Patterns match Tauri's default bundle naming.
+            const matchers = {
+                "dmg-arm":  (n) => /aarch64\.dmg$/i.test(n),
+                "dmg-intel": (n) => /(?:x64|x86_64)\.dmg$/i.test(n),
+                "appimage": (n) => /\.AppImage$/i.test(n),
+                "exe":      (n) => /(?:x64-setup|x86_64-setup)\.exe$/i.test(n),
+            };
+
+            // Best-effort platform detection so we can highlight the most relevant button.
+            function detectPreferredAsset() {
+                const ua = navigator.userAgent || "";
+                const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+                const isMac = /Mac|Darwin/i.test(platform) || /Mac OS X/i.test(ua);
+                const isWin = /Win/i.test(platform) || /Windows/i.test(ua);
+                const isLinux = /Linux/i.test(platform) && !/Android/i.test(ua);
+                if (isMac) {
+                    // Intel Macs report "MacIntel" with no ARM hint; Apple Silicon
+                    // reports "MacIntel" too under Rosetta. Default to Apple Silicon
+                    // (overwhelmingly more common on new hardware).
+                    return "dmg-arm";
+                }
+                if (isWin) return "exe";
+                if (isLinux) return "appimage";
+                return null;
+            }
+
+            fetch("https://api.github.com/repos/" + REPO + "/releases/latest", {
+                headers: { "Accept": "application/vnd.github+json" },
+            })
+                .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+                .then((release) => {
+                    const assets = release.assets || [];
+                    buttons.forEach((btn) => {
+                        const key = btn.getAttribute("data-asset");
+                        const match = matchers[key];
+                        if (!match) return;
+                        const asset = assets.find((a) => match(a.name));
+                        if (asset && asset.browser_download_url) {
+                            btn.setAttribute("href", asset.browser_download_url);
+                        }
+                    });
+
+                    if (versionLabel && release.tag_name) {
+                        versionLabel.textContent = "Latest release: " + release.tag_name;
+                    }
+
+                    // Highlight the button matching the visitor's platform.
+                    const preferred = detectPreferredAsset();
+                    if (preferred) {
+                        buttons.forEach((btn) => {
+                            if (btn.getAttribute("data-asset") === preferred) {
+                                btn.classList.add("ring-2", "ring-blue", "ring-offset-2");
+                                if (btn.parentElement) {
+                                    btn.parentElement.insertBefore(btn, btn.parentElement.firstChild);
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(function (err) {
+                    // On failure the buttons still resolve to the releases page.
+                    console.warn("Failed to resolve direct download URLs:", err);
+                });
         })();
     </script>
 </body>
