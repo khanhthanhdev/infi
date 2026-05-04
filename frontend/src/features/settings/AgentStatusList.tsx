@@ -23,7 +23,7 @@ export function AgentStatusList({ agents }: AgentStatusListProps) {
             key={agent.id}
             className="grid grid-cols-[32px_28px_1fr_auto] items-center gap-4 px-5 py-4"
           >
-            <span className="font-mono text-[11px] tabular-nums text-[#3f4653]">
+            <span className="text-[11px] tabular-nums text-[#3f4653]">
               {String(index + 1).padStart(2, "0")}
             </span>
             <img
@@ -33,7 +33,7 @@ export function AgentStatusList({ agents }: AgentStatusListProps) {
             />
             <div className="flex flex-col gap-0.5">
               <span className="text-[14px] font-medium text-[#111827]">{agent.label}</span>
-              <span className="truncate font-mono text-[11.5px] text-[#3f4653]">
+              <span className="truncate text-[11.5px] text-[#3f4653]">
                 {agent.command || "Not found on PATH"}
               </span>
             </div>

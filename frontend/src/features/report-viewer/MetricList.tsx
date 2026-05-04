@@ -35,7 +35,7 @@ export const MetricList = memo(function MetricList({
   if (metrics.length === 0) return null;
 
   return (
-    <div className="rounded-[10px] border border-[#e7e9ee] bg-white">
+    <div className="rounded-[10px] border border-border bg-card">
       {metrics.map((metric, index) => {
         const entity = metric.entity_id ? entityMap.get(metric.entity_id) : null;
         const source = sourceMap.get(metric.source_id);
@@ -48,39 +48,39 @@ export const MetricList = memo(function MetricList({
             key={metric.id}
             onClick={() => onSelect?.(metricSelection(metric, source))}
             className={cn(
-              "report-row-tint grid w-full grid-cols-[3ch_minmax(0,1fr)_auto] items-baseline gap-4 border-t border-[#e7e9ee] px-5 py-3.5 text-left transition-colors first:border-0",
+              "report-row-tint grid w-full grid-cols-[3ch_minmax(0,1fr)_auto] items-baseline gap-4 border-t border-border px-5 py-3.5 text-left transition-colors first:border-0",
               metricTone(metric.change_pct),
               selectedId === `metric:${metric.id}` && "report-selected",
             )}
           >
-            <span className="font-mono text-[10.5px] tabular-nums text-[#3f4653]">
+            <span className="text-[11px] tabular-nums text-text-secondary">
               {String(index + 1).padStart(2, "0")}
             </span>
             <div className="min-w-0 space-y-0.5">
               <div className="flex flex-wrap items-baseline gap-x-2">
                 {explanation ? (
                   <MetricExplanationTooltip explanation={explanation}>
-                    <span className="cursor-help text-[14px] font-medium text-[#111827] underline decoration-dotted underline-offset-2">
+                    <span className="cursor-help text-[14px] font-medium text-text-primary underline decoration-dotted underline-offset-2">
                       {metricLabel}
                     </span>
                   </MetricExplanationTooltip>
                 ) : (
-                  <span className="text-[14px] font-medium text-[#111827]">{metricLabel}</span>
+                  <span className="text-[14px] font-medium text-text-primary">{metricLabel}</span>
                 )}
                 {entity && (
-                  <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]/80">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary/80">
                     {entity.symbol || entity.name}
                   </span>
                 )}
                 {metric.period && (
-                  <span className="font-mono text-[10.5px] tabular-nums text-[#3f4653]">
+                  <span className="text-[11px] tabular-nums text-text-secondary">
                     {metric.period}
                   </span>
                 )}
                 <FreshnessChip iso={metric.as_of} variant="metric" />
               </div>
               {source && (
-                <div className="font-mono text-[10.5px] tabular-nums text-[#3f4653]/80">
+                <div className="text-[11px] tabular-nums text-text-secondary/80">
                   {source.title}
                 </div>
               )}
@@ -90,13 +90,9 @@ export const MetricList = memo(function MetricList({
                 const { value, suffix } = formatMetricValue(metric.numeric_value, metric.unit);
                 return (
                   <>
-                    <span className="font-mono text-[14px] tabular-nums text-[#111827]">
-                      {value}
-                    </span>
+                    <span className="text-[14px] tabular-nums text-text-primary">{value}</span>
                     {suffix && (
-                      <span className="font-mono text-[10.5px] tabular-nums text-[#3f4653]">
-                        {suffix}
-                      </span>
+                      <span className="text-[11px] tabular-nums text-text-secondary">{suffix}</span>
                     )}
                   </>
                 );

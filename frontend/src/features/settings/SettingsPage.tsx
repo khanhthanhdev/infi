@@ -50,7 +50,7 @@ export function SettingsPage({ agents }: SettingsPageProps) {
         <div className="w-full px-6 pb-44 pt-5 lg:px-8">
           <section className="relative overflow-hidden">
             <div className="flex min-h-[240px] flex-col justify-center px-8 py-9 sm:px-11 lg:w-[62%] xl:w-[58%]">
-              <p className="mb-4 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3572ad]">
+              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3572ad]">
                 Configure Infi
               </p>
               <h1 className="max-w-[560px] text-[44px] font-semibold leading-[1.02] tracking-[-0.035em] text-[#111827] sm:text-[52px]">
@@ -81,7 +81,7 @@ export function SettingsPage({ agents }: SettingsPageProps) {
                 label="Agents"
                 title="Local ACP agents"
                 meta={
-                  <span className="font-mono tabular-nums">
+                  <span className="tabular-nums">
                     {String(agents.length).padStart(2, "0")} detected
                   </span>
                 }

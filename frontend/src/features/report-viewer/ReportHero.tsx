@@ -16,22 +16,22 @@ export const ReportHero = memo(function ReportHero({ report, onSwitchRun }: Repo
 
   return (
     <header
-      className={`report-hero-panel ${heroTone(stance?.stance ?? "")} space-y-10 rounded-[10px] border border-[#e7e9ee] bg-white p-6`}
+      className={`report-hero-panel ${heroTone(stance?.stance ?? "")} space-y-10 rounded-[10px] border border-border bg-card p-6`}
     >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-blue)]">
           Final stance
         </span>
-        <span className="text-[#dfe5ee]" aria-hidden>
+        <span className="text-border" aria-hidden>
           ·
         </span>
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
           {horizon}
         </span>
-        <span className="text-[#dfe5ee]" aria-hidden>
+        <span className="text-border" aria-hidden>
           ·
         </span>
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
           As of {asOf}
         </span>
       </div>
@@ -41,15 +41,15 @@ export const ReportHero = memo(function ReportHero({ report, onSwitchRun }: Repo
           <StanceHeadline accent={accent} stance={stance} />
 
           {stance?.summary && (
-            <p className="max-w-[34em] text-xl font-normal leading-[1.45] tracking-[-0.005em] text-[#111827]">
+            <p className="max-w-[34em] text-xl font-normal leading-[1.45] tracking-[-0.005em] text-text-primary">
               {stance.summary}
             </p>
           )}
         </div>
 
-        <aside className="space-y-6 lg:border-l lg:border-[#e7e9ee] lg:pl-8">
+        <aside className="space-y-6 lg:border-l lg:border-border lg:pl-8">
           <div className="space-y-2">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-blue)]">
               Confidence
             </span>
             <ConfidenceRail confidence={stance?.confidence ?? 0} accentClass={accent.rule} />
@@ -57,7 +57,7 @@ export const ReportHero = memo(function ReportHero({ report, onSwitchRun }: Repo
 
           {report.runs.length > 1 && activeRunId && (
             <div className="space-y-2">
-              <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-blue)]">
                 Run
               </span>
               <RunSwitcher runs={report.runs} activeRunId={activeRunId} onSwitch={onSwitchRun} />
@@ -65,7 +65,9 @@ export const ReportHero = memo(function ReportHero({ report, onSwitchRun }: Repo
           )}
 
           {stance?.disclaimer && (
-            <p className="text-[11px] leading-relaxed text-[#3f4653]/80">{stance.disclaimer}</p>
+            <p className="text-[11px] leading-relaxed text-text-secondary/80">
+              {stance.disclaimer}
+            </p>
           )}
         </aside>
       </div>
@@ -122,7 +124,7 @@ function StatFooter({
   projections: number;
 }) {
   return (
-    <div className="rounded-[6px] border border-[#e7e9ee] bg-[#fbfbfa] p-4">
+    <div className="rounded-[6px] border border-border bg-background p-4">
       <dl className="grid grid-cols-2 gap-y-4 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="Entities" value={entities} tone="report-tone-neutral" />
         <Stat label="Sources" value={sources} tone="report-tone-neutral" />
@@ -139,11 +141,9 @@ function Stat({ label, value, tone }: { label: string; value: number; tone: stri
   return (
     <div className={`report-stat ${tone} flex flex-col gap-1 px-3 py-2`}>
       <dt>
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#3f4653]">
-          {label}
-        </span>
+        <span className="text-[10px] uppercase tracking-[0.18em] text-text-secondary">{label}</span>
       </dt>
-      <dd className="font-mono text-2xl font-medium tabular-nums text-[#111827]">{value}</dd>
+      <dd className="text-2xl font-medium tabular-nums text-text-primary">{value}</dd>
     </div>
   );
 }

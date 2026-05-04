@@ -134,7 +134,7 @@ export function DataSourcesSection() {
         title="Provider registry"
         meta={
           sources && (
-            <span className="flex items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="flex items-center gap-3 text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
               <span className="tabular-nums">{String(enabledCount).padStart(2, "0")} enabled</span>
               <span aria-hidden className="h-3 w-px bg-[#dfe5ee]" />
               <span className="tabular-nums">{String(keyedCount).padStart(2, "0")} keyed</span>
@@ -165,14 +165,14 @@ export function DataSourcesSection() {
                   {idx > 0 && <div className="border-t border-[#e7e9ee] pt-5 mb-5" />}
                   <header className="flex items-baseline justify-between gap-4">
                     <div className="flex items-baseline gap-3">
-                      <span className="font-mono text-[10.5px] font-medium tabular-nums text-[#3f4653]">
+                      <span className="text-[10.5px] font-medium tabular-nums text-[#3f4653]">
                         {String(idx + 1).padStart(2, "0")}
                       </span>
-                      <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#3572ad]">
+                      <span className="text-[10.5px] uppercase tracking-[0.18em] text-[#3572ad]">
                         {CATEGORY_LABEL[category]}
                       </span>
                     </div>
-                    <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] tabular-nums text-[#3f4653]">
+                    <span className="text-[10.5px] uppercase tracking-[0.14em] tabular-nums text-[#3f4653]">
                       {String(enabledInCat).padStart(2, "0")} /{" "}
                       {String(rows.length).padStart(2, "0")}
                     </span>
@@ -235,11 +235,11 @@ function ProviderRow({
     <div className="grid grid-cols-[1fr_auto] items-start gap-x-8 gap-y-3 py-4 first:pt-0 last:pb-0">
       <div className="min-w-0 space-y-1">
         <div className="flex items-baseline gap-3">
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
             {src.requires_key ? (src.has_key ? "Key stored" : "Key required") : "No key"}
           </span>
           {src.rate_limit_hint && (
-            <span className="font-mono text-[10.5px] tabular-nums text-[#3f4653]/70">
+            <span className="text-[10.5px] tabular-nums text-[#3f4653]/70">
               {src.rate_limit_hint}
             </span>
           )}
@@ -251,7 +251,7 @@ function ProviderRow({
       </div>
       <EnabledToggle enabled={src.enabled} disabled={busy} onChange={onToggleEnabled} />
       <div className="col-span-2 space-y-3 pt-1">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
           <a
             href={src.docs_url}
             target="_blank"
@@ -286,13 +286,13 @@ function ProviderRow({
               value={draft}
               placeholder={src.has_key ? "Replace stored key" : "Paste API key"}
               onChange={(event) => onDraftChange(event.target.value)}
-              className="h-9 max-w-sm flex-1 rounded-[6px] border-[#dfe5ee] bg-transparent font-mono text-[13px] text-[#111827]"
+              className="h-9 max-w-sm flex-1 rounded-[6px] border-[#dfe5ee] bg-transparent text-[13px] text-[#111827]"
             />
             <button
               type="button"
               disabled={busy || !hasDraft}
               onClick={onSave}
-              className="inline-flex h-9 items-center rounded-[6px] border border-[#155dff] bg-[#155dff] px-4 font-mono text-[10.5px] uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#0d4ad6] disabled:cursor-not-allowed disabled:border-[#dfe5ee] disabled:bg-transparent disabled:text-[#3f4653]/50"
+              className="inline-flex h-9 items-center rounded-[6px] border border-[#155dff] bg-[#155dff] px-4 text-[10.5px] uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#0d4ad6] disabled:cursor-not-allowed disabled:border-[#dfe5ee] disabled:bg-transparent disabled:text-[#3f4653]/50"
             >
               {src.has_key ? "Replace" : "Save"}
             </button>
@@ -301,7 +301,7 @@ function ProviderRow({
               type="button"
               disabled={busy || !canTest}
               onClick={onTest}
-              className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-40"
+              className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-40"
             >
               Test
             </button>
@@ -312,7 +312,7 @@ function ProviderRow({
                   type="button"
                   disabled={busy}
                   onClick={onClear}
-                  className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#e53e3e] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#e53e3e] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Clear
                 </button>
@@ -321,7 +321,7 @@ function ProviderRow({
             {testResult && (
               <span
                 className={
-                  "ml-auto font-mono text-[10.5px] uppercase tracking-[0.14em] tabular-nums " +
+                  "ml-auto text-[10.5px] uppercase tracking-[0.14em] tabular-nums " +
                   (testResult.status === "ok" ? "text-[#38a169]" : "text-[#e53e3e]")
                 }
               >
@@ -337,14 +337,14 @@ function ProviderRow({
               type="button"
               disabled={busy}
               onClick={onTest}
-              className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-40"
+              className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-40"
             >
               Test reachability
             </button>
             {testResult && (
               <span
                 className={
-                  "font-mono text-[10.5px] uppercase tracking-[0.14em] tabular-nums " +
+                  "text-[10.5px] uppercase tracking-[0.14em] tabular-nums " +
                   (testResult.status === "ok" ? "text-[#38a169]" : "text-[#e53e3e]")
                 }
               >
@@ -375,7 +375,7 @@ function EnabledToggle({ enabled, disabled, onChange }: EnabledToggleProps) {
       disabled={disabled}
       onClick={() => onChange(!enabled)}
       className={
-        "inline-flex h-7 items-center gap-2 rounded-[6px] border px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors disabled:cursor-not-allowed disabled:opacity-50 " +
+        "inline-flex h-7 items-center gap-2 rounded-[6px] border px-2.5 text-[10.5px] uppercase tracking-[0.14em] transition-colors disabled:cursor-not-allowed disabled:opacity-50 " +
         (enabled
           ? "border-[#155dff] bg-[#155dff] text-white hover:bg-[#0d4ad6]"
           : "border-[#dfe5ee] text-[#3f4653] hover:border-[#155dff] hover:text-[#155dff]")

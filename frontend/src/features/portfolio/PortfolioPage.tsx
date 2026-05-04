@@ -168,7 +168,7 @@ function EmptyCreate({
   return (
     <section className="relative min-h-[360px] overflow-hidden">
       <div className="relative z-10 flex min-h-[360px] flex-col justify-center px-8 py-9 sm:px-11 lg:w-[62%] xl:w-[58%]">
-        <p className="mb-4 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3572ad]">
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3572ad]">
           Portfolio workspace
         </p>
         <h1 className="max-w-[560px] text-[44px] font-semibold leading-[1.02] tracking-[-0.035em] text-[#111827] sm:text-[52px]">
@@ -180,11 +180,11 @@ function EmptyCreate({
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-3">
           <div className="space-y-1">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
               Base currency
             </span>
             <Select value={currency} onValueChange={onCurrencyChange}>
-              <SelectTrigger className="h-10 w-[140px] rounded-[6px] border border-[#dfe5ee] bg-white/80 font-mono uppercase shadow-none hover:border-[#cbd5e1] hover:bg-white data-[state=open]:border-[#155dff]">
+              <SelectTrigger className="h-10 w-[140px] rounded-[6px] border border-[#dfe5ee] bg-white/80 uppercase shadow-none hover:border-[#cbd5e1] hover:bg-white data-[state=open]:border-[#155dff]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -416,7 +416,7 @@ function PortfolioView({
     <div className="space-y-10">
       <header className="flex flex-wrap items-start justify-between gap-6">
         <div className="min-w-0 space-y-3">
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3572ad]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3572ad]">
             Portfolio
           </p>
           {editingName ? (
@@ -431,7 +431,7 @@ function PortfolioView({
                 className="h-auto max-w-[640px] rounded-[6px] border border-[#155dff] bg-white p-3 text-[34px] font-semibold leading-[1.02] tracking-[-0.02em] text-[#111827] shadow-none focus-visible:border-[#155dff] focus-visible:ring-0 md:text-[48px]"
                 aria-label="Portfolio name"
               />
-              <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              <div className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
                 ↵ save · esc cancel
               </div>
             </div>
@@ -481,7 +481,7 @@ function PortfolioView({
 
       <section className="space-y-5">
         <div className="flex items-center gap-4">
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
             01 · Holdings
           </span>
           <div className="h-px flex-1 bg-[#dfe5ee]" />
@@ -499,7 +499,7 @@ function PortfolioView({
         ) : (
           <div className="overflow-x-auto rounded-[10px] border border-[#e7e9ee] bg-white">
             <div className="min-w-[700px]">
-              <div className="grid grid-cols-[minmax(150px,1.2fr)_80px_100px_100px_120px_90px] gap-3 border-b border-[#e7e9ee] px-5 py-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              <div className="grid grid-cols-[minmax(150px,1.2fr)_80px_100px_100px_120px_90px] gap-3 border-b border-[#e7e9ee] px-5 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
                 <span>Instrument</span>
                 <span className="text-right">30d</span>
                 <span className="text-right">Qty</span>
@@ -526,7 +526,7 @@ function PortfolioView({
 
       <section className="space-y-5">
         <div className="flex items-center gap-4">
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
             03 · Snapshot
           </span>
           <div className="h-px flex-1 bg-[#dfe5ee]" />
@@ -586,7 +586,7 @@ function PortfolioMeta({
   // "no snapshot yet" — everything else is noise.
   if (holdingCount === 0) {
     return (
-      <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+      <div className="flex flex-wrap items-center gap-3 text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
         <span>{baseCurrency}</span>
         <span aria-hidden className="text-[#3f4653]/40">
           ·
@@ -608,7 +608,7 @@ function PortfolioMeta({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+      <div className="flex flex-wrap items-center gap-3 text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
         {segments.map((segment, index) => (
           <span key={segment} className="flex items-center gap-3">
             {index > 0 && (
@@ -621,7 +621,7 @@ function PortfolioMeta({
         ))}
       </div>
       {totals.length > 1 && (
-        <div className="flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]/50">
+        <div className="flex flex-wrap items-center gap-3 text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]/50">
           {totals.map(([code, sum], index) => (
             <span key={code} className="flex items-center gap-3">
               {index > 0 && (
@@ -788,7 +788,7 @@ function HoldingRow({
         <div className="flex items-baseline gap-2">
           <span className="truncate font-medium text-[#111827]">{holding.symbol}</span>
           {holding.market && (
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
               {holding.market}
             </span>
           )}
@@ -798,16 +798,16 @@ function HoldingRow({
         </div>
       </div>
       <HoldingSparkline symbol={holding.symbol} market={holding.market} />
-      <span className="text-right font-mono tabular-nums text-[#111827]">
+      <span className="text-right tabular-nums text-[#111827]">
         {formatNumber(holding.quantity)}
       </span>
-      <span className="text-right font-mono tabular-nums text-[#111827]">
+      <span className="text-right tabular-nums text-[#111827]">
         {price !== null ? formatMoney(price, currency) : "—"}
       </span>
-      <span className="text-right font-mono tabular-nums text-[#111827]">
+      <span className="text-right tabular-nums text-[#111827]">
         {holding.market_value !== null ? formatMoney(holding.market_value, currency) : "—"}
       </span>
-      <span className="text-right font-mono tabular-nums text-[#111827]">
+      <span className="text-right tabular-nums text-[#111827]">
         {holding.allocation_pct !== null ? formatPercent(holding.allocation_pct) : "—"}
       </span>
     </div>
@@ -830,7 +830,7 @@ function PortfolioAnalysesSection({
   return (
     <section className="space-y-5">
       <div className="flex items-center gap-4">
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+        <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
           02 · Analyses
         </span>
         <div className="h-px flex-1 bg-[#dfe5ee]" />
@@ -868,7 +868,7 @@ function AnalysisRow({ analysis, onSelect }: { analysis: AnalysisSummary; onSele
     >
       <div className="min-w-0">
         <div className="truncate text-[14px] font-medium text-[#111827]">{analysis.title}</div>
-        <div className="mt-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+        <div className="mt-1 text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
           {formatDate(analysis.updated_at)}
           <span aria-hidden className="mx-2 text-[#3f4653]/40">
             ·
@@ -881,7 +881,7 @@ function AnalysisRow({ analysis, onSelect }: { analysis: AnalysisSummary; onSele
         </div>
       </div>
       <span
-        className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] ${running ? "bg-[#e4ecff] text-[#155dff]" : "bg-[#f1f5ff] text-[#3f4653]"}`}
+        className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] uppercase tracking-[0.14em] ${running ? "bg-[#e4ecff] text-[#155dff]" : "bg-[#f1f5ff] text-[#3f4653]"}`}
       >
         {running && <CircleNotch size={10} className="animate-spin" />}
         {statusText}
@@ -953,9 +953,7 @@ function HoldingSparkline({ symbol, market }: { symbol: string; market: string |
 
 function FieldLabel({ label }: { label: string }) {
   return (
-    <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
-      {label}
-    </span>
+    <span className="text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">{label}</span>
   );
 }
 

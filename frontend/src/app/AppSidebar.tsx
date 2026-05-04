@@ -241,7 +241,7 @@ export function AppSidebar({
                             }}
                           >
                             <MarqueeTitle title={portfolio.name} />
-                            <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-sidebar-foreground/50">
+                            <span className="shrink-0 text-[10px] uppercase tracking-[0.14em] text-sidebar-foreground/50">
                               {portfolio.base_currency}
                             </span>
                           </Button>
@@ -289,14 +289,14 @@ export function AppSidebar({
             <button
               type="button"
               onClick={onUpdateClick}
-              className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-sidebar-foreground/50 transition-colors hover:text-sidebar-foreground"
+              className="text-[10.5px] uppercase tracking-[0.14em] text-sidebar-foreground/50 transition-colors hover:text-sidebar-foreground"
             >
               Update ↑
             </button>
           )}
         </div>
         {currentVersion && (
-          <span className="font-mono text-[10.5px] tabular-nums text-sidebar-foreground/35">
+          <span className="text-[10.5px] tabular-nums text-sidebar-foreground/35">
             v{currentVersion}
           </span>
         )}
@@ -362,7 +362,7 @@ function FilterItem({
       </span>
       <span
         className={cn(
-          "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 font-mono text-[10px] font-semibold tabular-nums",
+          "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold tabular-nums",
           active ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
         )}
       >
@@ -452,7 +452,7 @@ function EmptyCta({
           className="h-8 rounded-[6px] text-[13px] font-normal data-[active=true]:bg-[var(--accent-blue-light)]"
         >
           <span className="flex items-center gap-2">
-            <span aria-hidden className="font-mono text-muted-foreground">
+            <span aria-hidden className="text-muted-foreground">
               +
             </span>
             <span>{label}</span>
@@ -478,7 +478,7 @@ function Expander({
     <button
       type="button"
       onClick={onToggle}
-      className="mt-1 flex h-6 w-full items-center px-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-sidebar-foreground/45 transition-colors hover:text-sidebar-foreground"
+      className="mt-1 flex h-6 w-full items-center px-2 text-[10.5px] uppercase tracking-[0.14em] text-sidebar-foreground/45 transition-colors hover:text-sidebar-foreground"
     >
       {label}
     </button>
@@ -490,7 +490,7 @@ function AnalysisMeta({ analysis }: { analysis: AnalysisSummary }) {
     analysis.active_run_status === "running" || analysis.active_run_status === "queued";
 
   return (
-    <span className="flex items-center gap-1.5 pl-0 font-mono text-[10px] uppercase tracking-[0.14em] text-sidebar-foreground/45">
+    <span className="flex items-center gap-1.5 pl-0 text-[10px] uppercase tracking-[0.14em] text-sidebar-foreground/45">
       {running ? (
         <>
           <CircleNotch size={10} className="animate-spin text-primary" />

@@ -53,7 +53,7 @@ export const StructuredArtifactView = memo(function StructuredArtifactView({
       >
         <header className="flex flex-wrap items-baseline justify-between gap-3">
           <div className="space-y-2">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
               {formatKind(artifact.kind)}
             </span>
             <h3 className="text-[17px] font-semibold leading-snug tracking-tight">
@@ -66,7 +66,7 @@ export const StructuredArtifactView = memo(function StructuredArtifactView({
             )}
           </div>
           {artifact.evidence_ids.length > 0 && (
-            <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
+            <span className="text-[11px] tabular-nums text-muted-foreground">
               {String(artifact.evidence_ids.length).padStart(2, "0")} sources
             </span>
           )}
@@ -145,10 +145,10 @@ function KpiGrid({ artifact, selectedId, onSelect, explanations = [] }: Renderer
                     selected && "report-selected",
                   )}
                 >
-                  <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
                     {textValue(row.period) || textValue(row.group) || "Metric"}
                   </span>
-                  <div className="mt-3 font-mono text-[22px] tabular-nums tracking-normal text-foreground">
+                  <div className="mt-3 text-[22px] tabular-nums tracking-normal text-foreground">
                     {formatValue(value)}
                     {row.unit ? (
                       <span className="ml-1 text-[11px] text-muted-foreground">
@@ -164,7 +164,7 @@ function KpiGrid({ artifact, selectedId, onSelect, explanations = [] }: Renderer
                   >
                     {title}
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10.5px] tabular-nums text-muted-foreground">
+                  <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] tabular-nums text-muted-foreground">
                     {row.prior_value != null && <span>prior {formatValue(row.prior_value)}</span>}
                     {row.change_pct != null && <span>chg {formatValue(row.change_pct)}%</span>}
                   </div>
@@ -173,7 +173,7 @@ function KpiGrid({ artifact, selectedId, onSelect, explanations = [] }: Renderer
               <TooltipContent variant="editorial" className="max-w-xs space-y-1.5 text-left">
                 {explanation && (
                   <div className="space-y-1.5 border-b border-border pb-2">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                       {explanation.display_name || explanation.metric_name}
                     </span>
                     <p className="text-[13px] font-medium leading-snug">{explanation.definition}</p>
@@ -182,7 +182,7 @@ function KpiGrid({ artifact, selectedId, onSelect, explanations = [] }: Renderer
                     </p>
                   </div>
                 )}
-                <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
                   Details
                 </span>
                 {Object.entries(row)
@@ -213,7 +213,7 @@ function RatioSnapshot({ artifact, selectedId, onSelect, explanations = [] }: Re
     <div className="grid gap-6 md:grid-cols-2">
       {groups.map(([group, rows]) => (
         <section key={group} className="border-t border-border pt-3">
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
             {group}
           </span>
           <div className="mt-3 divide-y divide-border/70">
@@ -242,7 +242,7 @@ function RatioSnapshot({ artifact, selectedId, onSelect, explanations = [] }: Re
                   ) : (
                     <span className="min-w-0 truncate">{metricName}</span>
                   )}
-                  <span className="font-mono tabular-nums">
+                  <span className="tabular-nums">
                     {formatValue(row.value ?? row.numeric_value)}
                     {row.unit ? ` ${formatValue(row.unit)}` : ""}
                   </span>
@@ -263,7 +263,7 @@ function FactorList({ artifact, selectedId, onSelect, explanations = [] }: Rende
     <div className="grid gap-7 md:grid-cols-2">
       {groups.map(([group, rows]) => (
         <section key={group} className="space-y-3 border-t border-border pt-3">
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
             {group}
           </span>
           <div className="divide-y divide-border/70">
@@ -294,7 +294,7 @@ function FactorList({ artifact, selectedId, onSelect, explanations = [] }: Rende
                       <span className="text-[14px] font-medium">{factorName}</span>
                     )}
                     {row.importance ? (
-                      <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
                         {formatValue(row.importance)}
                       </span>
                     ) : null}
@@ -399,7 +399,7 @@ function ArtifactTable({
                   key={column.key}
                   title={column.description ?? undefined}
                   className={cn(
-                    "px-3 align-top text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground",
+                    "px-3 align-top text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground",
                     columnIsNumeric[colIndex]
                       ? "min-w-[96px] whitespace-nowrap text-right"
                       : "min-w-[180px] max-w-[420px]",
@@ -444,7 +444,7 @@ function ArtifactTable({
                       className={cn(
                         "px-3 align-top",
                         numeric
-                          ? "min-w-[96px] whitespace-nowrap text-right font-mono tabular-nums"
+                          ? "min-w-[96px] whitespace-nowrap text-right tabular-nums"
                           : "min-w-[180px] max-w-[420px] whitespace-normal leading-[1.55]",
                       )}
                     >
@@ -518,9 +518,7 @@ function SvgBarChart({
                 className={valueFillTone(point.value)}
               />
             </svg>
-            <div className="font-mono tabular-nums text-muted-foreground">
-              {formatNumber(point.value)}
-            </div>
+            <div className="tabular-nums text-muted-foreground">{formatNumber(point.value)}</div>
           </button>
         );
       })}
@@ -572,7 +570,11 @@ function LineAreaChart({
                   <stop offset="100%" stopColor="currentColor" stopOpacity="0.02" />
                 </linearGradient>
               </defs>
-              <path d={areaPath} fill={`url(#${gradientId})`} className="text-[#3572ad]" />
+              <path
+                d={areaPath}
+                fill={`url(#${gradientId})`}
+                className="text-[var(--accent-blue)]"
+              />
             </>
           )}
           <polyline
@@ -580,7 +582,7 @@ function LineAreaChart({
             stroke="currentColor"
             strokeWidth="2"
             points={linePoints}
-            className="text-[#3572ad]"
+            className="text-[var(--accent-blue)]"
           />
           {coords.map((c, index) => {
             const selection = artifactPointSelection(artifact, c.point, c.point.series, index);
@@ -597,7 +599,7 @@ function LineAreaChart({
           })}
         </svg>
       </div>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] tabular-nums text-muted-foreground">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] tabular-nums text-muted-foreground">
         {points.map((point, index) => (
           <button
             type="button"
@@ -637,13 +639,13 @@ function rowTone(index: number): string {
 }
 
 function valueFillTone(value: number): string {
-  if (value > 0) return "fill-[#38a169]";
-  if (value < 0) return "fill-[#e03535]";
-  return "fill-[#3572ad]";
+  if (value > 0) return "fill-[var(--accent-green)]";
+  if (value < 0) return "fill-[var(--accent-red)]";
+  return "fill-[var(--accent-blue)]";
 }
 
 function valueTextTone(value: number): string {
-  if (value > 0) return "text-[#38a169]";
-  if (value < 0) return "text-[#e03535]";
-  return "text-[#3572ad]";
+  if (value > 0) return "text-[var(--accent-green)]";
+  if (value < 0) return "text-[var(--accent-red)]";
+  return "text-[var(--accent-blue)]";
 }

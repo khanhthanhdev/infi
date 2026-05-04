@@ -82,11 +82,11 @@ function ProjectionCard({
       <header className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-14">
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
               Projection
             </span>
             <span className="h-1 w-1 rounded-full bg-border" aria-hidden />
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
               {projection.horizon}
             </span>
             <span className="h-1 w-1 rounded-full bg-border" aria-hidden />
@@ -94,7 +94,7 @@ function ProjectionCard({
           </div>
           <h3 className="text-[32px] font-semibold leading-[1.05] tracking-[-0.02em] sm:text-[40px]">
             {label}
-            <span className="pl-4 font-mono text-[0.6em] tabular-nums text-muted-foreground">
+            <span className="pl-4 text-[0.6em] tabular-nums text-muted-foreground">
               {projection.current_value_label}
             </span>
           </h3>
@@ -105,16 +105,19 @@ function ProjectionCard({
           <button
             type="button"
             onClick={() => onSelect?.(projectionSelection(projection))}
-            className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
+            className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground"
           >
             Inspect projection
           </button>
         </div>
         <aside className="space-y-2 lg:border-l lg:border-border lg:pl-6">
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
             Confidence
           </span>
-          <ConfidenceRail confidence={projection.confidence} accentClass="bg-[#3572ad]" />
+          <ConfidenceRail
+            confidence={projection.confidence}
+            accentClass="bg-[var(--accent-blue)]"
+          />
         </aside>
       </header>
 
@@ -137,13 +140,13 @@ function ProjectionCard({
 
       {projection.key_assumptions.length > 0 && (
         <section className="space-y-3 border-t border-border pt-6">
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
             Key assumptions
           </span>
-          <ol className="space-y-2 text-[14px] leading-[1.6] text-foreground/90">
+          <ol className="space-y-2 text-[14.5px] leading-[1.55] text-foreground/90">
             {projection.key_assumptions.map((assumption, i) => (
               <li key={`${i}-${assumption.slice(0, 32)}`} className="flex gap-3">
-                <span className="mt-[0.35em] font-mono text-[10.5px] tabular-nums text-muted-foreground">
+                <span className="mt-[0.35em] text-[11px] tabular-nums text-muted-foreground">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span>{assumption}</span>
@@ -221,8 +224,8 @@ function ProjectionGauge({
             x: project(projection.current_value),
             labelTop: "now",
             labelBottom: projection.current_value_label,
-            topClassName: "fill-muted-foreground text-[10px] font-mono uppercase tracking-[0.16em]",
-            bottomClassName: "fill-foreground text-[11px] font-mono tabular-nums",
+            topClassName: "fill-muted-foreground text-[10px] uppercase tracking-[0.16em]",
+            bottomClassName: "fill-foreground text-[11px] tabular-nums",
             dot: null,
             tick: true,
           },
@@ -235,8 +238,8 @@ function ProjectionGauge({
         x: project(scenario.target_value),
         labelTop: scenario.label,
         labelBottom: formatProjectionTargetLabel(projection, scenario),
-        topClassName: cn("text-[10px] font-mono uppercase tracking-[0.16em]", accent.text),
-        bottomClassName: "fill-foreground text-[11px] font-mono tabular-nums",
+        topClassName: cn("text-[10px] uppercase tracking-[0.16em]", accent.text),
+        bottomClassName: "fill-foreground text-[11px] tabular-nums",
         dot: { fillClassName: accent.fill },
         tick: false,
       };
@@ -321,7 +324,7 @@ function ProjectionGauge({
           })}
         </svg>
       </div>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] tabular-nums text-muted-foreground">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] tabular-nums text-muted-foreground">
         {scenarios.map((scenario, i) => {
           const movement = formatProjectionMovement(projection, scenario);
           return (
@@ -341,10 +344,10 @@ function ProbabilityBar({ scenarios }: { scenarios: ProjectionScenario[] }) {
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between">
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
           Probability weight
         </span>
-        <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
+        <span className="text-[11px] tabular-nums text-muted-foreground">
           {Math.round(total * 100)}%
         </span>
       </div>
@@ -361,7 +364,7 @@ function ProbabilityBar({ scenarios }: { scenarios: ProjectionScenario[] }) {
           );
         })}
       </div>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] tabular-nums text-muted-foreground">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] tabular-nums text-muted-foreground">
         {scenarios.map((scenario, i) => (
           <span key={`${scenario.label}-${i}`} className="inline-flex items-center gap-1.5">
             <span
@@ -404,10 +407,10 @@ function ScenarioColumn({
     >
       <div className="space-y-2">
         <div className="flex items-baseline gap-2">
-          <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
-            {indexLabel}
-          </span>
-          <span className={cn("font-mono text-[10.5px] uppercase tracking-[0.14em]", accent.text)}>
+          <span className="text-[11px] tabular-nums text-muted-foreground">{indexLabel}</span>
+          <span
+            className={cn("text-[11px] font-semibold uppercase tracking-[0.18em]", accent.text)}
+          >
             {scenario.label}
           </span>
         </div>
@@ -416,19 +419,17 @@ function ScenarioColumn({
             {formatProjectionTargetLabel(projection, scenario)}
           </span>
           {movement && (
-            <span className="font-mono text-[12px] tabular-nums text-muted-foreground">
-              {movement}
-            </span>
+            <span className="text-[12px] tabular-nums text-muted-foreground">{movement}</span>
           )}
         </div>
-        <div className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
+        <div className="text-[11px] tabular-nums text-muted-foreground">
           {Math.round(scenario.probability * 100)}% probability
         </div>
       </div>
 
       <div className={cn("h-[2px] w-10", accent.bar)} aria-hidden />
 
-      <p className="text-[14px] leading-[1.6] text-foreground/90">{scenario.rationale}</p>
+      <p className="text-[14.5px] leading-[1.55] text-foreground/90">{scenario.rationale}</p>
 
       {scenario.catalysts.length > 0 && (
         <ScenarioList label="Catalysts" items={scenario.catalysts} markerClass={accent.bar} />
@@ -451,7 +452,7 @@ function ScenarioList({
 }) {
   return (
     <div className="space-y-2">
-      <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
         {label}
       </span>
       <ul className="space-y-1.5 text-[13.5px] leading-[1.55] text-foreground/85">
@@ -472,7 +473,7 @@ function ScenarioList({
 function EvidenceRow({ ids, sourceMap }: { ids: string[]; sourceMap: Map<string, Source> }) {
   return (
     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5 border-t border-border pt-4">
-      <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+      <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
         Evidence
       </span>
       {ids.map((id, index) => {
@@ -487,7 +488,7 @@ function EvidenceRow({ ids, sourceMap }: { ids: string[]; sourceMap: Map<string,
             rel="noreferrer"
             className="inline-flex items-baseline gap-1.5 text-[12.5px] text-foreground/80 underline-offset-4 hover:underline"
           >
-            <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">
+            <span className="text-[11px] tabular-nums text-muted-foreground">
               {String(index + 1).padStart(2, "0")}
             </span>
             <span className="max-w-[24ch] truncate">{label}</span>
@@ -515,21 +516,21 @@ function scenarioAccent(label: string): {
   switch (label.toLowerCase()) {
     case "bull":
       return {
-        fill: "fill-[#38a169]",
-        text: "text-[#38a169]",
-        bar: "bg-[#38a169]",
+        fill: "fill-[var(--accent-green)]",
+        text: "text-[var(--accent-green)]",
+        bar: "bg-[var(--accent-green)]",
       };
     case "bear":
       return {
-        fill: "fill-[#e03535]",
-        text: "text-[#e03535]",
-        bar: "bg-[#e03535]",
+        fill: "fill-[var(--accent-red)]",
+        text: "text-[var(--accent-red)]",
+        bar: "bg-[var(--accent-red)]",
       };
     default:
       return {
-        fill: "fill-[#3572ad]",
-        text: "text-[#3572ad]",
-        bar: "bg-[#3572ad]",
+        fill: "fill-[var(--accent-blue)]",
+        text: "text-[var(--accent-blue)]",
+        bar: "bg-[var(--accent-blue)]",
       };
   }
 }
@@ -559,7 +560,7 @@ function ProjectionMetricLabel({
   if (explanation) {
     return (
       <MetricExplanationTooltip explanation={explanation}>
-        <span className="cursor-help font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] underline decoration-dotted underline-offset-2">
+        <span className="cursor-help text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary underline decoration-dotted underline-offset-2">
           {metricName}
         </span>
       </MetricExplanationTooltip>
@@ -567,7 +568,7 @@ function ProjectionMetricLabel({
   }
 
   return (
-    <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+    <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
       {metricName}
     </span>
   );

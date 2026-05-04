@@ -47,24 +47,24 @@ export const AnalysisSection = memo(function AnalysisSection({
       {grouped.map((group) => (
         <div key={group.id} className="space-y-2">
           <div
-            className={`report-section-nav ${groupTone(group.id)} sticky top-12 z-10 -mx-8 flex h-12 items-center border-b border-[#e7e9ee] bg-white/95 px-8 backdrop-blur-xl`}
+            className={`report-section-nav ${groupTone(group.id)} sticky top-12 z-10 -mx-8 flex h-12 items-center border-b border-border bg-card/95 px-8 backdrop-blur-xl`}
           >
             <div className="flex flex-1 items-baseline justify-between gap-4">
               <span
-                className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]"
+                className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-blue)]"
                 style={{ "--report-accent": "#3572ad" } as CSSProperties}
               >
                 {group.label}
               </span>
               <span
-                className="font-mono text-[10.5px] tabular-nums text-[#3f4653]"
+                className="text-[11px] tabular-nums text-text-secondary"
                 style={{ "--report-accent": "#3572ad" } as CSSProperties}
               >
                 {String(group.blocks.length).padStart(2, "0")}
               </span>
             </div>
           </div>
-          <div className="rounded-[10px] border border-[#e7e9ee] bg-white">
+          <div className="rounded-[10px] border border-border bg-card">
             {group.blocks.map((block, index) => (
               <AnalysisBlockCard
                 key={block.id}

@@ -121,7 +121,7 @@ export const reportMarkdownComponents: Components = {
   tbody: ({ children }) => <TableBody>{children}</TableBody>,
   tr: ({ children }) => <TableRow className="border-b border-border/60">{children}</TableRow>,
   th: ({ children }) => (
-    <TableHead className="px-3 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+    <TableHead className="px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
       {children}
     </TableHead>
   ),
@@ -141,7 +141,7 @@ export const reportMarkdownComponents: Components = {
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal space-y-1.5 pl-5 marker:font-mono marker:text-[0.85em] marker:tabular-nums marker:text-muted-foreground">
+    <ol className="list-decimal space-y-1.5 pl-5 marker:marker:text-[0.85em] marker:tabular-nums marker:text-muted-foreground">
       {children}
     </ol>
   ),
@@ -181,7 +181,7 @@ export const reportMarkdownComponents: Components = {
     </h3>
   ),
   h4: ({ children }) => (
-    <h4 className="text-[10.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+    <h4 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
       <TextWithHighlights>{children}</TextWithHighlights>
     </h4>
   ),
@@ -190,16 +190,10 @@ export const reportMarkdownComponents: Components = {
     if (isBlock) {
       return <code className={`${className ?? ""} block`}>{children}</code>;
     }
-    return (
-      <code className="bg-muted px-1 py-0.5 font-mono text-[0.88em] text-foreground">
-        {children}
-      </code>
-    );
+    return <code className="bg-muted px-1 py-0.5 text-[0.88em] text-foreground">{children}</code>;
   },
   pre: ({ children }) => (
-    <pre className="overflow-x-auto border border-border bg-muted/40 p-3 font-mono text-xs">
-      {children}
-    </pre>
+    <pre className="overflow-x-auto border border-border bg-muted/40 p-3 text-xs">{children}</pre>
   ),
 };
 
@@ -246,7 +240,7 @@ export function createReportMarkdownComponents(explanations: MetricExplanation[]
       </h3>
     ),
     h4: ({ children }) => (
-      <h4 className="text-[10.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+      <h4 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
         <TextWithHighlights explanations={explanations}>{children}</TextWithHighlights>
       </h4>
     ),

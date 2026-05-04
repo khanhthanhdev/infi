@@ -34,7 +34,7 @@ export function ReportContextTray({
       <div className="space-y-5">
         <header className="flex items-start justify-between gap-3 border-b border-border pb-4">
           <div className="min-w-0 space-y-2">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
               {selection.type.replace(/_/g, " ")}
             </span>
             <h3 className="text-[16px] font-semibold leading-snug tracking-tight">
@@ -58,7 +58,7 @@ export function ReportContextTray({
 
         {selection.values.length > 0 && (
           <section className="space-y-2">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
               Values
             </span>
             <dl className="divide-y divide-border/70 border-y border-border text-[12.5px]">
@@ -68,7 +68,7 @@ export function ReportContextTray({
                   className="grid grid-cols-[96px_1fr] gap-3 py-2"
                 >
                   <dt className="text-muted-foreground">{item.label}</dt>
-                  <dd className="min-w-0 break-words font-mono tabular-nums">{item.value}</dd>
+                  <dd className="min-w-0 break-words tabular-nums">{item.value}</dd>
                 </div>
               ))}
             </dl>
@@ -77,7 +77,7 @@ export function ReportContextTray({
 
         {sourceIds.length > 0 && (
           <section className="space-y-2">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
               Sources
             </span>
             <div className="divide-y divide-border/70 border-y border-border">
@@ -91,7 +91,7 @@ export function ReportContextTray({
                     rel="noreferrer"
                     className="block py-2 text-[12.5px] leading-snug text-foreground/85 underline-offset-4 hover:underline"
                   >
-                    <span className="block font-mono text-[10.5px] text-muted-foreground">
+                    <span className="block text-[11px] text-muted-foreground">
                       {id.slice(0, 8)}
                     </span>
                     {source?.title ?? id}
@@ -104,7 +104,7 @@ export function ReportContextTray({
 
         <section className="space-y-2">
           <div className="flex items-center justify-between gap-3">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
               JSON context
             </span>
             <button
@@ -116,14 +116,14 @@ export function ReportContextTray({
               Copy
             </button>
           </div>
-          <pre className="max-h-56 overflow-auto border-y border-border py-3 font-mono text-[10.5px] leading-relaxed text-muted-foreground">
+          <pre className="max-h-56 overflow-auto border-y border-border py-3 text-[11px] leading-relaxed text-muted-foreground">
             {json}
           </pre>
         </section>
 
         {onAsk ? (
           <section className="space-y-3 border-t border-border pt-4">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
               Ask about this
             </span>
             <Textarea

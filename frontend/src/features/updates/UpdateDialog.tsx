@@ -96,7 +96,7 @@ export function UpdateDialog({
                 <ArrowUp size={14} aria-hidden />
                 <span>{updateInfo.releaseName || `v${updateInfo.latestVersion}`}</span>
               </DialogPrimitive.Title>
-              <p className="font-mono text-[11.5px] tabular-nums text-[#3f4653]">
+              <p className="text-[11.5px] tabular-nums text-[#3f4653]">
                 v{currentVersion} → v{updateInfo.latestVersion}
               </p>
             </div>
@@ -132,7 +132,7 @@ export function UpdateDialog({
               <button
                 type="button"
                 onClick={handleCopy}
-                className="flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#171b23]"
+                className="flex items-center gap-1.5 text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#171b23]"
               >
                 <Copy size={12} aria-hidden />
                 {copied ? "Copied" : "Copy"}
@@ -145,7 +145,7 @@ export function UpdateDialog({
               <HairlineDivider />
               <section className="flex items-center gap-2 px-5 py-3">
                 <CircleNotch size={12} className="animate-spin text-[#155dff]" aria-hidden />
-                <span className="truncate font-mono text-[11.5px] text-[#3f4653]">
+                <span className="truncate text-[11.5px] text-[#3f4653]">
                   {latestLog || "Working…"}
                 </span>
               </section>
@@ -157,7 +157,7 @@ export function UpdateDialog({
               <HairlineDivider />
               <section className="px-5 py-3">
                 <Eyebrow className="mb-2 text-[#e53e3e]">Update failed</Eyebrow>
-                <p className="font-mono text-[11.5px] text-[#e53e3e]">{errorMessage}</p>
+                <p className="text-[11.5px] text-[#e53e3e]">{errorMessage}</p>
                 <p className="mt-2 text-[12px] text-[#3f4653]">
                   Run the manual command above in your terminal as a fallback.
                 </p>
@@ -172,7 +172,7 @@ export function UpdateDialog({
               href={updateInfo.releaseUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#171b23]"
+              className="flex items-center gap-1.5 text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#171b23]"
             >
               <ArrowSquareOut size={12} aria-hidden />
               View on GitHub
@@ -182,7 +182,7 @@ export function UpdateDialog({
                 <button
                   type="button"
                   onClick={handleInstall}
-                  className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#171b23]"
+                  className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#171b23]"
                 >
                   Retry
                 </button>

@@ -120,7 +120,7 @@ function CustomModelForm({
       <div className="flex items-center gap-2">
         <label
           htmlFor={`${agent.id}-custom-model`}
-          className="flex-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground"
+          className="flex-1 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground"
         >
           Custom model
         </label>
@@ -132,11 +132,11 @@ function CustomModelForm({
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder="model id"
-          className="h-7 rounded-none border-border px-2 font-mono text-[11.5px] shadow-none focus-visible:ring-0"
+          className="h-7 rounded-none border-border px-2 text-[11.5px] shadow-none focus-visible:ring-0"
         />
         <button
           type="submit"
-          className="h-7 border border-foreground bg-foreground px-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-background transition-colors hover:bg-background hover:text-foreground disabled:border-border disabled:bg-transparent disabled:text-muted-foreground"
+          className="h-7 border border-foreground bg-foreground px-2 text-[10.5px] uppercase tracking-[0.14em] text-background transition-colors hover:bg-background hover:text-foreground disabled:border-border disabled:bg-transparent disabled:text-muted-foreground"
           disabled={!value.trim()}
         >
           Use

@@ -17,7 +17,7 @@ export function TimelineErrorBlock({ message, kind, details }: TimelineErrorBloc
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="font-mono text-[10.5px] uppercase tracking-[0.14em]">
+              <div className="text-[10.5px] uppercase tracking-[0.14em]">
                 {kind ? kind.replaceAll("_", " ") : "Error"}
               </div>
               <p className="mt-1 whitespace-pre-wrap break-words text-[13px] leading-[1.55]">

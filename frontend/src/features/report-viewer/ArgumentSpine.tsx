@@ -24,7 +24,7 @@ export const ArgumentSpine = memo(function ArgumentSpine({ stance }: ArgumentSpi
         number="02"
         label="Would change our mind"
         items={stance.what_would_change}
-        markerClass="bg-[#7c3aed]"
+        markerClass="bg-[var(--accent-purple)]"
         markerStyle="dot"
         toneClass="report-tone-warning"
       />
@@ -50,10 +50,10 @@ function SpineColumn({
   return (
     <div className={`report-card-tint ${toneClass} flex flex-col gap-5 border-t px-4 py-4`}>
       <div className="flex items-baseline gap-2 border-b border-border pb-3">
-        <span className="font-mono text-[10.5px] font-medium tabular-nums text-[#3572ad]">
+        <span className="text-[11px] font-medium tabular-nums text-[var(--accent-blue)]">
           {number}
         </span>
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-blue)]">
           {label}
         </span>
       </div>

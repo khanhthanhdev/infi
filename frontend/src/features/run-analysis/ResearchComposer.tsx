@@ -180,7 +180,7 @@ export function ResearchComposer({
         )}
       </div>
       <div className="flex shrink-0 items-center gap-4">
-        <span className="hidden font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground/60 xl:inline">
+        <span className="hidden text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground/60 xl:inline">
           {canRun ? "⌘ + ↵ to run" : ""}
         </span>
         <button

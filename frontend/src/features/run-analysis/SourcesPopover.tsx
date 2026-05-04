@@ -34,7 +34,7 @@ export function SourcesPopover({ sources, selected, onToggle }: SourcesPopoverPr
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="inline-flex items-center gap-2 border border-border px-3 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-2 border border-border px-3 py-1.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground"
       >
         <span>RUN SOURCES</span>
         <span className="tabular-nums text-foreground">
@@ -44,7 +44,7 @@ export function SourcesPopover({ sources, selected, onToggle }: SourcesPopoverPr
       </button>
       {open && (
         <div className="absolute bottom-full left-0 z-20 mb-2 w-80 border border-border bg-background">
-          <div className="border-b border-border px-3 py-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+          <div className="border-b border-border px-3 py-2 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
             Per-run sources
           </div>
           <div className="max-h-80 divide-y divide-border overflow-auto">
@@ -66,7 +66,7 @@ export function SourcesPopover({ sources, selected, onToggle }: SourcesPopoverPr
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block text-[13px]">{src.display_name}</span>
-                    <span className="block font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+                    <span className="block text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
                       {src.category.replaceAll("_", " ")}
                       {missingKey ? " · no key" : ""}
                     </span>
@@ -84,7 +84,7 @@ export function SourcesPopover({ sources, selected, onToggle }: SourcesPopoverPr
               setState({ view: "settings" });
               setOpen(false);
             }}
-            className="flex w-full items-center justify-between border-t border-border px-3 py-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
+            className="flex w-full items-center justify-between border-t border-border px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
           >
             <span>Manage sources</span>
             <ArrowUpRight size={12} weight="bold" />

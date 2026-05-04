@@ -82,7 +82,7 @@ export function ConfidenceBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 font-mono text-[10.5px] tabular-nums text-muted-foreground",
+        "inline-flex items-center gap-2 text-[11px] tabular-nums text-muted-foreground",
         className,
       )}
     >
@@ -112,7 +112,7 @@ export function ConfidenceRail({
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="font-mono text-xs tabular-nums text-foreground">{pct}%</span>
+      <span className="text-xs tabular-nums text-foreground">{pct}%</span>
     </div>
   );
 }

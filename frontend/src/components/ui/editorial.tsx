@@ -39,7 +39,7 @@ export function SectionHeader({
       <div className="flex items-end justify-between gap-4">
         <div className="flex items-baseline gap-3">
           {number && (
-            <span className="font-mono text-[10.5px] font-medium tabular-nums text-muted-foreground">
+            <span className="text-[10.5px] font-medium tabular-nums text-muted-foreground">
               {number}
             </span>
           )}
@@ -112,7 +112,7 @@ export function FreshnessChip({
     return (
       <span
         className={cn(
-          "font-mono text-[10.5px] tabular-nums uppercase tracking-[0.14em] text-muted-foreground/60",
+          "text-[10.5px] tabular-nums uppercase tracking-[0.14em] text-muted-foreground/60",
           className,
         )}
         title="Unparseable date"
@@ -128,7 +128,7 @@ export function FreshnessChip({
   return (
     <span
       className={cn(
-        "inline-flex items-baseline gap-1 font-mono text-[10.5px] tabular-nums uppercase tracking-[0.14em]",
+        "inline-flex items-baseline gap-1 text-[10.5px] tabular-nums uppercase tracking-[0.14em]",
         tone,
         className,
       )}

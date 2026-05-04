@@ -115,7 +115,7 @@ export function ResearchPage({ agents }: ResearchPageProps) {
         <div className="w-full px-6 pb-44 pt-5 lg:px-8">
           <section className="relative min-h-[360px] overflow-hidden">
             <div className="relative z-10 flex min-h-[360px] flex-col justify-center px-8 py-9 sm:px-11 lg:w-[62%] xl:w-[58%]">
-              <p className="mb-4 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3572ad]">
+              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#3572ad]">
                 Source-backed investment research
               </p>
               <h1 className="max-w-[560px] text-[44px] font-semibold leading-[1.02] tracking-[-0.035em] text-[#111827] sm:text-[52px]">

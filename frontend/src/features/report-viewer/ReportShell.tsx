@@ -78,25 +78,25 @@ export function ReportShell({
   }, []);
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-[#fbfbfa]">
+    <div className="flex h-full min-h-0 flex-col bg-background">
       <div ref={scrollRef} className="report-shell-scroll min-h-0 flex-1 overflow-auto">
         <div className="pointer-events-none sticky top-0 z-30 h-0">
-          <div className="report-compact-bar report-section-nav pointer-events-auto border-b border-[#e7e9ee] bg-white/95 backdrop-blur-xl">
+          <div className="report-compact-bar report-section-nav pointer-events-auto border-b border-border bg-card/95 backdrop-blur-xl">
             <div className="mx-auto flex h-12 max-w-5xl items-center justify-between gap-4 px-8">
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 {compactLabel && (
-                  <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad] sm:hidden">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-blue)] sm:hidden">
                     {compactShortLabel ?? compactLabel}
                   </span>
                 )}
                 {compactLabel && (
-                  <span className="hidden font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad] sm:inline">
+                  <span className="hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-blue)] sm:inline">
                     {compactLabel}
                   </span>
                 )}
                 <span className="report-compact-title flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-                  <span className="h-1 w-1 rounded-full bg-[#155dff]" aria-hidden />
-                  <span className="min-w-0 truncate text-[13px] font-medium leading-none tracking-normal text-[#111827]">
+                  <span className="h-1 w-1 rounded-full bg-[var(--accent-blue)]" aria-hidden />
+                  <span className="min-w-0 truncate text-[13px] font-medium leading-none tracking-normal text-text-primary">
                     {analysis.title}
                   </span>
                 </span>
@@ -106,7 +106,7 @@ export function ReportShell({
           </div>
         </div>
 
-        <header className="report-hero-panel report-tone-info border-b border-[#e7e9ee]">
+        <header className="report-hero-panel report-tone-info border-b border-border">
           <div className="mx-auto flex max-w-5xl flex-col gap-6 px-8 pt-10 pb-5">
             <ReportShellMetaLine
               analysis={analysis}
@@ -115,20 +115,20 @@ export function ReportShell({
             />
 
             <div className="space-y-4">
-              <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.02em] text-[#111827]">
+              <h1 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.02em] text-text-primary">
                 {analysis.title}
               </h1>
               {prompt &&
                 (promptExpanded ? (
                   <p
                     ref={promptRef}
-                    className="max-w-[62ch] whitespace-pre-wrap break-words text-[14.5px] leading-[1.55] text-[#3f4653]"
+                    className="max-w-[62ch] whitespace-pre-wrap break-words text-[14.5px] leading-[1.55] text-text-secondary"
                   >
                     {prompt}
                     <button
                       type="button"
                       onClick={togglePromptExpanded}
-                      className="ml-2 align-baseline font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#111827]"
+                      className="ml-2 align-baseline text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary transition-colors hover:text-text-primary"
                     >
                       Show less
                     </button>
@@ -137,7 +137,7 @@ export function ReportShell({
                   <div className="flex max-w-[62ch] items-baseline gap-2">
                     <p
                       ref={promptRef}
-                      className="min-w-0 flex-1 truncate text-[14.5px] leading-[1.55] text-[#3f4653]"
+                      className="min-w-0 flex-1 truncate text-[14.5px] leading-[1.55] text-text-secondary"
                     >
                       {prompt}
                     </p>
@@ -145,7 +145,7 @@ export function ReportShell({
                       <button
                         type="button"
                         onClick={togglePromptExpanded}
-                        className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653] transition-colors hover:text-[#111827]"
+                        className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary transition-colors hover:text-text-primary"
                       >
                         Show more
                       </button>
@@ -184,26 +184,26 @@ function ReportShellMetaLine({
 
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-      <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3572ad]">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-blue)]">
         {introLabel}
       </span>
       {intent && (
         <>
-          <span className="text-[#dfe5ee]" aria-hidden>
+          <span className="text-border" aria-hidden>
             ·
           </span>
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
             {intent.replace(/_/g, " ")}
           </span>
         </>
       )}
       {status && (
         <>
-          <span className="text-[#dfe5ee]" aria-hidden>
+          <span className="text-border" aria-hidden>
             ·
           </span>
           <span
-            className={`font-mono text-[10.5px] uppercase tracking-[0.14em] ${isRunning ? "text-[#155dff]" : "text-[#3f4653]"}`}
+            className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${isRunning ? "text-[var(--accent-blue)]" : "text-text-secondary"}`}
           >
             {isRunning ? "Running" : status}
           </span>
@@ -211,10 +211,10 @@ function ReportShellMetaLine({
       )}
       {created && (
         <>
-          <span className="text-[#dfe5ee]" aria-hidden>
+          <span className="text-border" aria-hidden>
             ·
           </span>
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
             {formatCreated(created)}
           </span>
         </>

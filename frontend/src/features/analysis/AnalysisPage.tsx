@@ -153,13 +153,13 @@ export function AnalysisPage({ agents }: AnalysisPageProps) {
           <TabsList className="h-auto w-fit gap-6 rounded-[6px] bg-[#f1f5ff] p-1">
             <TabsTrigger
               value="report"
-              className="h-auto flex-none rounded-[5px] border-0 bg-transparent px-4 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-[#3f4653] shadow-none data-[state=active]:bg-white data-[state=active]:text-[#111827] data-[state=active]:shadow-none"
+              className="h-auto flex-none rounded-[5px] border-0 bg-transparent px-4 py-2 text-[11px] font-medium uppercase tracking-[0.16em] text-[#3f4653] shadow-none data-[state=active]:bg-white data-[state=active]:text-[#111827] data-[state=active]:shadow-none"
             >
               Report
             </TabsTrigger>
             <TabsTrigger
               value="agent"
-              className="h-auto flex-none rounded-[5px] border-0 bg-transparent px-4 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-[#3f4653] shadow-none data-[state=active]:bg-white data-[state=active]:text-[#111827] data-[state=active]:shadow-none"
+              className="h-auto flex-none rounded-[5px] border-0 bg-transparent px-4 py-2 text-[11px] font-medium uppercase tracking-[0.16em] text-[#3f4653] shadow-none data-[state=active]:bg-white data-[state=active]:text-[#111827] data-[state=active]:shadow-none"
             >
               Agent
               {isRunning && <Dot className="-ml-0.5 size-1.5 animate-pulse bg-[#155dff]" />}

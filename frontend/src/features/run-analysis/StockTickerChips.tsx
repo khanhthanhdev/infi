@@ -29,7 +29,7 @@ export function StockTickerChips({ onSelect }: StockTickerChipsProps) {
             className="group inline-flex h-8 min-w-[68px] items-center justify-center rounded-[5px] border border-[#e4e7ec] bg-white px-4 transition-colors hover:border-[#c9d3e2] hover:bg-[#f8fbff]"
             title={ticker.name}
           >
-            <span className="font-mono text-[11px] font-medium tracking-[0.02em] text-[#2d3440]">
+            <span className="text-[11px] font-medium tracking-[0.02em] text-[#2d3440]">
               {ticker.symbol}
             </span>
           </button>

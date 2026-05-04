@@ -13,18 +13,14 @@ export function MetricDelta({ changePct, priorValue, className }: MetricDeltaPro
   const isNegative = pct < 0;
   const arrow = isPositive ? "↑" : isNegative ? "↓" : "·";
   const color = isPositive
-    ? "text-[#38a169]"
+    ? "text-[var(--accent-green)]"
     : isNegative
-      ? "text-[#e03535]"
+      ? "text-[var(--accent-red)]"
       : "text-muted-foreground";
   const sign = isPositive ? "+" : "";
   return (
     <span
-      className={cn(
-        "inline-flex items-baseline gap-1 font-mono text-[11px] tabular-nums",
-        color,
-        className,
-      )}
+      className={cn("inline-flex items-baseline gap-1 text-[11px] tabular-nums", color, className)}
       title={priorValue !== null ? `prior ${priorValue}` : undefined}
     >
       <span>{arrow}</span>
