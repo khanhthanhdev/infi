@@ -103,6 +103,7 @@ fn find_agent_in_windows_locations(agent: &str) -> Option<PathBuf> {
         home.join("AppData").join("Roaming").join("npm").join(&exe),
         home.join("AppData").join("Local").join("pnpm").join(&cmd),
         home.join("AppData").join("Local").join("pnpm").join(&exe),
+        home.join("scoop").join("shims").join(&cmd),
         home.join("scoop").join("shims").join(&exe),
         home.join(".npm-global").join("bin").join(&cmd),
         home.join(".npm-global").join("bin").join(&exe),
@@ -116,6 +117,7 @@ fn find_agent_in_windows_locations(agent: &str) -> Option<PathBuf> {
             .join("shims")
             .join(&exe),
         home.join(".asdf").join("shims").join(&exe),
+        home.join(".bun").join("bin").join(&cmd),
         home.join(".bun").join("bin").join(&exe),
     ];
 
@@ -333,8 +335,12 @@ fn shell_escape_value(value: &OsStr) -> Option<String> {
 fn candidate_names(command: &str) -> Vec<OsString> {
     #[cfg(target_os = "windows")]
     {
-        let mut names = vec![OsString::from(command)];
+        let mut names = Vec::new();
         if Path::new(command).extension().is_none() {
+            // Try PATHEXT extensions first (.COM, .EXE, .BAT, .CMD) so that
+            // e.g. `npx.cmd` is found before the extensionless `npx` shell
+            // script that Node.js installs on Windows. CreateProcessW can only
+            // execute .exe/.com/.bat/.cmd directly.
             let exts =
                 std::env::var("PATHEXT").unwrap_or_else(|_| ".COM;.EXE;.BAT;.CMD".to_string());
             for ext in exts.split(';') {
@@ -345,6 +351,7 @@ fn candidate_names(command: &str) -> Vec<OsString> {
                 names.push(OsString::from(format!("{command}{ext}")));
             }
         }
+        names.push(OsString::from(command));
         names
     }
     #[cfg(not(target_os = "windows"))]
