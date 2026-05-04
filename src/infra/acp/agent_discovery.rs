@@ -84,6 +84,7 @@ fn agent_definitions() -> Vec<Box<dyn AgentDefinition>> {
         Box::new(MistralVibeAgent::new()),
         Box::new(KimiAgent::new()),
         Box::new(OpenCodeAgent::new()),
+        Box::new(PiAgent::new()),
     ];
 
     let custom_command = config
@@ -396,6 +397,41 @@ impl AgentDefinition for OpenCodeAgent {
     }
 }
 
+struct PiAgent {
+    candidate: AgentCandidate,
+}
+
+impl PiAgent {
+    fn new() -> Self {
+        Self {
+            candidate: npx_candidate(
+                "pi",
+                "Pi",
+                "PI_ACP_BIN",
+                "pi-acp",
+                "pi-acp",
+                false,
+            ),
+        }
+    }
+}
+
+impl AgentDefinition for PiAgent {
+    fn candidate(&self) -> &AgentCandidate {
+        &self.candidate
+    }
+
+    fn build_launch_for_model(&self, model_id: Option<&str>) -> Result<AgentLaunch, String> {
+        if model_id.is_some() {
+            return Err(format!(
+                "{} does not support model selection via Infi. Configure the model in pi settings (~/.pi/agent/models.json).",
+                self.candidate.label
+            ));
+        }
+        launch_from_candidate(&self.candidate)
+    }
+}
+
 struct CustomAgent {
     candidate: AgentCandidate,
 }
@@ -683,7 +719,7 @@ mod tests {
     fn candidate_lookup_never_empty_and_has_stable_ids() {
         let candidates = list_agent_candidates();
         assert!(!candidates.is_empty());
-        for expected in ["codex", "claude", "gemini", "qwen", "kimi", "opencode"] {
+        for expected in ["codex", "claude", "gemini", "qwen", "kimi", "opencode", "pi"] {
             assert!(
                 candidates.iter().any(|candidate| candidate.id == expected),
                 "missing built-in agent id {expected}",

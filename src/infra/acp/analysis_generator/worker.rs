@@ -162,10 +162,11 @@ async fn generate_with_acp_inner(input: GenerateAnalysisInput) -> Result<Generat
     let mut cmd = {
         #[cfg(target_os = "windows")]
         {
-            let is_batch = agent_command.ends_with(".cmd")
-                || agent_command.ends_with(".CMD")
-                || agent_command.ends_with(".bat")
-                || agent_command.ends_with(".BAT");
+            let is_batch = {
+                let p = std::path::Path::new(&agent_command);
+                p.extension()
+                    .is_some_and(|ext| ext.eq_ignore_ascii_case("cmd") || ext.eq_ignore_ascii_case("bat"))
+            };
             if is_batch {
                 let mut c = Command::new("cmd");
                 c.arg("/C").arg(&agent_command);

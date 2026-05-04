@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::ffi::{OsStr, OsString};
+#[cfg(unix)]
 use std::io::IsTerminal;
 use std::path::{Path, PathBuf};
 #[cfg(unix)]
@@ -84,7 +85,7 @@ pub fn find_agent_bin(agent: &str) -> Option<PathBuf> {
     }
     #[cfg(target_os = "windows")]
     {
-        return find_agent_in_windows_locations(agent);
+        find_agent_in_windows_locations(agent)
     }
     #[cfg(not(target_os = "windows"))]
     {
@@ -153,6 +154,7 @@ pub fn suppress_windows_console_tokio(_command: &mut tokio::process::Command) {
     {
         use std::os::windows::process::CommandExt;
         const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        #[allow(clippy::used_underscore_binding)]
         _command.creation_flags(CREATE_NO_WINDOW);
     }
 }
@@ -238,10 +240,7 @@ fn should_load_shell_environment() -> bool {
     !std::io::stdout().is_terminal()
 }
 
-#[cfg(not(unix))]
-fn should_load_shell_environment() -> bool {
-    false
-}
+
 
 #[cfg(unix)]
 fn capture_login_shell_environment() -> Option<HashMap<String, String>> {
