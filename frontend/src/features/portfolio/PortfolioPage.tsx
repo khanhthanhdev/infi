@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { MetricExplanationTooltip } from "@/components/ui/MetricExplanationTooltip";
 import {
   Select,
   SelectContent,
@@ -52,6 +53,7 @@ import {
   usePriceHistory,
   useRenamePortfolio,
 } from "@/shared/api/queries";
+import { buildExplanationLookup } from "@/shared/lib/explanations";
 import { getState, setState, useAppStore } from "@/store";
 import type {
   AgentCandidate,
@@ -61,6 +63,8 @@ import type {
   PortfolioDetail,
   PortfolioHolding,
 } from "@/types";
+import { PortfolioInsights } from "./PortfolioInsights";
+import { getPortfolioExplanations } from "./portfolio-explanations";
 
 async function persistModelByAgent(map: Record<string, string | null>) {
   try {
@@ -80,7 +84,7 @@ interface PortfolioPageProps {
   onSelectAnalysis: (analysisId: string) => void | Promise<void>;
 }
 
-const CURRENCY_OPTIONS = ["USD", "EUR", "GBP", "CHF", "JPY", "CAD", "AUD", "SEK", "NOK"] as const;
+const CURRENCY_OPTIONS = ["USD", "EUR", "GBP", "CHF", "JPY", "CAD", "AUD", "SEK", "NOK", "VND"] as const;
 
 export function PortfolioPage({ agents, onSelectAnalysis }: PortfolioPageProps) {
   const selectedPortfolioId = useAppStore((state) => state.selectedPortfolioId);
@@ -178,7 +182,7 @@ function EmptyCreate({
           Set up a portfolio, paste or upload the current holdings snapshot, and run portfolio-level
           research when you want it.
         </p>
-        <div className="mt-7 flex flex-wrap items-center gap-3">
+        <div className="mt-7 flex flex-wrap items-end gap-3">
           <div className="space-y-1">
             <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
               Base currency
@@ -399,6 +403,7 @@ function PortfolioView({
       startWithAnalysisId(analysis_id, effective_prompt, {
         agentId: pickedAgentId,
         modelId: pickedModelId,
+        explainable: true,
       });
     } catch (err) {
       toast.error("Could not start analysis", { description: String(err) });
@@ -408,6 +413,12 @@ function PortfolioView({
   };
 
   const sortedHoldings = detail.holdings;
+
+  const explanations = useMemo(
+    () => getPortfolioExplanations(detail.holdings, baseCurrency),
+    [detail.holdings, baseCurrency],
+  );
+  const explanationLookup = useMemo(() => buildExplanationLookup(explanations), [explanations]);
 
   const placeholderCurrency = baseCurrency;
   const placeholder = `Paste CSV (market is optional — use it to pin a listing):\nSymbol, Market, Quantity, Price, Currency\nAAPL, NASDAQ, 10, 190, ${placeholderCurrency}`;
@@ -504,8 +515,28 @@ function PortfolioView({
                 <span className="text-right">30d</span>
                 <span className="text-right">Qty</span>
                 <span className="text-right">Price</span>
-                <span className="text-right">Value</span>
-                <span className="text-right">Weight</span>
+                {explanationLookup.get("portfolio:market_value") ? (
+                  <MetricExplanationTooltip
+                    explanation={explanationLookup.get("portfolio:market_value")!}
+                  >
+                    <span className="cursor-help text-right underline decoration-dotted underline-offset-2">
+                      Value
+                    </span>
+                  </MetricExplanationTooltip>
+                ) : (
+                  <span className="text-right">Value</span>
+                )}
+                {explanationLookup.get("portfolio:weight") ? (
+                  <MetricExplanationTooltip
+                    explanation={explanationLookup.get("portfolio:weight")!}
+                  >
+                    <span className="cursor-help text-right underline decoration-dotted underline-offset-2">
+                      Weight
+                    </span>
+                  </MetricExplanationTooltip>
+                ) : (
+                  <span className="text-right">Weight</span>
+                )}
               </div>
               {sortedHoldings.map((holding) => (
                 <HoldingRow
@@ -519,6 +550,23 @@ function PortfolioView({
         )}
       </section>
 
+      {sortedHoldings.length > 0 && (
+        <section className="space-y-5">
+          <div className="flex items-center gap-4">
+            <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
+              02 · Insights
+            </span>
+            <div className="h-px flex-1 bg-[#dfe5ee]" />
+            <span className="text-[13px] font-medium text-[#111827]">Portfolio-level metrics</span>
+          </div>
+          <PortfolioInsights
+            holdings={detail.holdings}
+            baseCurrency={baseCurrency}
+            explanations={explanations}
+          />
+        </section>
+      )}
+
       <PortfolioAnalysesSection
         portfolioId={detail.portfolio.id}
         onSelectAnalysis={onSelectAnalysis}
@@ -527,7 +575,7 @@ function PortfolioView({
       <section className="space-y-5">
         <div className="flex items-center gap-4">
           <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
-            03 · Snapshot
+            04 · Snapshot
           </span>
           <div className="h-px flex-1 bg-[#dfe5ee]" />
           <span className="text-[13px] font-medium text-[#111827]">Update current holdings</span>
@@ -831,7 +879,7 @@ function PortfolioAnalysesSection({
     <section className="space-y-5">
       <div className="flex items-center gap-4">
         <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#3f4653]">
-          02 · Analyses
+          03 · Analyses
         </span>
         <div className="h-px flex-1 bg-[#dfe5ee]" />
         <span className="text-[13px] font-medium text-[#111827]">Linked research</span>
