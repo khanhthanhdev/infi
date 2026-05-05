@@ -28,26 +28,10 @@ export function useAnalyses() {
   });
 }
 
-export function useAnalysisReport(analysisId: string | null, runId?: string) {
-  return useQuery({
-    queryKey: queryKeys.report(analysisId!, runId),
-    queryFn: () => commands.getAnalysisReport(analysisId!, runId),
-    enabled: !!analysisId,
-  });
-}
-
 export function usePortfolios() {
   return useQuery({
     queryKey: queryKeys.portfolios,
     queryFn: commands.getPortfolios,
-  });
-}
-
-export function usePortfolioDetail(portfolioId: string | null) {
-  return useQuery({
-    queryKey: queryKeys.portfolio(portfolioId!),
-    queryFn: () => commands.getPortfolioDetail(portfolioId!),
-    enabled: !!portfolioId,
   });
 }
 

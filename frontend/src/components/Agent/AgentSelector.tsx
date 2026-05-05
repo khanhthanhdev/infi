@@ -74,7 +74,7 @@ export default function AgentSelector({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
-        className="w-[220px] rounded-md bg-popover/95 backdrop-blur-xl border-border shadow-md p-1"
+        className="w-[220px] rounded-md bg-popover border-border shadow-md p-1"
       >
         {agents.map((agent) => {
           const isSelected = agent.id === selectedAgentId;

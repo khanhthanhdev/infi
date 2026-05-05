@@ -180,17 +180,6 @@ export function setRunProgress(runId: string, progress: ProgressItem[]) {
   emit();
 }
 
-export function clearRuns() {
-  state.activeRuns = {};
-  state.activeAnalysisId = null;
-  state.selectedRunTab = null;
-  emit();
-}
-
-export function isAnyRunActive(s: State): boolean {
-  return Object.values(s.activeRuns).some((r) => r.status === "running");
-}
-
 export function useAppStore<T>(selector: (state: State) => T): T {
   return useSyncExternalStore(
     (callback) => {

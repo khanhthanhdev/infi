@@ -56,19 +56,6 @@ export function HairlineDivider({ className }: { className?: string }) {
   return <div className={cn("h-px w-full bg-border", className)} />;
 }
 
-export function MetaRow({ items, className }: { items: React.ReactNode[]; className?: string }) {
-  return (
-    <div className={cn("flex flex-wrap items-center gap-x-3 gap-y-2", className)}>
-      {items.map((item, index) => (
-        <span key={index} className="flex items-center gap-x-3">
-          {index > 0 && <Dot />}
-          {item}
-        </span>
-      ))}
-    </div>
-  );
-}
-
 export function Dot({ className }: { className?: string }) {
   return <span className={cn("h-1 w-1 rounded-full bg-border", className)} aria-hidden />;
 }

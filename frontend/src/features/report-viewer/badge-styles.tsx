@@ -1,18 +1,5 @@
 import { cn } from "@/lib/utils";
 
-export function getImportanceClasses(importance: string): string {
-  switch (importance) {
-    case "high":
-      return "border-foreground/20 bg-foreground text-background";
-    case "medium":
-      return "border-border bg-transparent text-foreground";
-    case "low":
-      return "border-border bg-transparent text-muted-foreground";
-    default:
-      return "";
-  }
-}
-
 export interface StanceAccent {
   tick: string;
   text: string;
@@ -64,11 +51,6 @@ export function getStanceAccent(stance: string): StanceAccent {
         label: "Insufficient data",
       };
   }
-}
-
-export function getStanceClasses(stance: string): string {
-  const accent = getStanceAccent(stance);
-  return cn("border-transparent bg-transparent", accent.text);
 }
 
 export function ConfidenceBadge({

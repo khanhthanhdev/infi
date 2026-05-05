@@ -1,0 +1,10 @@
+{
+  "entry": ["viewer.html"],
+  "ignoreExportsUsedInFile": true,
+  "ignorePatterns": [
+    "src/components/ui/dropdown-menu.tsx",
+    "src/components/ui/select.tsx",
+    "src/components/ui/sheet.tsx",
+    "src/components/ui/sidebar.tsx"
+  ]
+}

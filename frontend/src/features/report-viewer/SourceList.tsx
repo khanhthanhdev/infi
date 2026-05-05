@@ -22,7 +22,7 @@ export const SourceList = memo(function SourceList({
   );
 
   return (
-    <div className="rounded-[10px] border border-border bg-card">
+    <div className="border border-border bg-card">
       {sorted.map((source, index) => (
         <SourceRow
           key={source.id}
