@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useRef } from "react";
 import { useExpandableOverflow } from "@/hooks/useExpandableOverflow";
+import { formatDate } from "@/lib/format";
 import type { AnalysisIntent, AnalysisStatus } from "@/types";
 
 export interface ReportShellAnalysis {
@@ -215,20 +216,10 @@ function ReportShellMetaLine({
             ·
           </span>
           <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-            {formatCreated(created)}
+            {formatDate(created)}
           </span>
         </>
       )}
     </div>
   );
-}
-
-function formatCreated(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
 }

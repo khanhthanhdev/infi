@@ -38,12 +38,12 @@ import {
 } from "@/components/ui/select";
 import { useRunAnalysis } from "@/features/run-analysis/useRunAnalysis";
 import { getLogoPath } from "@/lib/agents";
+import { formatDate, formatMoney, formatNumber } from "@/lib/format";
+import { persistModelByAgent } from "@/lib/settings";
 import {
   createPortfolioAnalysis,
   getPortfolioDetail,
-  getSettings,
   parsePortfolioCsv,
-  updateSettings,
 } from "@/shared/api/commands";
 import {
   useAnalyses,
@@ -66,25 +66,23 @@ import type {
 import { PortfolioInsights } from "./PortfolioInsights";
 import { getPortfolioExplanations } from "./portfolio-explanations";
 
-async function persistModelByAgent(map: Record<string, string | null>) {
-  try {
-    const settings = await getSettings();
-    const next: Record<string, string> = {};
-    for (const [id, value] of Object.entries(map)) {
-      if (value) next[id] = value;
-    }
-    await updateSettings({ ...settings, model_by_agent: next });
-  } catch {
-    // non-critical
-  }
-}
-
 interface PortfolioPageProps {
   agents: AgentCandidate[];
   onSelectAnalysis: (analysisId: string) => void | Promise<void>;
 }
 
-const CURRENCY_OPTIONS = ["USD", "EUR", "GBP", "CHF", "JPY", "CAD", "AUD", "SEK", "NOK", "VND"] as const;
+const CURRENCY_OPTIONS = [
+  "USD",
+  "EUR",
+  "GBP",
+  "CHF",
+  "JPY",
+  "CAD",
+  "AUD",
+  "SEK",
+  "NOK",
+  "VND",
+] as const;
 
 export function PortfolioPage({ agents, onSelectAnalysis }: PortfolioPageProps) {
   const selectedPortfolioId = useAppStore((state) => state.selectedPortfolioId);
@@ -1005,36 +1003,9 @@ function FieldLabel({ label }: { label: string }) {
   );
 }
 
-function formatMoney(value: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: currency || "USD",
-      maximumFractionDigits: Math.abs(value) >= 1000 ? 0 : 2,
-    }).format(value);
-  } catch {
-    // Fallback if the currency code isn't recognized by Intl.
-    return `${value.toFixed(Math.abs(value) >= 1000 ? 0 : 2)} ${currency}`;
-  }
-}
-
-function formatNumber(value: number): string {
-  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 4 }).format(value);
-}
-
 function formatPercent(value: number): string {
   return new Intl.NumberFormat(undefined, {
     style: "percent",
     maximumFractionDigits: 1,
   }).format(value);
-}
-
-function formatDate(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
 }

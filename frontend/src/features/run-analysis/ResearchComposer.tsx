@@ -9,23 +9,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { getSettings, listSources, updateSettings } from "@/shared/api/commands";
+import { persistModelByAgent } from "@/lib/settings";
+import { listSources } from "@/shared/api/commands";
 import { getState, setState, useAppStore } from "@/store";
 import type { AgentCandidate, SourceDescriptor } from "@/types";
 import { SourcesPopover } from "./SourcesPopover";
-
-async function persistModelByAgent(map: Record<string, string | null>) {
-  try {
-    const settings = await getSettings();
-    const next: Record<string, string> = {};
-    for (const [id, value] of Object.entries(map)) {
-      if (value) next[id] = value;
-    }
-    await updateSettings({ ...settings, model_by_agent: next });
-  } catch {
-    // non-critical
-  }
-}
 
 interface ResearchComposerProps {
   agentId: string;

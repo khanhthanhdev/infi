@@ -3,6 +3,7 @@ import { MetricExplanationTooltip } from "@/components/ui/MetricExplanationToolt
 import { cn } from "@/lib/utils";
 import { buildExplanationLookup } from "@/shared/lib/explanations";
 import type { MetricExplanation, PortfolioHolding } from "@/types";
+import { computePortfolioSummary } from "./portfolio-explanations";
 
 interface PortfolioInsightsProps {
   holdings: PortfolioHolding[];
@@ -20,27 +21,8 @@ interface InsightMetric {
 function computeInsights(holdings: PortfolioHolding[], baseCurrency: string): InsightMetric[] {
   if (holdings.length === 0) return [];
 
-  const weights = holdings
-    .map((h) => h.allocation_pct ?? 0)
-    .filter((w) => w > 0)
-    .sort((a, b) => b - a);
-
-  const top5Weight = weights.slice(0, 5).reduce((a, b) => a + b, 0);
-  const top3Weight = weights.slice(0, 3).reduce((a, b) => a + b, 0);
-  const largestWeight = weights[0] ?? 0;
-  const uniqueMarkets = new Set(holdings.map((h) => h.market ?? "unknown")).size;
-  const uniqueCurrencies = new Set(holdings.map((h) => h.currency || baseCurrency)).size;
-
-  const totalMarketValue = holdings.reduce((sum, h) => sum + (h.market_value ?? 0), 0);
-  const totalCostBasis = holdings.reduce((sum, h) => sum + (h.cost_basis ?? 0), 0);
-  const hasCostBasis = holdings.some((h) => h.cost_basis != null && h.cost_basis > 0);
-
-  const unrealizedPnl =
-    hasCostBasis && totalCostBasis > 0
-      ? (totalMarketValue - totalCostBasis) / totalCostBasis
-      : null;
-
-  const isConcentrated = top5Weight > 0.7;
+  const s = computePortfolioSummary(holdings, baseCurrency);
+  const isConcentrated = s.top5Weight > 0.7;
 
   const metrics: InsightMetric[] = [
     {
@@ -51,24 +33,24 @@ function computeInsights(holdings: PortfolioHolding[], baseCurrency: string): In
     {
       key: "portfolio:concentration_top5",
       label: "Top 5 weight",
-      value: `${(top5Weight * 100).toFixed(1)}%`,
+      value: `${(s.top5Weight * 100).toFixed(1)}%`,
       emphasis: isConcentrated,
     },
     {
       key: "portfolio:concentration_top3",
       label: "Top 3 weight",
-      value: `${(top3Weight * 100).toFixed(1)}%`,
+      value: `${(s.top3Weight * 100).toFixed(1)}%`,
     },
     {
       key: "portfolio:largest_position",
       label: "Largest position",
-      value: `${(largestWeight * 100).toFixed(1)}%`,
-      emphasis: largestWeight > 0.15,
+      value: `${(s.largestWeight * 100).toFixed(1)}%`,
+      emphasis: s.largestWeight > 0.15,
     },
     {
       key: "portfolio:currency_exposure",
       label: "Currencies",
-      value: String(uniqueCurrencies),
+      value: String(s.uniqueCurrencies),
     },
   ];
 
@@ -76,16 +58,16 @@ function computeInsights(holdings: PortfolioHolding[], baseCurrency: string): In
     metrics.push({
       key: "portfolio:market_exposure",
       label: "Markets",
-      value: String(uniqueMarkets),
+      value: String(s.uniqueMarkets),
     });
   }
 
-  if (unrealizedPnl != null) {
+  if (s.unrealizedPnl != null) {
     metrics.push({
       key: "portfolio:unrealized_pnl",
       label: "Unrealized P/L",
-      value: `${unrealizedPnl >= 0 ? "+" : ""}${(unrealizedPnl * 100).toFixed(1)}%`,
-      emphasis: unrealizedPnl < -0.1,
+      value: `${s.unrealizedPnl >= 0 ? "+" : ""}${(s.unrealizedPnl * 100).toFixed(1)}%`,
+      emphasis: s.unrealizedPnl < -0.1,
     });
   }
 

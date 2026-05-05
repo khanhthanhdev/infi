@@ -1,3 +1,4 @@
+import { formatMoney } from "@/lib/format";
 import type { MetricExplanation, PortfolioHolding } from "@/types";
 
 function uid(key: string): string {
@@ -7,7 +8,7 @@ function uid(key: string): string {
 /**
  * Compute portfolio-level summary values used in explanation assessments.
  */
-function computePortfolioSummary(holdings: PortfolioHolding[], baseCurrency: string) {
+export function computePortfolioSummary(holdings: PortfolioHolding[], baseCurrency: string) {
   const weights = holdings
     .map((h) => h.allocation_pct ?? 0)
     .filter((w) => w > 0)
@@ -213,16 +214,4 @@ export function getPortfolioExplanations(
           : "Cost basis data not available for all holdings.",
     }),
   ];
-}
-
-function formatMoney(value: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: currency || "USD",
-      maximumFractionDigits: Math.abs(value) >= 1000 ? 0 : 2,
-    }).format(value);
-  } catch {
-    return `${value.toFixed(Math.abs(value) >= 1000 ? 0 : 2)} ${currency}`;
-  }
 }

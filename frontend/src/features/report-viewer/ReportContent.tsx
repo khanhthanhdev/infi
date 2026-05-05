@@ -1011,29 +1011,13 @@ function PortfolioRiskView({
         </div>
       )}
 
-      <RiskList label="Macro sensitivities" items={risk.macro_sensitivities} />
-      <RiskList label="Single-name risks" items={risk.single_name_risks} />
-      <RiskList label="Tail risks" items={risk.tail_risks} />
+      <CompactList label="Macro sensitivities" items={risk.macro_sensitivities} />
+      <CompactList label="Single-name risks" items={risk.single_name_risks} />
+      <CompactList label="Tail risks" items={risk.tail_risks} />
 
       {risk.correlation_notes && (
         <p className="text-[13px] leading-[1.55] text-text-secondary">{risk.correlation_notes}</p>
       )}
-    </div>
-  );
-}
-
-function RiskList({ label, items }: { label: string; items: string[] }) {
-  if (items.length === 0) return null;
-  return (
-    <div className="space-y-2">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-blue)]">
-        {label}
-      </span>
-      <ul className="space-y-1.5 text-[13.5px] leading-[1.55] text-text-primary/85">
-        {items.map((item, index) => (
-          <li key={`${label}-${index}-${item.slice(0, 20)}`}>{item}</li>
-        ))}
-      </ul>
     </div>
   );
 }

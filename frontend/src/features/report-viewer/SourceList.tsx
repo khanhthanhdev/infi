@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "@phosphor-icons/react";
 import { memo } from "react";
 import { FreshnessChip } from "@/components/ui/editorial";
+import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Source } from "@/types";
 import { type SelectionProps, sourceSelection } from "./selection";
@@ -170,15 +171,4 @@ function reliabilityTone(reliability: Source["reliability"]) {
     default:
       return "report-tone-negative";
   }
-}
-
-function formatDate(value: string): string {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
 }

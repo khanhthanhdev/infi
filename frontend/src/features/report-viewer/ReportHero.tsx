@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { formatDate } from "@/lib/format";
 import type { AnalysisReport, FinalStance } from "@/types";
 import { ConfidenceRail, getStanceAccent } from "./badge-styles";
 
@@ -194,15 +195,4 @@ function RunSwitcher({
       })}
     </div>
   );
-}
-
-function formatDate(value: string): string {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
 }

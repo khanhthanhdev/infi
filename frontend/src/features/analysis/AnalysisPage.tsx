@@ -14,7 +14,7 @@ import { Dot } from "@/components/ui/editorial";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReportContent } from "@/features/report-viewer/ReportContent";
 import { ReportShell, type ReportShellAnalysis } from "@/features/report-viewer/ReportShell";
-import { getTimelineBlocks } from "@/features/run-analysis/progress";
+import { getTimelineBlocks, replayEvent } from "@/features/run-analysis/progress";
 import { TimelineErrorBlock } from "@/features/run-analysis/TimelineErrorBlock";
 import { useRunAnalysis } from "@/features/run-analysis/useRunAnalysis";
 import {
@@ -398,66 +398,4 @@ function AgentTimeline({
       )}
     </div>
   );
-}
-
-/**
- * Replay a single persisted event into a progress items array.
- */
-function replayEvent(payload: import("@/types").ProgressEventPayload, items: ProgressItem[]) {
-  const push = (type: ProgressItem["type"], message: string, data?: unknown) => {
-    items.push({ id: crypto.randomUUID(), type, message, timestamp: Date.now(), data });
-  };
-  const appendLast = (type: ProgressItem["type"], delta: string) => {
-    const last = items[items.length - 1];
-    if (last && last.type === type) {
-      items[items.length - 1] = { ...last, message: last.message + delta };
-    } else {
-      items.push({ id: crypto.randomUUID(), type, message: delta, timestamp: Date.now() });
-    }
-  };
-
-  switch (payload.event) {
-    case "MessageDelta":
-      appendLast("agent_message", payload.data.delta);
-      break;
-    case "ThoughtDelta":
-      appendLast("agent_thought", payload.data.delta);
-      break;
-    case "ToolCallStarted":
-      push("tool_call", payload.data.title, payload.data);
-      break;
-    case "ToolCallComplete":
-      push("tool_result", `${payload.data.title || "tool"} ${payload.data.status}`, payload.data);
-      break;
-    case "Plan":
-      push("plan", "Plan updated", payload.data);
-      break;
-    case "PlanSubmitted":
-      push("submitted", "Research plan submitted");
-      break;
-    case "SourceSubmitted":
-      push("submitted", "Source submitted");
-      break;
-    case "MetricSubmitted":
-      push("submitted", "Metric submitted");
-      break;
-    case "ArtifactSubmitted":
-      push("submitted", "Structured artifact submitted");
-      break;
-    case "BlockSubmitted":
-      push("submitted", "Analysis block submitted");
-      break;
-    case "StanceSubmitted":
-      push("submitted", "Final stance submitted");
-      break;
-    case "Completed":
-      push("completed", "Analysis complete");
-      break;
-    case "Error":
-      push("error", payload.data.message);
-      break;
-    case "Log":
-      push("log", payload.data);
-      break;
-  }
 }
