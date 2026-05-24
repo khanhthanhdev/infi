@@ -22,24 +22,29 @@
    <header class="header">
      <div class="header-left">
        <div class="header-logo">
-         <div class="logo-icon" aria-hidden="true">
-           <span></span>
-           <span></span>
-           <span></span>
-         </div>
          <div>
            <h1 class="project-title">Infi</h1>
            <p class="project-subtitle">AI-Powered Stock & Portfolio Research Workbench</p>
+           <p class="project-kicker">Source-backed, structured investment research powered by AI agents.</p>
          </div>
        </div>
      </div>
      <div class="header-right">
+       <div class="team-mark" aria-hidden="true">
+         <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+       </div>
        <div class="team-info">
          <div class="team-label">Team</div>
          <div class="team-name">[Your Team Name]</div>
          <div class="team-members">
-           Member 1 • Member 2 • Member 3 • Member 4
+           Member 1 &nbsp;•&nbsp; Member 2<br>
+           Member 3 &nbsp;•&nbsp; Member 4
          </div>
+       </div>
+       <div class="qr-area">
+         <div class="qr-placeholder">QR CODE</div>
+         <strong>Scan QR</strong>
+         <span>Demo / Project link</span>
        </div>
      </div>
    </header>
@@ -48,7 +53,6 @@
         AGENTS ROW (matching landing page)
         ============================================================ -->
    <div class="agents-row">
-     <span class="agents-label">Works with coding agents you already run</span>
      <div class="agents-list">
        <span class="agent-item">
          <span>Claude Code</span>
@@ -115,6 +119,38 @@
          </div>
        </section>
 
+       <!-- METHOD -->
+       <section class="section section-method">
+         <div class="section-header">
+           <span class="section-pill">
+             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M4 15h16"/><path d="M4 11h16"/><path d="M4 7h16"/></svg>
+             Method
+           </span>
+           <h2 class="section-title">Structured agent pipeline</h2>
+           <p class="section-desc">Each run converts an open-ended request into validated, queryable research blocks.</p>
+         </div>
+
+         <div class="method-list">
+           <div class="method-item">
+             <strong>1. Parse intent</strong>
+             <span>Extract ticker set, horizon, portfolio context, and risk questions.</span>
+           </div>
+           <div class="method-item">
+             <strong>2. Gather evidence</strong>
+             <span>Fetch filings, prices, fundamentals, news, and macro context through typed tools.</span>
+           </div>
+           <div class="method-item">
+             <strong>3. Validate blocks</strong>
+             <span>Reject missing citations, probability drift, weak stance logic, and unresolved uncertainty.</span>
+           </div>
+           <div class="method-item">
+             <strong>4. Assemble report</strong>
+             <span>Store source links, scenario tables, thesis bullets, and final stance locally.</span>
+           </div>
+         </div>
+       </section>
+
        <!-- HOW IT WORKS -->
        <section class="section section-steps">
          <div class="section-header">
@@ -143,6 +179,21 @@
              <p class="how-step-desc">Thesis, key numbers, risks, scenarios, stance. Saved on your machine.</p>
            </div>
          </div>
+
+         <div class="workflow-notes">
+           <div>
+             <strong>Agent adapters</strong>
+             <span>ACP-compatible sessions launch Claude Code, Codex, Gemini CLI, Qwen, Mistral, Kimi, OpenCode, or a custom binary with the user's local credentials.</span>
+           </div>
+           <div>
+             <strong>Local storage</strong>
+             <span>Reports, citations, tool calls, and validation outcomes are persisted in SQLite, with secrets delegated to the operating-system keychain.</span>
+           </div>
+           <div>
+             <strong>Inspectable trail</strong>
+             <span>Each output block keeps the tool call, source URL, source title, retrieval time, and confidence so readers can audit the conclusion.</span>
+           </div>
+         </div>
        </section>
 
        <!-- RESEARCH REPORT — Screenshots -->
@@ -159,15 +210,15 @@
          </div>
 
          <div class="image-pair">
-           <div class="image-card" style="height: 82mm;">
+           <div class="image-card" style="height: 94mm;">
              <div class="image-card-label">
                <p>Workbench and generated report</p>
              </div>
              <div class="image-card-content">
-               <img class="poster-asset poster-asset-workbench" src="./assets/infi-poster-workbench.png" alt="Infi workbench report screen">
+               <img class="poster-asset poster-asset-workbench" src="./assets/infi-poster-workbench-generated.png" alt="Generated Infi workbench report screen">
              </div>
            </div>
-           <div class="image-card" style="height: 82mm;">
+           <div class="image-card" style="height: 94mm;">
              <div class="image-card-label">
                <p>Validation gates before storage</p>
              </div>
@@ -270,6 +321,27 @@
          </div>
        </section>
 
+       <!-- DATA -->
+       <section class="section section-data">
+         <div class="section-header">
+           <span class="section-pill">
+             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
+             Data
+           </span>
+           <h2 class="section-title">Evidence coverage</h2>
+         </div>
+
+         <div class="coverage-grid">
+           <div><strong>SEC filings</strong><span>10-K, 10-Q, 8-K</span></div>
+           <div><strong>Market data</strong><span>Prices, ratios, volume</span></div>
+           <div><strong>News</strong><span>Recent catalysts</span></div>
+           <div><strong>Portfolio</strong><span>Allocation and exposure</span></div>
+           <div><strong>Scenarios</strong><span>Base, upside, downside</span></div>
+           <div><strong>Stance</strong><span>Confidence and blockers</span></div>
+         </div>
+       </section>
+
        <!-- PROPOSAL — Features -->
        <section class="section section-features">
          <div class="section-header">
@@ -332,7 +404,7 @@
            </div>
          </div>
 
-         <div class="image-card image-card-full" style="height: 102mm;">
+         <div class="image-card image-card-full comparison-shot" style="height: 88mm;">
            <div class="image-card-label">
              <p>Comparison against existing research workflows</p>
            </div>
@@ -353,7 +425,7 @@
            <h2 class="section-title">Technical Architecture</h2>
          </div>
 
-         <div class="image-card image-card-full architecture-shot" style="height: 94mm;">
+         <div class="image-card image-card-full architecture-shot" style="height: 88mm;">
            <div class="image-card-label">
              <p>User prompt to source-backed report</p>
            </div>
@@ -368,6 +440,25 @@
            <span>Probability sum</span>
            <span>Stance coherence</span>
            <span>Blocking uncertainty</span>
+         </div>
+       </section>
+
+       <!-- VALIDATION -->
+       <section class="section section-validation">
+         <div class="section-header">
+           <span class="section-pill">
+             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+             Validation goals
+           </span>
+           <h2 class="section-title">What gets blocked</h2>
+         </div>
+
+         <div class="validation-grid">
+           <div><span>01</span><strong>Evidence chain</strong><p>Claims must include original sources.</p></div>
+           <div><span>02</span><strong>Probability sum</strong><p>Scenario weights must sum to 1.0.</p></div>
+           <div><span>03</span><strong>Stance coherence</strong><p>Final stance cannot contradict high-confidence risk blocks.</p></div>
+           <div><span>04</span><strong>Open questions</strong><p>High-impact uncertainty blocks final recommendation language.</p></div>
          </div>
        </section>
 
