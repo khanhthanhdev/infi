@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Infi — AI-Powered Stock & Portfolio Research Workbench</title>
+
+   <!-- Fonts matching landing page -->
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+   <!-- Poster Styles -->
+   <link rel="stylesheet" href="./poster.css">
+ </head>
+ <body>
+
+<div class="poster">
+   <!-- ============================================================
+        HEADER
+        ============================================================ -->
+   <header class="header">
+     <div class="header-left">
+       <div class="header-logo">
+         <div class="logo-icon" aria-hidden="true">
+           <span></span>
+           <span></span>
+           <span></span>
+         </div>
+         <div>
+           <h1 class="project-title">Infi</h1>
+           <p class="project-subtitle">AI-Powered Stock & Portfolio Research Workbench</p>
+         </div>
+       </div>
+     </div>
+     <div class="header-right">
+       <div class="team-info">
+         <div class="team-label">Team</div>
+         <div class="team-name">[Your Team Name]</div>
+         <div class="team-members">
+           Member 1 • Member 2 • Member 3 • Member 4
+         </div>
+       </div>
+     </div>
+   </header>
+
+   <!-- ============================================================
+        AGENTS ROW (matching landing page)
+        ============================================================ -->
+   <div class="agents-row">
+     <span class="agents-label">Works with coding agents you already run</span>
+     <div class="agents-list">
+       <span class="agent-item">
+         <span>Claude Code</span>
+       </span>
+       <span class="agent-item">
+         <span>Codex</span>
+       </span>
+       <span class="agent-item">
+         <span>Gemini CLI</span>
+       </span>
+       <span class="agent-item">
+         <span>Qwen</span>
+       </span>
+       <span class="agent-item">
+         <span>Mistral</span>
+       </span>
+       <span class="agent-item">
+         <span>Kimi</span>
+       </span>
+       <span class="agent-item">
+         <span>OpenCode</span>
+       </span>
+       <span class="agent-item" style="color: var(--muted); opacity: 0.6;">
+         <span>or a custom binary</span>
+       </span>
+     </div>
+   </div>
+
+   <!-- ============================================================
+        MAIN CONTENT
+        ============================================================ -->
+   <main class="content">
+       <!-- IDEA -->
+       <section class="section section-idea">
+         <div class="section-header">
+           <span class="section-pill">
+             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47
+ 5 11.38 5 9a7 7 0 0 1 7-7Z"/><path d="M10 21h4"/></svg>
+             Idea
+           </span>
+           <h2 class="section-title">Making investment research transparent</h2>
+           <p class="section-desc">Source-backed claims. Structured reports. No black boxes.</p>
+         </div>
+
+         <div class="highlight-box">
+           <p><strong>Infi</strong> orchestrates AI coding agents to fetch real-time financial data, structure every claim as a source-backed data
+ block, and assemble comprehensive investment reports — all running locally on your machine.</p>
+         </div>
+
+         <h3>Key Innovation</h3>
+         <p>The agent <strong>never emits free-form prose</strong> as the final output. Instead, every claim must be submitted through typed MCP (Model
+ Context Protocol) tools with validation gates ensuring evidence chains, probability consistency, and stance coherence.</p>
+
+         <div class="metrics-grid">
+           <div class="metric-card">
+             <div class="metric-value">100%</div>
+             <div class="metric-label">Source Citation Rate</div>
+           </div>
+           <div class="metric-card">
+             <div class="metric-value">7</div>
+             <div class="metric-label">Supported Agents</div>
+           </div>
+         </div>
+       </section>
+
+       <!-- HOW IT WORKS -->
+       <section class="section section-steps">
+         <div class="section-header">
+           <span class="section-pill">
+             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+             How it works
+           </span>
+           <h2 class="section-title">Three steps. Then you read.</h2>
+         </div>
+
+         <div class="how-grid">
+           <div class="how-step">
+             <div class="how-step-number">01</div>
+             <div class="how-step-title">Ask or add a portfolio</div>
+             <p class="how-step-desc">Plain English. "Compare NVDA to AMD." Or add a portfolio and ask where the risk points are.</p>
+           </div>
+           <div class="how-step">
+             <div class="how-step-number">02</div>
+             <div class="how-step-title">Pick your agent</div>
+             <p class="how-step-desc">Infi detects coding agents on your machine — Claude, Codex, Gemini, or your own. Uses the agent's own auth.</p>
+           </div>
+           <div class="how-step">
+             <div class="how-step-number">03</div>
+             <div class="how-step-title">Read the report</div>
+             <p class="how-step-desc">Thesis, key numbers, risks, scenarios, stance. Saved on your machine.</p>
+           </div>
+         </div>
+       </section>
+
+       <!-- RESEARCH REPORT — Screenshots -->
+       <section class="section section-report">
+         <div class="section-header">
+           <span class="section-pill">
+             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2
+ 14 8 20 8"/></svg>
+             Research report
+           </span>
+           <h2 class="section-title">Research output with sources attached</h2>
+           <p class="section-desc">Every report is organized into sections you can read, check, and come back to later.</p>
+         </div>
+
+         <div class="image-pair">
+           <div class="image-card" style="height: 82mm;">
+             <div class="image-card-label">
+               <p>Workbench and generated report</p>
+             </div>
+             <div class="image-card-content">
+               <img class="poster-asset poster-asset-workbench" src="./assets/infi-poster-workbench.png" alt="Infi workbench report screen">
+             </div>
+           </div>
+           <div class="image-card" style="height: 82mm;">
+             <div class="image-card-label">
+               <p>Validation gates before storage</p>
+             </div>
+             <div class="image-card-content">
+               <img class="poster-asset poster-asset-validation" src="./assets/infi-poster-validation.png" alt="MCP validation gate flow">
+             </div>
+           </div>
+         </div>
+       </section>
+
+       <!-- SOCIAL & ETHICAL ISSUES -->
+       <section class="section section-ethics">
+         <div class="section-header">
+           <span class="section-pill">
+             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12
+ 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+             Social & Ethical Issues
+           </span>
+           <h2 class="section-title">Risks & Mitigation</h2>
+         </div>
+
+         <table class="risk-table">
+           <thead>
+             <tr>
+               <th>Risk</th>
+               <th>Severity</th>
+               <th>Mitigation</th>
+             </tr>
+           </thead>
+           <tbody>
+             <tr>
+               <td><strong>Investment Harm</strong></td>
+               <td class="risk-severity high">HIGH</td>
+               <td>Mandatory disclaimer on every report</td>
+             </tr>
+             <tr>
+               <td><strong>Data Privacy</strong></td>
+               <td class="risk-severity high">HIGH</td>
+               <td>Local-first: SQLite + OS keychain, zero telemetry</td>
+             </tr>
+             <tr>
+               <td><strong>AI Hallucination</strong></td>
+               <td class="risk-severity medium">MED</td>
+               <td>MCP validation gates enforce evidence chains</td>
+             </tr>
+             <tr>
+               <td><strong>Algorithmic Bias</strong></td>
+               <td class="risk-severity medium">MED</td>
+               <td>Multi-agent cross-validation, transparent sources</td>
+             </tr>
+           </tbody>
+         </table>
+
+         <div class="highlight-box">
+           <p><strong>Safety-First:</strong> "Research only. Not investment advice." — embedded in every FinalStance.</p>
+         </div>
+       </section>
+       <!-- BACKGROUND -->
+       <section class="section section-background">
+         <div class="section-header">
+           <span class="section-pill">
+             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2
+ 4-4"/></svg>
+             Background
+           </span>
+           <h2 class="section-title">Problem & Context</h2>
+         </div>
+
+         <h3>Problem Statement</h3>
+         <ol>
+           <li><strong>Fragmentation:</strong> Analysts manually switch between 15+ data sources per report</li>
+           <li><strong>Opacity:</strong> AI tools are black boxes — users cannot verify reasoning or data sources</li>
+           <li><strong>Unstructured Output:</strong> Free-form text requires manual reformatting</li>
+         </ol>
+
+         <div class="metrics-grid">
+           <div class="metric-card" style="border-top: 3px solid var(--stance-bearish);">
+             <div class="metric-value">20-30h</div>
+             <div class="metric-label">Per Research Report</div>
+           </div>
+           <div class="metric-card" style="border-top: 3px solid var(--stance-mixed);">
+             <div class="metric-value">70%</div>
+             <div class="metric-label">Retail Investors Lose</div>
+           </div>
+         </div>
+
+         <div class="accent-bar"></div>
+
+         <h3>Solution Approach</h3>
+         <div class="flow">
+           <div class="flow-step">1. ORCHESTRATE</div>
+           <div class="flow-arrow">→</div>
+           <div class="flow-step">2. STRUCTURE</div>
+           <div class="flow-arrow">→</div>
+           <div class="flow-step">3. VERIFY</div>
+           <div class="flow-arrow">→</div>
+           <div class="flow-step">4. PRESENT</div>
+         </div>
+       </section>
+
+       <!-- PROPOSAL — Features -->
+       <section class="section section-features">
+         <div class="section-header">
+           <span class="section-pill">
+             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+             Features
+           </span>
+           <h2 class="section-title">What each report includes</h2>
+         </div>
+
+         <div class="feature-grid">
+           <div class="feature-item">
+             <div class="feature-item-header">
+               <span class="feature-dot"></span>
+               <span class="feature-number">01 · Evidence</span>
+             </div>
+             <div class="feature-title">Every claim has a source</div>
+             <p class="feature-desc">Numbers and claims keep their citations, so you can open the original source.</p>
+           </div>
+           <div class="feature-item">
+             <div class="feature-item-header">
+               <span class="feature-dot amber"></span>
+               <span class="feature-number">02 · Stance</span>
+             </div>
+             <div class="feature-title">A clear final stance</div>
+             <p class="feature-desc">Bullish, bearish, mixed, or neutral — with confidence and reasons.</p>
+           </div>
+           <div class="feature-item">
+             <div class="feature-item-header">
+               <span class="feature-dot"></span>
+               <span class="feature-number">03 · Scenarios</span>
+             </div>
+             <div class="feature-title">Scenario cases side by side</div>
+             <p class="feature-desc">Base, upside, and downside cases stored as separate sections.</p>
+           </div>
+           <div class="feature-item">
+             <div class="feature-item-header">
+               <span class="feature-dot"></span>
+               <span class="feature-number">04 · Private</span>
+             </div>
+             <div class="feature-title">Stays on your computer</div>
+             <p class="feature-desc">No account, no telemetry, no cloud sync. Keys in OS keychain.</p>
+           </div>
+           <div class="feature-item">
+             <div class="feature-item-header">
+               <span class="feature-dot"></span>
+               <span class="feature-number">05 · Sources</span>
+             </div>
+             <div class="feature-title">12 data providers built in</div>
+             <p class="feature-desc">SEC filings, market data, news — Alpha Vantage, Polygon, Yahoo Finance.</p>
+           </div>
+           <div class="feature-item">
+             <div class="feature-item-header">
+               <span class="feature-dot amber"></span>
+               <span class="feature-number">06 · Portfolio</span>
+             </div>
+             <div class="feature-title">Portfolio reviews</div>
+             <p class="feature-desc">Position reviews, allocation notes, risk notes, and scenario options.</p>
+           </div>
+         </div>
+
+         <div class="image-card image-card-full" style="height: 102mm;">
+           <div class="image-card-label">
+             <p>Comparison against existing research workflows</p>
+           </div>
+           <div class="image-card-content">
+             <img class="poster-asset poster-asset-comparison" src="./assets/infi-poster-comparison.png" alt="Comparison table showing Infi advantages">
+           </div>
+         </div>
+       </section>
+
+       <!-- PROPOSAL — Architecture -->
+       <section class="section section-architecture">
+         <div class="section-header">
+           <span class="section-pill">
+             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+             Architecture
+           </span>
+           <h2 class="section-title">Technical Architecture</h2>
+         </div>
+
+         <div class="image-card image-card-full architecture-shot" style="height: 94mm;">
+           <div class="image-card-label">
+             <p>User prompt to source-backed report</p>
+           </div>
+           <div class="image-card-content">
+             <img class="poster-asset poster-asset-architecture" src="./assets/infi-poster-architecture.png" alt="Infi technical architecture diagram">
+           </div>
+         </div>
+
+         <div class="tool-strip">
+           <span>21+ typed MCP tools</span>
+           <span>Evidence chain</span>
+           <span>Probability sum</span>
+           <span>Stance coherence</span>
+           <span>Blocking uncertainty</span>
+         </div>
+       </section>
+
+   </main>
+
+   <!-- ============================================================
+        REFERENCES
+        ============================================================ -->
+   <section class="section" style="grid-column: 1 / -1;">
+     <div class="section-header">
+       <span class="section-pill">
+         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+ stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+         References
+       </span>
+       <h2 class="section-title">Academic & Technical Sources</h2>
+     </div>
+
+     <ol class="references-list">
+       <li><span class="ref-number">[1]</span> Agent Client Protocol (ACP) Specification, Zed Industries, 2024.
+ <code>zed.dev/blog/agent-client-protocol</code></li>
+       <li><span class="ref-number">[2]</span> Model Context Protocol (MCP), Anthropic, 2024. <code>modelcontextprotocol.io</code></li>
+       <li><span class="ref-number">[3]</span> Yang et al., "FinGPT: Open-Source Financial Large Language Models," arXiv:2306.06031, 2023.</li>
+       <li><span class="ref-number">[4]</span> Lewis et al., "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks," NeurIPS 2020.</li>
+       <li><span class="ref-number">[5]</span> Wei et al., "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models," NeurIPS 2022.</li>
+       <li><span class="ref-number">[6]</span> Tauri 2 Documentation, <code>v2.tauri.app</code></li>
+       <li><span class="ref-number">[7]</span> Rust Programming Language, <code>doc.rust-lang.org/book</code></li>
+       <li><span class="ref-number">[8]</span> SEC EDGAR API Documentation, <code>sec.gov/edgar</code></li>
+       <li><span class="ref-number">[9]</span> Alpha Vantage API Documentation, <code>alphavantage.co</code></li>
+       <li><span class="ref-number">[10]</span> PMCP Crate Documentation, <code>docs.rs/pmcp</code></li>
+     </ol>
+   </section>
+
+   <!-- ============================================================
+        FOOTER
+        ============================================================ -->
+   <footer class="footer">
+     <div class="footer-left">
+       <div class="footer-logo-icon" aria-hidden="true"></div>
+       <span class="footer-logo">Infi</span>
+       <span class="footer-copyright">© 2026</span>
+     </div>
+     <div class="footer-links">
+       <a href="https://github.com/khanhthanhdev/infi/blob/main/docs/README.md" class="footer-link">Docs</a>
+       <a href="https://github.com/khanhthanhdev/infi/releases" class="footer-link">Releases</a>
+       <a href="https://github.com/khanhthanhdev/infi" class="footer-link">GitHub</a>
+     </div>
+     <div class="footer-right">
+       MIT · Research tool, not financial advice.
+     </div>
+   </footer>
+ </div>
+
+ </body>
+ </html>

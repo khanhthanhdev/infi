@@ -1,0 +1,1021 @@
+/* ============================================================
+    DESIGN SYSTEM — Matching Landing Page
+    ============================================================ */
+ :root {
+   /* A1 Portrait: 594mm × 841mm */
+   --poster-width: 594mm;
+   --poster-height: 841mm;
+
+   /* Colors from landing page */
+   --paper: #FFFFFF;
+   --paper-warm: #FAF9F5;
+   --ink: #1A1A18;
+   --ink-card: #26261F;
+   --muted: #6B6B60;
+   --rule: #E5E7EB;
+   --rule-ghost: #E5E5E0;
+   --blue: #155DFF;
+   --blue-deep: #1A4FCC;
+   --blue-light: #145BFF;
+   --blue-tint: #E8EEFF;
+   --blue-tint-50: rgba(232, 238, 255, 0.5);
+   --blue-20: rgba(21, 93, 255, 0.2);
+   --blue-10: rgba(21, 93, 255, 0.1);
+   --gold: #F2C542;
+   --amber: #D4A017;
+
+   /* Stance colors */
+   --stance-bullish: #059669;
+   --stance-bearish: #DC2626;
+   --stance-mixed: #D97706;
+   --stance-neutral: #71717A;
+
+   /* Typography */
+   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+   --font-display: 'Inter Tight', 'Inter', sans-serif;
+   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+   /* Spacing */
+   --gap-xs: 3mm;
+   --gap-sm: 5mm;
+   --gap-md: 8mm;
+   --gap-lg: 11mm;
+   --gap-xl: 16mm;
+ }
+
+ /* Reset & Base */
+ *, *::before, *::after {
+   box-sizing: border-box;
+   margin: 0;
+   padding: 0;
+ }
+
+ @page {
+   size: A1 portrait;
+   margin: 0;
+ }
+
+ body {
+   font-family: var(--font-sans);
+   font-size: 11pt;
+   line-height: 1.5;
+   color: var(--ink);
+   background: var(--paper-warm);
+   min-height: 100vh;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+ }
+
+ ::selection {
+   background: var(--blue);
+   color: white;
+ }
+
+ img, video {
+   display: block;
+   max-width: 100%;
+   height: auto;
+ }
+
+ /* ============================================================
+    POSTER CONTAINER
+    ============================================================ */
+ .poster {
+   width: var(--poster-width);
+   height: var(--poster-height);
+   margin: 0 auto;
+   padding: var(--gap-lg);
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+   gap: var(--gap-md);
+   background: var(--paper-warm);
+   position: relative;
+   overflow: hidden;
+   box-shadow: 0 8mm 30mm rgba(26, 26, 24, 0.1);
+ }
+
+ /* ============================================================
+    HEADER
+    ============================================================ */
+ .header {
+   grid-column: 1 / -1;
+   background: var(--paper);
+   border: 1px solid var(--rule-ghost);
+   border-radius: 10px;
+   padding: var(--gap-md) var(--gap-lg);
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+ }
+
+ .header-left {
+   flex: 1;
+ }
+
+ .header-logo {
+   display: flex;
+   align-items: center;
+   gap: var(--gap-sm);
+   margin-bottom: var(--gap-sm);
+ }
+
+ .logo-icon {
+   width: 18mm;
+   height: 18mm;
+   border-radius: 8px;
+   background: var(--blue);
+   display: grid;
+   place-items: center;
+   overflow: hidden;
+   position: relative;
+   flex-shrink: 0;
+ }
+
+ .logo-icon span {
+   width: 9mm;
+   height: 2mm;
+   background: white;
+   display: block;
+   transform: skewY(-28deg);
+   margin: -1.5mm 0;
+ }
+
+ .logo-icon span:nth-child(2) {
+   width: 11mm;
+   opacity: 0.9;
+ }
+
+ .logo-icon span:nth-child(3) {
+   width: 13mm;
+   opacity: 0.8;
+ }
+
+ .project-title {
+   font-family: var(--font-display);
+   font-size: 34pt;
+   font-weight: 600;
+   letter-spacing: -0.02em;
+   line-height: 1.1;
+   color: var(--ink);
+ }
+
+ .project-subtitle {
+   font-family: var(--font-display);
+   font-size: 14pt;
+   font-weight: 400;
+   color: var(--muted);
+   letter-spacing: 0.01em;
+   margin-top: 2mm;
+ }
+
+ .header-right {
+   text-align: right;
+   padding-left: var(--gap-lg);
+   border-left: 1px solid var(--rule);
+ }
+
+ .team-info {
+   font-size: 11pt;
+   line-height: 1.8;
+ }
+
+ .team-label {
+   font-size: 10px;
+   text-transform: uppercase;
+   letter-spacing: 0.2em;
+   color: var(--muted);
+   margin-bottom: 2mm;
+ }
+
+ .team-name {
+   font-weight: 600;
+   font-size: 12pt;
+   color: var(--ink);
+ }
+
+ .team-members {
+   font-size: 10pt;
+   color: var(--muted);
+ }
+
+ /* ============================================================
+    AGENTS ROW (matching landing page)
+    ============================================================ */
+ .agents-row {
+   grid-column: 1 / -1;
+   display: flex;
+   align-items: center;
+   gap: var(--gap-md);
+   padding: 0 0 var(--gap-xs);
+   border-bottom: 1px solid var(--rule);
+ }
+
+ .agents-label {
+   font-size: 10pt;
+   color: var(--ink);
+   white-space: nowrap;
+   font-weight: 500;
+ }
+
+ .agents-list {
+   display: flex;
+   align-items: center;
+   gap: var(--gap-md);
+   overflow-x: auto;
+   flex: 1;
+ }
+
+ .agent-item {
+   display: flex;
+   align-items: center;
+   white-space: nowrap;
+   flex-shrink: 0;
+   border: 1px solid var(--rule);
+   background: var(--paper);
+   border-radius: 999px;
+   padding: 1.5mm 3mm;
+ }
+
+ .agent-item span {
+   font-size: 8.5pt;
+   color: var(--muted);
+ }
+
+ /* ============================================================
+    MAIN CONTENT GRID
+    ============================================================ */
+ .content {
+   grid-column: 1 / -1;
+   display: grid;
+   grid-template-columns: repeat(12, minmax(0, 1fr));
+   gap: var(--gap-md);
+   min-height: 0;
+   align-items: start;
+ }
+
+ .section-idea {
+   grid-column: span 5;
+ }
+
+ .section-steps {
+   grid-column: span 7;
+ }
+
+ .section-report {
+   grid-column: span 7;
+ }
+
+ .section-ethics {
+   grid-column: span 5;
+ }
+
+ .section-background {
+   grid-column: span 4;
+ }
+
+ .section-features {
+   grid-column: span 8;
+ }
+
+ .section-architecture {
+   grid-column: 1 / span 7;
+ }
+
+ /* ============================================================
+    SECTION CARDS (matching landing page style)
+    ============================================================ */
+ .section {
+   background: var(--paper);
+   border: 1px solid var(--rule-ghost);
+   border-radius: 10px;
+   padding: var(--gap-sm);
+   position: relative;
+   page-break-inside: avoid;
+ }
+
+ .section-header {
+   margin-bottom: var(--gap-sm);
+ }
+
+ .section-pill {
+   display: inline-flex;
+   align-items: center;
+   gap: 1.5mm;
+   background: var(--blue-tint);
+   color: var(--blue);
+   font-size: 9pt;
+   font-weight: 500;
+   padding: 1.5mm 3mm;
+   border-radius: 4px;
+ }
+
+ .section-pill svg {
+   width: 3mm;
+   height: 3mm;
+ }
+
+ .section-title {
+   font-family: var(--font-display);
+   font-size: 18pt;
+   font-weight: 600;
+   color: var(--ink);
+   letter-spacing: -0.02em;
+   margin-top: var(--gap-sm);
+   line-height: 1.2;
+ }
+
+ .section-desc {
+   font-family: var(--font-display);
+   font-size: 11pt;
+   color: var(--muted);
+   line-height: 1.55;
+   margin-top: var(--gap-xs);
+ }
+
+ /* ============================================================
+    IMAGE CARDS (matching landing page)
+    ============================================================ */
+ .image-card {
+   background: var(--blue-tint-50);
+   border: 1px solid var(--blue-20);
+   border-radius: 10px;
+   overflow: hidden;
+   display: flex;
+   flex-direction: column;
+ }
+
+ .image-card-label {
+   padding: 3mm 4mm 2mm;
+ }
+
+ .image-card-label p {
+   color: var(--blue);
+   font-size: 10pt;
+   font-weight: 500;
+   margin: 0;
+ }
+
+ .image-card-content {
+   flex: 1;
+   overflow: hidden;
+   margin: 0 3mm 3mm;
+   border-radius: 8px;
+   border: 1px solid var(--blue-20);
+   background: white;
+ }
+
+ .image-card-content img {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   object-position: center;
+   background: white;
+ }
+
+ .poster-asset {
+   transform-origin: center;
+ }
+
+ .poster-asset-workbench {
+   transform: scale(1.12);
+ }
+
+ .poster-asset-validation {
+   transform: scale(1.1);
+ }
+
+ .poster-asset-comparison {
+   transform: scale(1.04);
+ }
+
+ .poster-asset-architecture {
+   transform: scale(1.08);
+ }
+
+ .image-card-full {
+   margin-top: var(--gap-sm);
+ }
+
+ .architecture-shot .image-card-content img {
+   object-fit: cover;
+   background: #fbfaf7;
+ }
+
+ /* ============================================================
+    TYPOGRAPHY
+    ============================================================ */
+ h3 {
+   font-family: var(--font-display);
+   font-size: 12pt;
+   font-weight: 600;
+   color: var(--ink);
+   margin-bottom: var(--gap-xs);
+   margin-top: var(--gap-sm);
+ }
+
+ h3:first-child {
+   margin-top: 0;
+ }
+
+ p {
+   margin-bottom: var(--gap-sm);
+   font-size: 9.8pt;
+   line-height: 1.6;
+   color: var(--ink);
+ }
+
+ p:last-child {
+   margin-bottom: 0;
+ }
+
+ strong {
+   font-weight: 600;
+   color: var(--ink);
+ }
+
+ code {
+   font-family: var(--font-mono);
+   font-size: 9.5pt;
+   background: var(--blue-tint);
+   padding: 1mm 2.5mm;
+   border-radius: 4px;
+   color: var(--blue);
+ }
+
+ /* ============================================================
+    LISTS
+    ============================================================ */
+ ul, ol {
+   padding-left: 5mm;
+   margin-bottom: var(--gap-sm);
+ }
+
+ li {
+   font-size: 9.8pt;
+   margin-bottom: 2mm;
+   line-height: 1.5;
+   color: var(--ink);
+ }
+
+ li:last-child {
+   margin-bottom: 0;
+ }
+
+ /* ============================================================
+    TABLES
+    ============================================================ */
+ table {
+   width: 100%;
+   border-collapse: collapse;
+   margin: var(--gap-sm) 0;
+   font-size: 9.5pt;
+ }
+
+ thead {
+   background: var(--ink);
+   color: white;
+ }
+
+ th {
+   padding: 3mm 3.5mm;
+   text-align: left;
+   font-weight: 600;
+   font-size: 9pt;
+   text-transform: uppercase;
+   letter-spacing: 0.1em;
+ }
+
+ td {
+   padding: 3mm 3.5mm;
+   border-bottom: 1px solid var(--rule);
+ }
+
+ tr:last-child td {
+   border-bottom: none;
+ }
+
+ tr:nth-child(even) {
+   background: rgba(250, 249, 245, 0.5);
+ }
+
+ /* ============================================================
+    FEATURE GRID (matching landing page)
+    ============================================================ */
+ .feature-grid {
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: 1px;
+   background: var(--blue-10);
+   border: 1px solid var(--blue-20);
+   border-radius: 10px;
+   overflow: hidden;
+   margin: var(--gap-sm) 0;
+ }
+
+ .feature-item {
+   background: var(--paper-warm);
+   padding: 3mm 4mm;
+ }
+
+ .feature-item-header {
+   display: flex;
+   align-items: center;
+   gap: 2mm;
+   margin-bottom: 2mm;
+ }
+
+ .feature-dot {
+   width: 2mm;
+   height: 2mm;
+   border-radius: 50%;
+   background: var(--blue);
+   flex-shrink: 0;
+ }
+
+ .feature-dot.amber {
+   background: var(--amber);
+ }
+
+ .feature-number {
+   font-size: 8pt;
+   color: var(--muted);
+   font-variant-numeric: tabular-nums;
+ }
+
+ .feature-title {
+   font-family: var(--font-display);
+   font-size: 11pt;
+   font-weight: 600;
+   color: var(--ink);
+   line-height: 1.3;
+   margin-bottom: 1mm;
+ }
+
+ .feature-desc {
+   font-size: 8.6pt;
+   line-height: 1.5;
+   color: var(--muted);
+ }
+
+ /* ============================================================
+    BADGES
+    ============================================================ */
+ .badge {
+   display: inline-flex;
+   align-items: center;
+   gap: 1.5mm;
+   padding: 1mm 2.5mm;
+   border-radius: 4px;
+   font-size: 8pt;
+   font-weight: 500;
+   letter-spacing: 0.02em;
+ }
+
+ .badge-blue {
+   background: var(--blue-tint);
+   color: var(--blue);
+ }
+
+ .badge-success {
+   background: rgba(5, 150, 105, 0.12);
+   color: var(--stance-bullish);
+ }
+
+ .badge-warning {
+   background: rgba(217, 119, 6, 0.12);
+   color: var(--stance-mixed);
+ }
+
+ .badge-danger {
+   background: rgba(220, 38, 38, 0.12);
+   color: var(--stance-bearish);
+ }
+
+ /* ============================================================
+    METRIC CARDS
+    ============================================================ */
+ .metrics-grid {
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: 3mm;
+   margin: var(--gap-sm) 0;
+ }
+
+ .metric-card {
+   background: var(--paper-warm);
+   border: 1px solid var(--rule-ghost);
+   border-radius: 8px;
+   padding: 3.5mm;
+   text-align: center;
+ }
+
+ .metric-value {
+   font-family: var(--font-display);
+   font-size: 18pt;
+   font-weight: 600;
+   color: var(--ink);
+   letter-spacing: -0.03em;
+   line-height: 1.1;
+ }
+
+ .metric-label {
+   font-size: 9px;
+   text-transform: uppercase;
+   letter-spacing: 0.12em;
+   color: var(--muted);
+   margin-top: 1.5mm;
+ }
+
+ /* ============================================================
+    FLOW / DIAGRAMS
+    ============================================================ */
+ .flow {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 3mm;
+   flex-wrap: wrap;
+   padding: var(--gap-xs) 0;
+ }
+
+ .flow-step {
+   background: var(--blue-tint);
+   border: 1px solid var(--blue-20);
+   border-radius: 8px;
+   padding: 2.5mm 4mm;
+   font-size: 8.8pt;
+   font-weight: 500;
+   color: var(--blue);
+   white-space: nowrap;
+ }
+
+ .flow-arrow {
+   font-size: 14pt;
+   color: var(--blue);
+   font-weight: 300;
+ }
+
+ .diagram {
+   background: var(--paper-warm);
+   border: 1px solid var(--rule-ghost);
+   border-radius: 8px;
+   padding: var(--gap-sm);
+   margin: var(--gap-sm) 0;
+   text-align: center;
+ }
+
+ .diagram-title {
+   font-size: 10px;
+   font-weight: 600;
+   text-transform: uppercase;
+   letter-spacing: 0.15em;
+   color: var(--muted);
+   margin-bottom: var(--gap-sm);
+ }
+
+ /* ============================================================
+    HOW IT WORKS GRID (matching landing page)
+    ============================================================ */
+ .how-grid {
+   display: grid;
+   grid-template-columns: repeat(3, 1fr);
+   gap: 1px;
+   background: var(--blue-10);
+   border: 1px solid var(--blue-20);
+   border-radius: 10px;
+   overflow: hidden;
+   margin: var(--gap-sm) 0;
+ }
+
+ .how-step {
+   background: var(--paper-warm);
+   padding: 3.5mm;
+ }
+
+ .how-step-number {
+   font-family: var(--font-mono);
+   font-size: 18pt;
+   font-weight: 600;
+   color: var(--ink);
+   line-height: 1;
+   margin-bottom: 2mm;
+ }
+
+ .how-step-title {
+   font-family: var(--font-display);
+   font-size: 11pt;
+   font-weight: 600;
+   color: var(--ink);
+   margin-bottom: 2mm;
+ }
+
+ .how-step-desc {
+   font-size: 8.5pt;
+   line-height: 1.5;
+   color: var(--muted);
+ }
+
+ /* ============================================================
+    TOOL GRID
+    ============================================================ */
+ .tool-grid {
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: 2mm;
+   margin: var(--gap-sm) 0;
+ }
+
+ .tool-item {
+   display: flex;
+   align-items: center;
+   gap: 2mm;
+   font-size: 8.5pt;
+   padding: 2mm 2.5mm;
+   background: var(--paper-warm);
+   border: 1px solid var(--rule-ghost);
+   border-radius: 6px;
+ }
+
+ .tool-dot {
+   width: 2mm;
+   height: 2mm;
+   background: var(--blue);
+   border-radius: 50%;
+   flex-shrink: 0;
+ }
+
+ .tool-name {
+   font-family: var(--font-mono);
+   font-size: 8pt;
+   color: var(--blue);
+ }
+
+ .tool-strip {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 2mm;
+   margin-top: var(--gap-sm);
+ }
+
+ .tool-strip span {
+   display: inline-flex;
+   align-items: center;
+   background: var(--paper-warm);
+   border: 1px solid var(--rule-ghost);
+   border-radius: 999px;
+   color: var(--muted);
+   font-family: var(--font-mono);
+   font-size: 7.8pt;
+   padding: 1.5mm 3mm;
+ }
+
+ /* ============================================================
+    RISK TABLE
+    ============================================================ */
+ .risk-table {
+   width: 100%;
+   font-size: 9pt;
+ }
+
+ .risk-table th {
+   background: var(--ink-card);
+   font-size: 8.5pt;
+ }
+
+ .risk-severity {
+   font-weight: 700;
+   text-align: center;
+   font-size: 8pt;
+   text-transform: uppercase;
+   letter-spacing: 0.1em;
+ }
+
+ .risk-severity.high {
+   color: var(--stance-bearish);
+ }
+
+ .risk-severity.medium {
+   color: var(--stance-mixed);
+ }
+
+ .risk-severity.low {
+   color: var(--stance-bullish);
+ }
+
+ /* ============================================================
+    COMPARISON TABLE
+    ============================================================ */
+ .comparison-table {
+   width: 100%;
+   font-size: 9pt;
+ }
+
+ .comparison-table th {
+   background: var(--ink);
+   font-size: 8.5pt;
+   text-align: center;
+ }
+
+ .comparison-table th:first-child {
+   text-align: left;
+ }
+
+ .comparison-table td {
+   text-align: center;
+   padding: 2.5mm;
+ }
+
+ .comparison-table td:first-child {
+   text-align: left;
+   font-weight: 500;
+ }
+
+ .check {
+   color: var(--stance-bullish);
+   font-weight: 700;
+ }
+
+ .cross {
+   color: var(--stance-bearish);
+ }
+
+ .partial {
+   color: var(--stance-mixed);
+ }
+
+ /* ============================================================
+    HIGHLIGHT BOX
+    ============================================================ */
+ .highlight-box {
+   background: var(--blue-tint);
+   border-left: 3px solid var(--blue);
+   padding: var(--gap-sm);
+   border-radius: 0 8px 8px 0;
+   margin: var(--gap-sm) 0;
+ }
+
+ .highlight-box p {
+   font-size: 9.6pt;
+   font-style: italic;
+   color: var(--ink-card);
+   margin: 0;
+ }
+
+ .accent-bar {
+   width: 100%;
+   height: 1px;
+   background: var(--rule);
+   margin: var(--gap-sm) 0;
+ }
+
+ /* ============================================================
+    REFERENCES
+    ============================================================ */
+ .references-list {
+   font-size: 8.5pt;
+   line-height: 1.7;
+   color: var(--muted);
+   columns: 2;
+   column-gap: var(--gap-md);
+   list-style-position: outside;
+   padding-left: 6mm;
+ }
+
+ .references-list li {
+   font-size: 8.5pt;
+   margin-bottom: 2mm;
+   break-inside: avoid;
+ }
+
+ .ref-number {
+   font-weight: 600;
+   color: var(--blue);
+   margin-right: 1mm;
+ }
+
+ /* ============================================================
+    FOOTER
+    ============================================================ */
+ .footer {
+   grid-column: 1 / -1;
+   background: var(--paper);
+   border: 1px solid var(--rule-ghost);
+   border-radius: 10px;
+   padding: var(--gap-sm) var(--gap-lg);
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   font-size: 9pt;
+ }
+
+ .footer-left {
+   display: flex;
+   align-items: center;
+   gap: var(--gap-sm);
+ }
+
+ .footer-logo-icon {
+   width: 5mm;
+   height: 5mm;
+   border-radius: 2px;
+   background: var(--blue);
+   position: relative;
+ }
+
+ .footer-logo-icon::before {
+   content: "";
+   position: absolute;
+   inset: 1.4mm 1mm;
+   border-top: 1.1mm solid white;
+   border-bottom: 1.1mm solid white;
+ }
+
+ .footer-logo {
+   font-family: var(--font-display);
+   font-weight: 600;
+   font-size: 11pt;
+   letter-spacing: -0.01em;
+   color: var(--ink);
+ }
+
+ .footer-copyright {
+   font-size: 9pt;
+   color: var(--muted);
+   margin-left: 2mm;
+ }
+
+ .footer-links {
+   display: flex;
+   gap: var(--gap-md);
+ }
+
+ .footer-link {
+   color: var(--muted);
+   text-decoration: none;
+   font-size: 9pt;
+   transition: color 0.15s;
+ }
+
+ .footer-link:hover {
+   color: var(--ink);
+ }
+
+ .footer-right {
+   color: var(--muted);
+   font-size: 8.5pt;
+ }
+
+ /* ============================================================
+    IMAGE PAIR (used in research report & portfolio sections)
+    ============================================================ */
+ .image-pair {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: 3mm;
+ }
+
+ /* ============================================================
+    PRINT STYLES
+    ============================================================ */
+ @media print {
+   body {
+     background: white;
+     margin: 0;
+     padding: 0;
+   }
+
+   .poster {
+     box-shadow: none;
+     margin: 0;
+     page-break-after: always;
+   }
+
+   .section {
+     break-inside: avoid;
+   }
+ }
+
+ /* ============================================================
+    RESPONSIVE (for screen viewing)
+    ============================================================ */
+ @media screen and (max-width: 1200px) {
+   .poster {
+     width: 100%;
+     height: auto;
+     aspect-ratio: 1 / 1.414;
+     padding: var(--gap-md);
+   }
+
+   .project-title {
+     font-size: 28pt;
+   }
+
+   .section-title {
+     font-size: 16pt;
+   }
+
+   p, li {
+     font-size: 10pt;
+   }
+ }
