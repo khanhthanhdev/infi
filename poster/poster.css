@@ -257,9 +257,16 @@
  }
 
  .agent-item::before {
-   content: "✦";
-   font-size: 10pt;
+   content: "";
+   display: none;
+ }
+
+ .agent-logo {
+   width: 16px;
+   height: 16px;
    margin-right: 2mm;
+   flex-shrink: 0;
+   vertical-align: middle;
  }
 
  .agent-item span {
