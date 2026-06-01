@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-06-01T10:30:00Z",
+  "commitHash": "d8ff49c2a6db932adbce20545bdc6423ac397a7a",
+  "branch": "main",
+  "pageCount": 26,
+  "topLevelSections": [
+    "overview",
+    "by-the-numbers",
+    "lore",
+    "how-to-contribute",
+    "systems",
+    "features",
+    "reference"
+  ],
+  "pageOrder": [
+    "overview/index.md",
+    "overview/architecture.md",
+    "overview/getting-started.md",
+    "overview/glossary.md",
+    "by-the-numbers.md",
+    "lore.md",
+    "how-to-contribute/index.md",
+    "how-to-contribute/development-workflow.md",
+    "how-to-contribute/testing.md",
+    "how-to-contribute/patterns-and-conventions.md",
+    "how-to-contribute/tooling.md",
+    "systems/index.md",
+    "systems/database.md",
+    "systems/acp-integration.md",
+    "systems/data-sources.md",
+    "systems/prompts.md",
+    "features/index.md",
+    "features/frontend-architecture.md",
+    "features/run-analysis.md",
+    "features/report-viewer.md",
+    "features/portfolio.md",
+    "features/settings.md",
+    "reference/index.md",
+    "reference/configuration.md",
+    "reference/data-models.md",
+    "reference/dependencies.md"
+  ]
+}

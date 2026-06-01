@@ -1,523 +1,908 @@
 <!DOCTYPE html>
- <html lang="en">
- <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Infi — AI-Powered Stock & Portfolio Research Workbench</title>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infi — Academic Poster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --poster-w: 594mm;
+      --poster-h: 841mm;
+      --font-scale: 1;
+      --bg: #fafbfc;
+      --ink: #1a1a2e;
+      --ink-secondary: #4a4a6a;
+      --muted: #7a7a9a;
+      --border: #e2e4e8;
+      --blue: #2563eb;
+      --blue-light: #eff6ff;
+      --amber: #f59e0b;
+      --amber-light: #fffbeb;
+      --green: #10b981;
+      --green-light: #ecfdf5;
+      --red: #ef4444;
+      --red-light: #fef2f2;
+      --radius: 6px;
+    }
+    html, body { background: #e5e5e5; font-family: 'Inter', sans-serif; }
+    body { display: flex; justify-content: center; padding: 20px; }
+    #root { width: 100%; }
 
-   <!-- Fonts matching landing page -->
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    /* Poster container */
+    .poster-shell {
+      width: var(--poster-w);
+      min-height: var(--poster-h);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: calc(11px * var(--font-scale));
+      line-height: 1.5;
+      position: relative;
+      margin: 0 auto;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
 
-   <!-- Poster Styles -->
-   <link rel="stylesheet" href="./poster.css">
- </head>
- <body>
+    /* Toolbar */
+    .poster-toolbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: #1a1a2e; color: #fff; padding: 8px 16px;
+      display: flex; align-items: center; gap: 12px;
+      font-size: 13px; font-family: 'Inter', sans-serif;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .poster-toolbar button {
+      background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+      padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-family: 'Inter', sans-serif;
+    }
+    .poster-toolbar button:hover { background: rgba(255,255,255,0.22); }
+    .poster-toolbar .spacer { flex: 1; }
+    .poster-toolbar .info { font-size: 11px; opacity: 0.7; }
 
-<div class="poster">
-   <!-- ============================================================
-        HEADER
-        ============================================================ -->
-   <header class="header">
-     <div class="header-left">
-       <div class="header-logo">
-         <div>
-           <h1 class="project-title">Infi</h1>
-           <p class="project-subtitle">AI-Powered Stock & Portfolio Research Workbench</p>
-           <p class="project-kicker">Source-backed, structured investment research powered by AI agents.</p>
-         </div>
-       </div>
-     </div>
-     <div class="header-right">
-       <div class="team-mark" aria-hidden="true">
-         <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-       </div>
-       <div class="team-info">
-         <div class="team-label">Team</div>
-         <div class="team-name">[Your Team Name]</div>
-         <div class="team-members">
-           Member 1 &nbsp;•&nbsp; Member 2<br>
-           Member 3 &nbsp;•&nbsp; Member 4
-         </div>
-       </div>
-       <div class="qr-area">
-         <div class="qr-placeholder">QR CODE</div>
-         <strong>Scan QR</strong>
-         <span>Demo / Project link</span>
-       </div>
-     </div>
-   </header>
+    /* Header */
+    .poster-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 24mm 20mm 10mm 20mm;
+      border-bottom: 2px solid var(--ink);
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+    }
+    .poster-header h1 {
+      font-family: 'Inter Tight', sans-serif; font-weight: 700;
+      font-size: calc(48px * var(--font-scale)); letter-spacing: -0.03em; line-height: 1;
+    }
+    .poster-header .subtitle {
+      font-size: calc(18px * var(--font-scale)); margin-top: 6px; opacity: 0.85; font-weight: 500;
+    }
+    .poster-header .kicker {
+      font-size: calc(13px * var(--font-scale)); margin-top: 10px; opacity: 0.65; max-width: 55ch;
+    }
+    .header-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .header-right .team-label { font-size: calc(10px * var(--font-scale)); text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.5; }
+    .header-right .team-name { font-size: calc(14px * var(--font-scale)); font-weight: 600; }
+    .header-right .team-members { font-size: calc(11px * var(--font-scale)); opacity: 0.6; }
+    .qr-box {
+      width: 70px; height: 70px; border: 2px solid rgba(255,255,255,0.3); border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: calc(9px * var(--font-scale)); text-align: center; opacity: 0.5;
+      margin-top: 4px;
+    }
+    .header-logo { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .header-logo img { width: 36px; height: 36px; border-radius: 8px; }
 
-   <!-- ============================================================
-        AGENTS ROW (matching landing page)
-        ============================================================ -->
-   <div class="agents-row">
-     <div class="agents-list">
-       <span class="agent-item">
-         <img src="./assets/agents/claude.svg" alt="Claude" class="agent-logo">
-         <span>Claude Code</span>
-       </span>
-       <span class="agent-item">
-         <img src="./assets/agents/codex.svg" alt="Codex" class="agent-logo">
-         <span>Codex</span>
-       </span>
-       <span class="agent-item">
-         <img src="./assets/agents/gemini.svg" alt="Gemini" class="agent-logo">
-         <span>Gemini CLI</span>
-       </span>
-       <span class="agent-item">
-         <img src="./assets/agents/qwen.svg" alt="Qwen" class="agent-logo">
-         <span>Qwen</span>
-       </span>
-       <span class="agent-item">
-         <img src="./assets/agents/mistral.svg" alt="Mistral" class="agent-logo">
-         <span>Mistral</span>
-       </span>
-       <span class="agent-item">
-         <img src="./assets/agents/kimi.svg" alt="Kimi" class="agent-logo">
-         <span>Kimi</span>
-       </span>
-       <span class="agent-item">
-         <img src="./assets/agents/opencode.svg" alt="OpenCode" class="agent-logo">
-         <span>OpenCode</span>
-       </span>
-       <span class="agent-item" style="color: var(--muted); opacity: 0.6;">
-         <span>or a custom binary</span>
-       </span>
-     </div>
-   </div>
+    /* Agents row */
+    .agents-row {
+      display: flex; align-items: center; gap: 16px; padding: 8px 20mm;
+      border-bottom: 1px solid var(--border); background: #fff; font-size: calc(10px * var(--font-scale));
+      overflow: hidden;
+    }
+    .agents-row .label { font-size: calc(9px * var(--font-scale)); color: var(--muted); white-space: nowrap; }
+    .agent-chip { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .agent-chip img { width: 14px; height: 14px; }
 
-   <!-- ============================================================
-        MAIN CONTENT
-        ============================================================ -->
-   <main class="content">
-       <!-- IDEA -->
-       <section class="section section-idea">
-         <div class="section-header">
-           <span class="section-pill">
-             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47
- 5 11.38 5 9a7 7 0 0 1 7-7Z"/><path d="M10 21h4"/></svg>
-             Idea
-           </span>
-           <h2 class="section-title">Making investment research transparent</h2>
-           <p class="section-desc">Source-backed claims. Structured reports. No black boxes.</p>
-         </div>
+    /* Main grid — 2 columns */
+    .poster-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 0;
+      min-height: calc(var(--poster-h) - 160mm);
+    }
+    .poster-col { padding: 8mm 10mm; border-right: 1px solid var(--border); }
+    .poster-col:last-child { border-right: none; }
 
-         <div class="highlight-box">
-           <p><strong>Infi</strong> orchestrates AI coding agents to fetch real-time financial data, structure every claim as a source-backed data
- block, and assemble comprehensive investment reports — all running locally on your machine.</p>
-         </div>
+    /* Cards */
+    .card {
+      margin-bottom: 6mm; border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border); background: #fff;
+      position: relative;
+    }
+    .card-handle {
+      position: absolute; top: 6px; right: 6px; width: 14px; height: 14px;
+      background: var(--ink); transform: rotate(45deg); border-radius: 2px;
+      cursor: grab; opacity: 0.15; z-index: 10; transition: opacity 0.15s;
+    }
+    .card:hover .card-handle { opacity: 0.5; }
+    .card-header {
+      padding: 4mm 5mm 3mm 5mm; border-bottom: 1px solid var(--border);
+    }
+    .card-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: calc(9px * var(--font-scale)); font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--blue); margin-bottom: 2mm;
+    }
+    .card-title {
+      font-family: 'Inter Tight', sans-serif; font-weight: 600;
+      font-size: calc(16px * var(--font-scale)); letter-spacing: -0.01em; line-height: 1.25;
+    }
+    .card-desc {
+      font-size: calc(11px * var(--font-scale)); color: var(--muted); margin-top: 2mm;
+    }
+    .card-body { padding: 3mm 5mm 4mm 5mm; }
+    .card-body p { margin-bottom: 2.5mm; font-size: calc(11px * var(--font-scale)); line-height: 1.55; }
+    .card-body h3 {
+      font-family: 'Inter Tight', sans-serif; font-weight: 600;
+      font-size: calc(12px * var(--font-scale)); margin: 3mm 0 2mm 0;
+    }
+    .card-body ul, .card-body ol { padding-left: 5mm; margin-bottom: 2.5mm; }
+    .card-body li { font-size: calc(11px * var(--font-scale)); margin-bottom: 1mm; line-height: 1.5; }
+    .card-body img { width: 100%; border-radius: 4px; margin: 2mm 0; }
+    .card-body table { width: 100%; border-collapse: collapse; font-size: calc(10px * var(--font-scale)); margin: 2mm 0; }
+    .card-body th, .card-body td { padding: 1.5mm 2.5mm; text-align: left; border-bottom: 1px solid var(--border); }
+    .card-body th { font-weight: 600; font-size: calc(9px * var(--font-scale)); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .card-body code { font-family: 'JetBrains Mono', monospace; font-size: calc(9.5px * var(--font-scale)); background: #f1f3f5; padding: 1px 4px; border-radius: 3px; }
+    .card-body strong { font-weight: 600; }
 
-         <h3>Key Innovation</h3>
-         <p>The agent <strong>never emits free-form prose</strong> as the final output. Instead, every claim must be submitted through typed MCP (Model
- Context Protocol) tools with validation gates ensuring evidence chains, probability consistency, and stance coherence.</p>
+    /* Metric cards */
+    .metrics-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5mm; margin: 2.5mm 0; }
+    .metric-box {
+      background: var(--blue-light); border-radius: var(--radius); padding: 3mm;
+      text-align: center; border-top: 3px solid var(--blue);
+    }
+    .metric-box.amber { background: var(--amber-light); border-top-color: var(--amber); }
+    .metric-box.green { background: var(--green-light); border-top-color: var(--green); }
+    .metric-box.red { background: var(--red-light); border-top-color: var(--red); }
+    .metric-value { font-family: 'JetBrains Mono', monospace; font-size: calc(20px * var(--font-scale)); font-weight: 700; line-height: 1; }
+    .metric-label { font-size: calc(8.5px * var(--font-scale)); color: var(--muted); margin-top: 1mm; }
 
-         <div class="metrics-grid">
-           <div class="metric-card">
-             <div class="metric-value">100%</div>
-             <div class="metric-label">Source Citation Rate</div>
-           </div>
-           <div class="metric-card">
-             <div class="metric-value">7</div>
-             <div class="metric-label">Supported Agents</div>
-           </div>
-         </div>
-       </section>
+    /* Highlight box */
+    .highlight-box {
+      background: var(--blue-light); border-left: 3px solid var(--blue);
+      padding: 3mm 4mm; border-radius: 0 var(--radius) var(--radius) 0; margin: 2.5mm 0;
+    }
+    .highlight-box p { margin: 0; font-size: calc(11px * var(--font-scale)); }
 
-       <!-- METHOD -->
-       <section class="section section-method">
-         <div class="section-header">
-           <span class="section-pill">
-             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M4 15h16"/><path d="M4 11h16"/><path d="M4 7h16"/></svg>
-             Method
-           </span>
-           <h2 class="section-title">Structured agent pipeline</h2>
-           <p class="section-desc">Each run converts an open-ended request into validated, queryable research blocks.</p>
-         </div>
+    /* Method steps */
+    .method-step {
+      display: flex; gap: 2.5mm; padding: 2.5mm 0; border-bottom: 1px solid var(--border);
+    }
+    .method-step:last-child { border-bottom: none; }
+    .method-step-num {
+      font-family: 'JetBrains Mono', monospace; font-size: calc(10px * var(--font-scale));
+      font-weight: 600; color: var(--blue); min-width: 5mm; padding-top: 0.5mm;
+    }
+    .method-step-text { flex: 1; }
+    .method-step-text strong { display: block; font-size: calc(11px * var(--font-scale)); margin-bottom: 0.5mm; }
+    .method-step-text span { font-size: calc(10px * var(--font-scale)); color: var(--muted); }
 
-         <div class="method-list">
-           <div class="method-item">
-             <strong>1. Parse intent</strong>
-             <span>Extract ticker set, horizon, portfolio context, and risk questions.</span>
-           </div>
-           <div class="method-item">
-             <strong>2. Gather evidence</strong>
-             <span>Fetch filings, prices, fundamentals, news, and macro context through typed tools.</span>
-           </div>
-           <div class="method-item">
-             <strong>3. Validate blocks</strong>
-             <span>Reject missing citations, probability drift, weak stance logic, and unresolved uncertainty.</span>
-           </div>
-           <div class="method-item">
-             <strong>4. Assemble report</strong>
-             <span>Store source links, scenario tables, thesis bullets, and final stance locally.</span>
-           </div>
-         </div>
-       </section>
+    /* Flow diagram */
+    .flow-row { display: flex; align-items: center; gap: 2mm; margin: 2.5mm 0; flex-wrap: wrap; }
+    .flow-step {
+      background: var(--ink); color: #fff; padding: 2mm 3.5mm; border-radius: var(--radius);
+      font-size: calc(9px * var(--font-scale)); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .flow-arrow { color: var(--muted); font-size: calc(14px * var(--font-scale)); }
 
-       <!-- HOW IT WORKS -->
-       <section class="section section-steps">
-         <div class="section-header">
-           <span class="section-pill">
-             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-             How it works
-           </span>
-           <h2 class="section-title">Three steps. Then you read.</h2>
-         </div>
+    /* Risk table */
+    .risk-severity {
+      font-family: 'JetBrains Mono', monospace; font-size: calc(8.5px * var(--font-scale));
+      font-weight: 600; padding: 1mm 2mm; border-radius: 3px; text-transform: uppercase;
+    }
+    .risk-severity.high { background: var(--red-light); color: var(--red); }
+    .risk-severity.med { background: var(--amber-light); color: var(--amber); }
 
-         <div class="how-grid">
-           <div class="how-step">
-             <div class="how-step-number">01</div>
-             <div class="how-step-title">Ask or add a portfolio</div>
-             <p class="how-step-desc">Plain English. "Compare NVDA to AMD." Or add a portfolio and ask where the risk points are.</p>
-           </div>
-           <div class="how-step">
-             <div class="how-step-number">02</div>
-             <div class="how-step-title">Pick your agent</div>
-             <p class="how-step-desc">Infi detects coding agents on your machine — Claude, Codex, Gemini, or your own. Uses the agent's own auth.</p>
-           </div>
-           <div class="how-step">
-             <div class="how-step-number">03</div>
-             <div class="how-step-title">Read the report</div>
-             <p class="how-step-desc">Thesis, key numbers, risks, scenarios, stance. Saved on your machine.</p>
-           </div>
-         </div>
+    /* Validation grid */
+    .validation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5mm; margin: 2.5mm 0; }
+    .validation-item {
+      padding: 2.5mm; border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .validation-item .num {
+      font-family: 'JetBrains Mono', monospace; font-size: calc(9px * var(--font-scale));
+      color: var(--blue); font-weight: 600;
+    }
+    .validation-item strong { display: block; font-size: calc(10.5px * var(--font-scale)); margin: 0.5mm 0; }
+    .validation-item p { font-size: calc(9.5px * var(--font-scale)); color: var(--muted); margin: 0; }
 
-         <div class="workflow-notes">
-           <div>
-             <strong>Agent adapters</strong>
-             <span>ACP-compatible sessions launch Claude Code, Codex, Gemini CLI, Qwen, Mistral, Kimi, OpenCode, or a custom binary with the user's local credentials.</span>
-           </div>
-           <div>
-             <strong>Local storage</strong>
-             <span>Reports, citations, tool calls, and validation outcomes are persisted in SQLite, with secrets delegated to the operating-system keychain.</span>
-           </div>
-           <div>
-             <strong>Inspectable trail</strong>
-             <span>Each output block keeps the tool call, source URL, source title, retrieval time, and confidence so readers can audit the conclusion.</span>
-           </div>
-         </div>
-       </section>
+    /* Tool strip */
+    .tool-strip {
+      display: flex; flex-wrap: wrap; gap: 2mm; margin: 2.5mm 0;
+    }
+    .tool-strip span {
+      font-family: 'JetBrains Mono', monospace; font-size: calc(8.5px * var(--font-scale));
+      background: #f1f3f5; padding: 1.5mm 2.5mm; border-radius: 3px; white-space: nowrap;
+    }
 
-       <!-- RESEARCH REPORT — Screenshots -->
-       <section class="section section-report">
-         <div class="section-header">
-           <span class="section-pill">
-             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2
- 14 8 20 8"/></svg>
-             Research report
-           </span>
-           <h2 class="section-title">Research output with sources attached</h2>
-           <p class="section-desc">Every report is organized into sections you can read, check, and come back to later.</p>
-         </div>
+    /* Features grid */
+    .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .feature-item {
+      padding: 3mm; border: 1px solid var(--border);
+    }
+    .feature-dot {
+      display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--blue); margin-right: 2mm; vertical-align: middle;
+    }
+    .feature-dot.amber { background: var(--amber); }
+    .feature-num { font-size: calc(8.5px * var(--font-scale)); color: var(--muted); }
+    .feature-title { font-size: calc(11px * var(--font-scale)); font-weight: 600; margin: 1mm 0; }
+    .feature-desc { font-size: calc(9.5px * var(--font-scale)); color: var(--muted); }
 
-         <div class="image-pair">
-           <div class="image-card" style="height: 94mm;">
-             <div class="image-card-label">
-               <p>Workbench and generated report</p>
-             </div>
-             <div class="image-card-content">
-               <img class="poster-asset poster-asset-workbench" src="./assets/infi-poster-workbench-generated.png" alt="Generated Infi workbench report screen">
-             </div>
-           </div>
-           <div class="image-card" style="height: 94mm;">
-             <div class="image-card-label">
-               <p>Validation gates before storage</p>
-             </div>
-             <div class="image-card-content">
-               <img class="poster-asset poster-asset-validation" src="./assets/infi-poster-validation.png" alt="MCP validation gate flow">
-             </div>
-           </div>
-         </div>
-       </section>
+    /* Coverage grid */
+    .coverage-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2mm; margin: 2.5mm 0; }
+    .coverage-item {
+      padding: 2.5mm; border: 1px solid var(--border); border-radius: var(--radius); text-align: center;
+    }
+    .coverage-item strong { display: block; font-size: calc(9.5px * var(--font-scale)); }
+    .coverage-item span { font-size: calc(8.5px * var(--font-scale)); color: var(--muted); }
 
-       <!-- SOCIAL & ETHICAL ISSUES -->
-       <section class="section section-ethics">
-         <div class="section-header">
-           <span class="section-pill">
-             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12
- 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-             Social & Ethical Issues
-           </span>
-           <h2 class="section-title">Risks & Mitigation</h2>
-         </div>
+    /* Screenshot pair */
+    .screenshot-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5mm; margin: 2.5mm 0; }
+    .screenshot-item { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+    .screenshot-item img { width: 100%; display: block; }
+    .screenshot-caption {
+      font-size: calc(8.5px * var(--font-scale)); color: var(--muted); text-align: center;
+      padding: 1.5mm 2mm; background: #fafbfc;
+    }
 
-         <table class="risk-table">
-           <thead>
-             <tr>
-               <th>Risk</th>
-               <th>Severity</th>
-               <th>Mitigation</th>
-             </tr>
-           </thead>
-           <tbody>
-             <tr>
-               <td><strong>Investment Harm</strong></td>
-               <td class="risk-severity high">HIGH</td>
-               <td>Mandatory disclaimer on every report</td>
-             </tr>
-             <tr>
-               <td><strong>Data Privacy</strong></td>
-               <td class="risk-severity high">HIGH</td>
-               <td>Local-first: SQLite + OS keychain, zero telemetry</td>
-             </tr>
-             <tr>
-               <td><strong>AI Hallucination</strong></td>
-               <td class="risk-severity medium">MED</td>
-               <td>MCP validation gates enforce evidence chains</td>
-             </tr>
-             <tr>
-               <td><strong>Algorithmic Bias</strong></td>
-               <td class="risk-severity medium">MED</td>
-               <td>Multi-agent cross-validation, transparent sources</td>
-             </tr>
-           </tbody>
-         </table>
+    /* References */
+    .ref-list { list-style: none; padding: 0; }
+    .ref-list li {
+      font-size: calc(9px * var(--font-scale)); margin-bottom: 1.5mm; padding-left: 7mm;
+      position: relative; line-height: 1.4;
+    }
+    .ref-list .ref-num {
+      position: absolute; left: 0; font-family: 'JetBrains Mono', monospace;
+      font-weight: 600; color: var(--blue); font-size: calc(8.5px * var(--font-scale));
+    }
 
-         <div class="highlight-box">
-           <p><strong>Safety-First:</strong> "Research only. Not investment advice." — embedded in every FinalStance.</p>
-         </div>
-       </section>
-       <!-- BACKGROUND -->
-       <section class="section section-background">
-         <div class="section-header">
-           <span class="section-pill">
-             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2
- 4-4"/></svg>
-             Background
-           </span>
-           <h2 class="section-title">Problem & Context</h2>
-         </div>
+    /* Footer */
+    .poster-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5mm 20mm; border-top: 2px solid var(--ink);
+      font-size: calc(9px * var(--font-scale)); color: var(--muted);
+      background: #fff;
+    }
+    .poster-footer .logo { font-weight: 700; font-size: calc(14px * var(--font-scale)); color: var(--ink); }
+    .poster-footer a { color: var(--blue); text-decoration: none; }
 
-         <h3>Problem Statement</h3>
-         <ol>
-           <li><strong>Fragmentation:</strong> Analysts manually switch between 15+ data sources per report</li>
-           <li><strong>Opacity:</strong> AI tools are black boxes — users cannot verify reasoning or data sources</li>
-           <li><strong>Unstructured Output:</strong> Free-form text requires manual reformatting</li>
-         </ol>
+    /* Drop zones */
+    .drop-zone {
+      height: 3mm; margin: 1mm 0; border: 2px dashed transparent;
+      border-radius: var(--radius); transition: all 0.15s;
+    }
+    .drop-zone.active { border-color: var(--blue); background: rgba(37, 99, 235, 0.06); }
 
-         <div class="metrics-grid">
-           <div class="metric-card" style="border-top: 3px solid var(--stance-bearish);">
-             <div class="metric-value">20-30h</div>
-             <div class="metric-label">Per Research Report</div>
-           </div>
-           <div class="metric-card" style="border-top: 3px solid var(--stance-mixed);">
-             <div class="metric-value">70%</div>
-             <div class="metric-label">Retail Investors Lose</div>
-           </div>
-         </div>
+    /* Print */
+    @media print {
+      .poster-toolbar { display: none !important; }
+      body { background: none; padding: 0; }
+      .poster-shell { box-shadow: none; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useCallback, useRef, useEffect } = React;
 
-         <div class="accent-bar"></div>
+// ─── IMAGE PATHS (relative to poster/index.html) ──────────────────────
+const IMG = {
+  agents: '../assets/agents/',
+  screenshots: '../assets/screenshots/',
+  landing: '../landing/assets/',
+  icons: '../landing/assets/icons/',
+  posterAssets: './assets/',
+};
 
-         <h3>Solution Approach</h3>
-         <div class="flow">
-           <div class="flow-step">1. ORCHESTRATE</div>
-           <div class="flow-arrow">→</div>
-           <div class="flow-step">2. STRUCTURE</div>
-           <div class="flow-arrow">→</div>
-           <div class="flow-step">3. VERIFY</div>
-           <div class="flow-arrow">→</div>
-           <div class="flow-step">4. PRESENT</div>
-         </div>
-       </section>
+// ─── CARD REGISTRY ────────────────────────────────────────────────────
+const CARD_REGISTRY = {
+  idea: {
+    title: "Making Investment Research Transparent",
+    pill: "Idea",
+    color: "#eff6ff",
+    body: `
+      <div class="highlight-box">
+        <p><strong>Infi</strong> (Invest with Intelligence) is an AI-powered desktop app that centralizes financial data, visualizes trading history, and provides predictive insights — tailored for novice investors. It orchestrates AI coding agents to fetch real-time data, structure every claim as a source-backed block, and assemble comprehensive reports, all running locally.</p>
+      </div>
+      <h3>Key Innovation</h3>
+      <p>The agent <strong>never emits free-form prose</strong> as the final output. Every claim must be submitted through typed MCP (Model Context Protocol) tools with validation gates ensuring evidence chains, probability consistency, and stance coherence.</p>
+      <h3>Unique Selling Points</h3>
+      <ul>
+        <li><strong>AI Data Translator:</strong> Reads complex financial charts and explains them in plain, jargon-free language</li>
+        <li><strong>All-in-One Visual Hub:</strong> Replaces cluttered spreadsheets with user-friendly dashboards</li>
+        <li><strong>Real-time Chatbot:</strong> Responds to inquiries and flags uncertainties in financial analysis</li>
+      </ul>
+      <div class="metrics-row">
+        <div class="metric-box"><div class="metric-value">100%</div><div class="metric-label">Source Citation Rate</div></div>
+        <div class="metric-box green"><div class="metric-value">7</div><div class="metric-label">Supported Agents</div></div>
+      </div>
+    `
+  },
+  background: {
+    title: "Problem & Context",
+    pill: "Background",
+    color: "#fef2f2",
+    body: `
+      <h3>Vietnam's Financial Market Boom</h3>
+      <p>Vietnam added <strong>2.6 million securities accounts</strong> in 2025 alone, surpassing the 2030 target of 11 million. As of Dec 2025, <strong>11.8 million trading accounts</strong> exist — ~11% of the population. Nearly <strong>75% of stock investors are under 35</strong>.</p>
+      <div class="metrics-row">
+        <div class="metric-box red"><div class="metric-value">24%</div><div class="metric-label">Financially Literate (rank 118/144)</div></div>
+        <div class="metric-box amber"><div class="metric-value">90%</div><div class="metric-label">Daily Trading by Retail</div></div>
+      </div>
+      <div class="metrics-row">
+        <div class="metric-box red"><div class="metric-value">95%</div><div class="metric-label">Retail Traders Fail to Profit</div></div>
+        <div class="metric-box amber"><div class="metric-value">20%+</div><div class="metric-label">Annual Account Growth</div></div>
+      </div>
+      <h3>Why Current Tools Fail</h3>
+      <ul>
+        <li><strong>Information Overload:</strong> Complex interfaces and massive raw data overwhelm beginners</li>
+        <li><strong>No Interpretation:</strong> Beginners cannot analyze the numbers provided</li>
+        <li><strong>Not Actionable:</strong> Data does not lead to clear decision-making</li>
+        <li><strong>Herd Behaviour & FOMO:</strong> 80–90% of retail day traders lose money following unverified tips</li>
+      </ul>
+      <h3>Core Problem Statement</h3>
+      <ol>
+        <li><strong>Fragmentation:</strong> Analysts switch between 15+ data sources per report</li>
+        <li><strong>Opacity:</strong> AI tools are black boxes — users cannot verify reasoning or data</li>
+        <li><strong>Unstructured Output:</strong> Free-form text requires manual reformatting</li>
+      </ol>
+      <h3>Solution Approach</h3>
+      <div class="flow-row">
+        <div class="flow-step">1. ORCHESTRATE</div><div class="flow-arrow">→</div>
+        <div class="flow-step">2. STRUCTURE</div><div class="flow-arrow">→</div>
+        <div class="flow-step">3. VERIFY</div><div class="flow-arrow">→</div>
+        <div class="flow-step">4. PRESENT</div>
+      </div>
+    `
+  },
+  method: {
+    title: "Structured Agent Pipeline",
+    pill: "Method",
+    color: "#fffbeb",
+    body: `
+      <p>Each run converts an open-ended request into validated, queryable research blocks.</p>
+      <div class="method-step"><div class="method-step-num">01</div><div class="method-step-text"><strong>Parse intent</strong><span>Extract ticker set, horizon, portfolio context, and risk questions.</span></div></div>
+      <div class="method-step"><div class="method-step-num">02</div><div class="method-step-text"><strong>Gather evidence</strong><span>Fetch filings, prices, fundamentals, news, and macro context through typed tools.</span></div></div>
+      <div class="method-step"><div class="method-step-num">03</div><div class="method-step-text"><strong>Validate blocks</strong><span>Reject missing citations, probability drift, weak stance logic, and unresolved uncertainty.</span></div></div>
+      <div class="method-step"><div class="method-step-num">04</div><div class="method-step-text"><strong>Assemble report</strong><span>Store source links, scenario tables, thesis bullets, and final stance locally.</span></div></div>
+    `
+  },
+  howitworks: {
+    title: "Three Steps. Then You Read.",
+    pill: "How It Works",
+    color: "#f0fdf4",
+    body: `
+      <img src="${IMG.landing}new-analysis-poster.webp" alt="Analysis workflow" />
+      <div class="method-step"><div class="method-step-num">01</div><div class="method-step-text"><strong>Ask or add a portfolio</strong><span>Plain English. "Compare NVDA to AMD." Or add a portfolio and ask where the risk points are.</span></div></div>
+      <div class="method-step"><div class="method-step-num">02</div><div class="method-step-text"><strong>Pick your agent</strong><span>Infi detects coding agents on your machine — Claude, Codex, Gemini, or your own. Uses the agent's own auth.</span></div></div>
+      <div class="method-step"><div class="method-step-num">03</div><div class="method-step-text"><strong>Read the report</strong><span>Thesis, key numbers, risks, scenarios, stance. Saved on your machine.</span></div></div>
+      <h3>The Hidden Gap We Fill</h3>
+      <table>
+        <tr><th>Existing Stock Apps</th><th>Infi</th></tr>
+        <tr><td>Focus on transaction & execution</td><td>Focus on education & validation</td></tr>
+        <tr><td>Complex technical charts & tools</td><td>Simplified insights & recommendations</td></tr>
+        <tr><td>High barrier to entry for beginners</td><td>User-friendly for F0 investors</td></tr>
+      </table>
+      <p><em>"We don't replace brokers. We empower the next generation of investors to use them effectively."</em></p>
+      <h3>Key Design Choices</h3>
+      <p><strong>Tiny footprint</strong> — ~10 MB bundle, 5 MB RAM, &lt;1s startup. Uses OS native webview.</p>
+      <p><strong>Agent adapters</strong> — ACP-compatible sessions launch any coding agent with the user's own auth.</p>
+      <p><strong>Inspectable trail</strong> — Each output block keeps tool call, source URL, retrieval time, and confidence.</p>
+    `
+  },
+  research: {
+    title: "Research Output with Sources Attached",
+    pill: "Research Report",
+    color: "#eff6ff",
+    body: `
+      <p>Every report is organized into sections you can read, check, and come back to later. Numbers and claims keep their citations.</p>
+      <div class="screenshot-pair">
+        <div class="screenshot-item">
+          <img src="${IMG.screenshots}analysis-thesis.png" alt="Thesis section" />
+          <div class="screenshot-caption">Thesis with supporting evidence</div>
+        </div>
+        <div class="screenshot-item">
+          <img src="${IMG.screenshots}analysis-projection.png" alt="Projections" />
+          <div class="screenshot-caption">Price projections with scenarios</div>
+        </div>
+      </div>
+      <div class="screenshot-pair">
+        <div class="screenshot-item">
+          <img src="${IMG.screenshots}analysis-sources.png" alt="Sources panel" />
+          <div class="screenshot-caption">Sources behind every claim</div>
+        </div>
+        <div class="screenshot-item">
+          <img src="${IMG.screenshots}analysis-scenario-matrix.png" alt="Scenario matrix" />
+          <div class="screenshot-caption">Scenario cases side by side</div>
+        </div>
+      </div>
+      <div class="screenshot-pair">
+        <div class="screenshot-item">
+          <img src="${IMG.screenshots}analysis-final-stance.png" alt="Final stance" />
+          <div class="screenshot-caption">Final stance with confidence</div>
+        </div>
+        <div class="screenshot-item">
+          <img src="${IMG.screenshots}analysis-data-points.png" alt="Data points" />
+          <div class="screenshot-caption">Structured data points with sources</div>
+        </div>
+      </div>
+    `
+  },
+  portfolio: {
+    title: "Portfolio Reviews",
+    pill: "Portfolio",
+    color: "#f0fdf4",
+    body: `
+      <p>Add the positions you want reviewed. Reports cover material positions, allocation, risk, and scenario options.</p>
+      <div class="screenshot-pair">
+        <div class="screenshot-item">
+          <img src="${IMG.screenshots}portfolio-risk.png" alt="Portfolio risk" />
+          <div class="screenshot-caption">Risk exposures and macro sensitivities</div>
+        </div>
+        <div class="screenshot-item">
+          <img src="${IMG.screenshots}portfolio-rebalancing-scenarios.png" alt="Rebalancing" />
+          <div class="screenshot-caption">Rebalancing scenarios</div>
+        </div>
+      </div>
+      <h3>What Each Portfolio Report Includes</h3>
+      <div class="feature-grid">
+        <div class="feature-item"><div><span class="feature-dot"></span><span class="feature-num">01 · Holdings</span></div><div class="feature-title">Per-position review</div><div class="feature-desc">Keep, Trim, Add, Watch, or Exit with rationale.</div></div>
+        <div class="feature-item"><div><span class="feature-dot amber"></span><span class="feature-num">02 · Risk</span></div><div class="feature-title">Factor exposures</div><div class="feature-desc">Concentration, sector, and macro risks.</div></div>
+        <div class="feature-item"><div><span class="feature-dot"></span><span class="feature-num">03 · Allocation</span></div><div class="feature-title">Current vs. suggested</div><div class="feature-desc">Weight comparison with reasoning.</div></div>
+        <div class="feature-item"><div><span class="feature-dot amber"></span><span class="feature-num">04 · Scenarios</span></div><div class="feature-title">Portfolio outcomes</div><div class="feature-desc">Bull/base/bear portfolio returns.</div></div>
+      </div>
+    `
+  },
+  architecture: {
+    title: "Technical Architecture",
+    pill: "Architecture",
+    color: "#eff6ff",
+    body: `
+      <img src="${IMG.posterAssets}infi-poster-architecture.png" alt="Architecture diagram" />
+      <div class="tool-strip">
+        <span>21+ typed MCP tools</span>
+        <span>Evidence chain</span>
+        <span>Probability sum</span>
+        <span>Stance coherence</span>
+        <span>Blocking uncertainty</span>
+      </div>
+      <h3>Domain Types</h3>
+      <table>
+        <tr><th>Type</th><th>Purpose</th></tr>
+        <tr><td><code>Analysis</code></td><td>Top-level record: id, title, prompt, intent, status</td></tr>
+        <tr><td><code>FinalStance</code></td><td>Bullish/Neutral/Bearish/Mixed with confidence</td></tr>
+        <tr><td><code>Projection</code></td><td>Bull/base/bear price targets with probabilities</td></tr>
+        <tr><td><code>MetricSnapshot</code></td><td>Normalized metric with source and timestamp</td></tr>
+        <tr><td><code>AnalysisBlock</code></td><td>Typed prose: Thesis, Risks, Valuation, etc.</td></tr>
+      </table>
+    `
+  },
+  validation: {
+    title: "What Gets Blocked",
+    pill: "Validation",
+    color: "#fef2f2",
+    body: `
+      <div class="validation-grid">
+        <div class="validation-item"><div class="num">01</div><strong>Evidence chain</strong><p>Claims must include original sources.</p></div>
+        <div class="validation-item"><div class="num">02</div><strong>Probability sum</strong><p>Scenario weights must sum to 1.0 (±0.02).</p></div>
+        <div class="validation-item"><div class="num">03</div><strong>Stance coherence</strong><p>Final stance cannot contradict high-confidence risk blocks.</p></div>
+        <div class="validation-item"><div class="num">04</div><strong>Open questions</strong><p>High-impact uncertainty blocks final recommendation language.</p></div>
+      </div>
+      <h3>MCP Tool Surface</h3>
+      <p><strong>15 research tools</strong> — submit_source, submit_metric_snapshot, submit_analysis_block, submit_final_stance, submit_projection, submit_counter_thesis, submit_uncertainty_ledger, finalize_analysis, and more.</p>
+      <p><strong>6 portfolio tools</strong> — submit_holding_review, submit_allocation_review, submit_portfolio_risk, submit_rebalancing_suggestion, submit_portfolio_scenario_analysis, submit_portfolio_expected_return_model.</p>
+    `
+  },
+  features: {
+    title: "What Each Report Includes",
+    pill: "Features",
+    color: "#fffbeb",
+    body: `
+      <div class="feature-grid">
+        <div class="feature-item"><div><span class="feature-dot"></span><span class="feature-num">01 · Evidence</span></div><div class="feature-title">Every claim has a source</div><div class="feature-desc">Numbers and claims keep their citations so you can verify.</div></div>
+        <div class="feature-item"><div><span class="feature-dot amber"></span><span class="feature-num">02 · Stance</span></div><div class="feature-title">A clear final stance</div><div class="feature-desc">Bullish, bearish, mixed, or neutral — with confidence and reasons.</div></div>
+        <div class="feature-item"><div><span class="feature-dot"></span><span class="feature-num">03 · Scenarios</span></div><div class="feature-title">Scenario cases side by side</div><div class="feature-desc">Base, upside, and downside cases stored as separate sections.</div></div>
+        <div class="feature-item"><div><span class="feature-dot"></span><span class="feature-num">04 · Private</span></div><div class="feature-title">Stays on your computer</div><div class="feature-desc">No account, no telemetry, no cloud sync. Keys in OS keychain.</div></div>
+        <div class="feature-item"><div><span class="feature-dot"></span><span class="feature-num">05 · Sources</span></div><div class="feature-title">12 data providers built in</div><div class="feature-desc">SEC EDGAR, Alpha Vantage, Polygon, Finnhub, Yahoo Finance, and more.</div></div>
+        <div class="feature-item"><div><span class="feature-dot amber"></span><span class="feature-num">06 · Portfolio</span></div><div class="feature-title">Portfolio reviews</div><div class="feature-desc">Position reviews, allocation notes, risk notes, and scenario options.</div></div>
+        <div class="feature-item"><div><span class="feature-dot"></span><span class="feature-num">07 · Metrics</span></div><div class="feature-title">Structured numbers</div><div class="feature-desc">P/E, EPS, margins, ROE — typed snapshots with source and timestamp.</div></div>
+        <div class="feature-item"><div><span class="feature-dot amber"></span><span class="feature-num">08 · Counter-thesis</span></div><div class="feature-title">The case against your direction</div><div class="feature-desc">Strongest argument against the chosen stance, so you see both sides.</div></div>
+        <div class="feature-item"><div><span class="feature-dot"></span><span class="feature-num">09 · Explanations</span></div><div class="feature-title">Terms explained in plain language</div><div class="feature-desc">Second pass explains every metric — P/E, CASA, NIM, EBITDA.</div></div>
+        <div class="feature-item"><div><span class="feature-dot amber"></span><span class="feature-num">10 · Validation</span></div><div class="feature-title">Cross-field coherence checks</div><div class="feature-desc">Evidence chains, probability sums, and stance coherence verified.</div></div>
+        <div class="feature-item"><div><span class="feature-dot"></span><span class="feature-num">11 · Holdings</span></div><div class="feature-title">Per-position review</div><div class="feature-desc">Keep, Trim, Add, Watch, or Exit — with rationale tied to research.</div></div>
+        <div class="feature-item"><div><span class="feature-dot amber"></span><span class="feature-num">12 · CSV Import</span></div><div class="feature-title">Import from any spreadsheet</div><div class="feature-desc">Upload CSV positions; auto-resolves symbols, no manual re-entry.</div></div>
+      </div>
+    `
+  },
+  ethics: {
+    title: "Risks & Mitigation",
+    pill: "Social & Ethical",
+    color: "#fef2f2",
+    body: `
+      <table>
+        <tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
+        <tr><td><strong>Investment Harm</strong></td><td><span class="risk-severity high">HIGH</span></td><td>Mandatory disclaimer: "Research only. Not investment advice."</td></tr>
+        <tr><td><strong>Data Privacy</strong></td><td><span class="risk-severity high">HIGH</span></td><td>Local-first: SQLite + OS keychain, zero telemetry, zero cloud sync</td></tr>
+        <tr><td><strong>AI Hallucination</strong></td><td><span class="risk-severity med">MED</span></td><td>MCP validation gates enforce evidence chains; blocking uncertainties</td></tr>
+        <tr><td><strong>Algorithmic Bias</strong></td><td><span class="risk-severity med">MED</span></td><td>Multi-agent cross-validation; transparent source citations</td></tr>
+        <tr><td><strong>Accessibility</strong></td><td><span class="risk-severity med">LOW</span></td><td>Desktop-only for now; responsive web version on roadmap</td></tr>
+        <tr><td><strong>Black Box Trust</strong></td><td><span class="risk-severity med">MED</span></td><td>Every claim is verifiable; inspectable trail with source URLs</td></tr>
+      </table>
+      <h3>Key Safeguards</h3>
+      <ul>
+        <li>Agent is a <strong>research worker</strong>, not a report writer — output is controlled via typed MCP tools</li>
+        <li><strong>Two-pass system:</strong> Pass 1 for research depth, Pass 2 for plain-language explanations</li>
+        <li><strong>Hedge detection:</strong> Jaccard similarity check on key_reasons vs. what_would_change</li>
+        <li><strong>Blocking uncertainty:</strong> High-confidence stances blocked when open questions exist</li>
+      </ul>
+    `
+  },
+  agents: {
+    title: "Supported Agents",
+    pill: "Agents",
+    color: "#eff6ff",
+    body: `
+      <table>
+        <tr><th>Agent</th><th>Binary</th><th>Model Override</th></tr>
+        <tr><td><strong>Claude Code</strong></td><td><code>npx @zed-industries/claude-code-acp</code></td><td><code>--model &lt;id&gt;</code></td></tr>
+        <tr><td><strong>Codex</strong></td><td><code>npx @zed-industries/codex-acp@latest</code></td><td><code>-c model=&lt;id&gt;</code></td></tr>
+        <tr><td><strong>Gemini CLI</strong></td><td><code>gemini</code></td><td><code>--model &lt;id&gt;</code></td></tr>
+        <tr><td><strong>Qwen</strong></td><td><code>qwen</code></td><td><code>--model &lt;id&gt;</code></td></tr>
+        <tr><td><strong>Kimi</strong></td><td><code>kimi</code></td><td><code>--model &lt;id&gt;</code></td></tr>
+        <tr><td><strong>Mistral</strong></td><td><code>vibe-acp</code></td><td>Not supported</td></tr>
+        <tr><td><strong>OpenCode</strong></td><td><code>opencode</code></td><td><code>--model &lt;id&gt;</code></td></tr>
+        <tr><td><strong>Custom</strong></td><td>User-configured</td><td>Not supported</td></tr>
+      </table>
+      <h3>Agent Discovery</h3>
+      <p>Look up agent by id → fall back to first available → validate model → build command → spawn with <code>kill_on_drop(true)</code> and own process group.</p>
+    `
+  },
+  comparison: {
+    title: "Prior Work, Development & Evaluation",
+    pill: "Research",
+    color: "#fffbeb",
+    body: `
+      <h3>Prior Work & Existing Solutions</h3>
+      <table>
+        <tr><th>Solution</th><th>Limitation</th></tr>
+        <tr><td><strong>Bloomberg Terminal</strong></td><td>$24,000/year; opaque analytics; cloud-dependent</td></tr>
+        <tr><td><strong>ChatGPT/Claude for finance</strong></td><td>Free-form text; hallucinations; no source citations</td></tr>
+        <tr><td><strong>Yahoo Finance, Seeking Alpha</strong></td><td>Manual research; no AI orchestration</td></tr>
+        <tr><td><strong>FinGPT, FinRL (Academic)</strong></td><td>Research prototypes; no production UI</td></tr>
+      </table>
+      <p><strong>Key Gap:</strong> No existing solution combines multi-agent AI orchestration, structured typed output, source-backed claims, and local-first privacy.</p>
+      <h3>Development Iterations</h3>
+      <table>
+        <tr><th>Version</th><th>Milestone</th></tr>
+        <tr><td><code>v0.1</code></td><td>Single-agent proof-of-concept with hardcoded Yahoo Finance data</td></tr>
+        <tr><td><code>v0.5</code></td><td>MCP server architecture with 5 data providers</td></tr>
+        <tr><td><code>v0.9</code></td><td>Multi-agent support (7 agents), 12 data providers, portfolio analysis</td></tr>
+        <tr><td><code>v1.0</code></td><td>Full UI with editorial design system, HTML/Markdown export</td></tr>
+      </table>
+      <h3>Evaluation Metrics</h3>
+      <table>
+        <tr><th>Metric</th><th>Target</th><th>Current</th></tr>
+        <tr><td>Source citation rate</td><td>100% of claims</td><td>100% (enforced by MCP)</td></tr>
+        <tr><td>Analysis completion time</td><td>&lt; 10 min</td><td>~5–8 min average</td></tr>
+        <tr><td>Data freshness</td><td>&lt; 7 days for stance metrics</td><td>Enforced by freshness gate</td></tr>
+        <tr><td>Agent compatibility</td><td>5+ agents</td><td>7 agents supported</td></tr>
+        <tr><td>Report structure compliance</td><td>100% typed blocks</td><td>No free-form final output</td></tr>
+      </table>
+      <h3>User Pain Points Addressed</h3>
+      <ul>
+        <li><strong>60–80%</strong> of analyst time spent on data gathering, not analysis</li>
+        <li>Only <strong>23%</strong> of financial professionals trust AI-generated analysis (Refinitiv 2024)</li>
+        <li>SEC increasing scrutiny on AI-driven investment recommendations</li>
+      </ul>
+    `
+  },
+  references: {
+    title: "Academic & Technical Sources",
+    pill: "References",
+    color: "#f8f9fa",
+    body: `
+      <ol class="ref-list">
+        <li><span class="ref-num">[1]</span> Agent Client Protocol (ACP) Specification, Zed Industries, 2024. <code>zed.dev/blog/agent-client-protocol</code></li>
+        <li><span class="ref-num">[2]</span> Model Context Protocol (MCP), Anthropic, 2024. <code>modelcontextprotocol.io</code></li>
+        <li><span class="ref-num">[3]</span> Yang et al., "FinGPT: Open-Source Financial LLMs," arXiv:2306.06031, 2023.</li>
+        <li><span class="ref-num">[4]</span> Lewis et al., "Retrieval-Augmented Generation," NeurIPS 2020.</li>
+        <li><span class="ref-num">[5]</span> Wei et al., "Chain-of-Thought Prompting," NeurIPS 2022.</li>
+        <li><span class="ref-num">[6]</span> Tauri 2 Documentation. <code>v2.tauri.app</code></li>
+        <li><span class="ref-num">[7]</span> Rust Programming Language. <code>doc.rust-lang.org/book</code></li>
+        <li><span class="ref-num">[8]</span> SEC EDGAR API. <code>sec.gov/edgar</code></li>
+        <li><span class="ref-num">[9]</span> Alpha Vantage API. <code>alphavantage.co</code></li>
+        <li><span class="ref-num">[10]</span> PMCP Crate. <code>docs.rs/pmcp</code></li>
+        <li><span class="ref-num">[11]</span> S&P Global Financial Literacy Survey. Vietnam: 24% financially literate.</li>
+        <li><span class="ref-num">[12]</span> Visa Financial Literacy Survey. 90% daily trading by retail investors.</li>
+        <li><span class="ref-num">[13]</span> VinaCapital, 2024. 95% of retail traders fail to sustain profits.</li>
+        <li><span class="ref-num">[14]</span> Refinitiv 2024 Survey. Only 23% of financial professionals trust AI analysis.</li>
+        <li><span class="ref-num">[15]</span> InfoQ Vietnam. Stock investor age structure: 75% under 35.</li>
+        <li><span class="ref-num">[16]</span> Brad Frost, "Atomic Design Methodology," 2016. <code>atomicdesign.bradfrost.com</code></li>
+      </ol>
+    `
+  }
+};
 
-       <!-- DATA -->
-       <section class="section section-data">
-         <div class="section-header">
-           <span class="section-pill">
-             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
-             Data
-           </span>
-           <h2 class="section-title">Evidence coverage</h2>
-         </div>
+// ─── DEFAULT LAYOUT (2 columns) ───────────────────────────────────────
+const DEFAULT_LAYOUT = {
+  columns: [
+    { id: 'col1', cards: ['idea', 'background', 'method', 'howitworks', 'research'] },
+    { id: 'col2', cards: ['portfolio', 'architecture', 'features', 'validation', 'ethics', 'agents', 'comparison', 'references'] }
+  ]
+};
 
-         <div class="coverage-grid">
-           <div><strong>SEC filings</strong><span>10-K, 10-Q, 8-K</span></div>
-           <div><strong>Market data</strong><span>Prices, ratios, volume</span></div>
-           <div><strong>News</strong><span>Recent catalysts</span></div>
-           <div><strong>Portfolio</strong><span>Allocation and exposure</span></div>
-           <div><strong>Scenarios</strong><span>Base, upside, downside</span></div>
-           <div><strong>Stance</strong><span>Confidence and blockers</span></div>
-         </div>
-       </section>
+const DEFAULT_LOGOS = [
+  { src: '../landing/assets/icons/icon.png', height: 28 },
+  { src: '../assets/agents/claude.svg', height: 18 },
+  { src: '../assets/agents/codex.svg', height: 18 },
+  { src: '../assets/agents/gemini.svg', height: 18 },
+];
 
-       <!-- PROPOSAL — Features -->
-       <section class="section section-features">
-         <div class="section-header">
-           <span class="section-pill">
-             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
-             Features
-           </span>
-           <h2 class="section-title">What each report includes</h2>
-         </div>
+// ─── CARD COMPONENT ───────────────────────────────────────────────────
+function Card({ id, data, onDragStart, onDragEnd, isDragging }) {
+  const ref = useRef(null);
+  return (
+    <div
+      className="card"
+      ref={ref}
+      data-card-id={id}
+      style={{ opacity: isDragging ? 0.4 : 1 }}
+    >
+      <div
+        className="card-handle"
+        draggable
+        onDragStart={(e) => {
+          e.dataTransfer.setData('text/plain', id);
+          e.dataTransfer.effectAllowed = 'move';
+          onDragStart(id);
+        }}
+        onDragEnd={() => onDragEnd()}
+        title="Drag to reorder"
+      />
+      <div className="card-header" style={{ background: data.color }}>
+        <div className="card-pill">{data.pill}</div>
+        <div className="card-title">{data.title}</div>
+      </div>
+      <div className="card-body" dangerouslySetInnerHTML={{ __html: data.body }} />
+    </div>
+  );
+}
 
-         <div class="feature-grid">
-           <div class="feature-item">
-             <div class="feature-item-header">
-               <span class="feature-dot"></span>
-               <span class="feature-number">01 · Evidence</span>
-             </div>
-             <div class="feature-title">Every claim has a source</div>
-             <p class="feature-desc">Numbers and claims keep their citations, so you can open the original source.</p>
-           </div>
-           <div class="feature-item">
-             <div class="feature-item-header">
-               <span class="feature-dot amber"></span>
-               <span class="feature-number">02 · Stance</span>
-             </div>
-             <div class="feature-title">A clear final stance</div>
-             <p class="feature-desc">Bullish, bearish, mixed, or neutral — with confidence and reasons.</p>
-           </div>
-           <div class="feature-item">
-             <div class="feature-item-header">
-               <span class="feature-dot"></span>
-               <span class="feature-number">03 · Scenarios</span>
-             </div>
-             <div class="feature-title">Scenario cases side by side</div>
-             <p class="feature-desc">Base, upside, and downside cases stored as separate sections.</p>
-           </div>
-           <div class="feature-item">
-             <div class="feature-item-header">
-               <span class="feature-dot"></span>
-               <span class="feature-number">04 · Private</span>
-             </div>
-             <div class="feature-title">Stays on your computer</div>
-             <p class="feature-desc">No account, no telemetry, no cloud sync. Keys in OS keychain.</p>
-           </div>
-           <div class="feature-item">
-             <div class="feature-item-header">
-               <span class="feature-dot"></span>
-               <span class="feature-number">05 · Sources</span>
-             </div>
-             <div class="feature-title">12 data providers built in</div>
-             <p class="feature-desc">SEC filings, market data, news — Alpha Vantage, Polygon, Yahoo Finance.</p>
-           </div>
-           <div class="feature-item">
-             <div class="feature-item-header">
-               <span class="feature-dot amber"></span>
-               <span class="feature-number">06 · Portfolio</span>
-             </div>
-             <div class="feature-title">Portfolio reviews</div>
-             <p class="feature-desc">Position reviews, allocation notes, risk notes, and scenario options.</p>
-           </div>
-         </div>
+// ─── COLUMN COMPONENT ─────────────────────────────────────────────────
+function Column({ colId, cards, cardIds, onDrop, onDragStart, onDragEnd, draggingId }) {
+  const [overIdx, setOverIdx] = useState(-1);
 
-         <div class="image-card image-card-full comparison-shot" style="height: 88mm;">
-           <div class="image-card-label">
-             <p>Comparison against existing research workflows</p>
-           </div>
-           <div class="image-card-content">
-             <img class="poster-asset poster-asset-comparison" src="./assets/infi-poster-comparison.png" alt="Comparison table showing Infi advantages">
-           </div>
-         </div>
-       </section>
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const items = e.currentTarget.querySelectorAll('.card, .drop-zone');
+    let idx = cards.length;
+    for (let i = 0; i < items.length; i++) {
+      const rect = items[i].getBoundingClientRect();
+      if (e.clientY < rect.top + rect.height / 2) { idx = i; break; }
+    }
+    setOverIdx(idx);
+  }, [cards.length]);
 
-       <!-- PROPOSAL — Architecture -->
-       <section class="section section-architecture">
-         <div class="section-header">
-           <span class="section-pill">
-             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-             Architecture
-           </span>
-           <h2 class="section-title">Technical Architecture</h2>
-         </div>
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    const cardId = e.dataTransfer.getData('text/plain');
+    if (cardId) onDrop(cardId, colId, overIdx >= 0 ? overIdx : cards.length);
+    setOverIdx(-1);
+  }, [colId, onDrop, overIdx, cards.length]);
 
-         <div class="image-card image-card-full architecture-shot" style="height: 88mm;">
-           <div class="image-card-label">
-             <p>User prompt to source-backed report</p>
-           </div>
-           <div class="image-card-content">
-             <img class="poster-asset poster-asset-architecture" src="./assets/infi-poster-architecture.png" alt="Infi technical architecture diagram">
-           </div>
-         </div>
+  const handleDragLeave = useCallback(() => setOverIdx(-1), []);
 
-         <div class="tool-strip">
-           <span>21+ typed MCP tools</span>
-           <span>Evidence chain</span>
-           <span>Probability sum</span>
-           <span>Stance coherence</span>
-           <span>Blocking uncertainty</span>
-         </div>
-       </section>
+  const rendered = [];
+  cards.forEach((cid, i) => {
+    if (overIdx === i) {
+      rendered.push(<div key={`drop-${i}`} className="drop-zone active" />);
+    }
+    rendered.push(
+      <Card
+        key={cid}
+        id={cid}
+        data={cardIds[cid]}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        isDragging={draggingId === cid}
+      />
+    );
+  });
+  if (overIdx >= cards.length) {
+    rendered.push(<div key="drop-end" className="drop-zone active" />);
+  }
 
-       <!-- VALIDATION -->
-       <section class="section section-validation">
-         <div class="section-header">
-           <span class="section-pill">
-             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-             Validation goals
-           </span>
-           <h2 class="section-title">What gets blocked</h2>
-         </div>
+  return (
+    <div
+      className="poster-col"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onDragLeave={handleDragLeave}
+    >
+      {rendered}
+    </div>
+  );
+}
 
-         <div class="validation-grid">
-           <div><span>01</span><strong>Evidence chain</strong><p>Claims must include original sources.</p></div>
-           <div><span>02</span><strong>Probability sum</strong><p>Scenario weights must sum to 1.0.</p></div>
-           <div><span>03</span><strong>Stance coherence</strong><p>Final stance cannot contradict high-confidence risk blocks.</p></div>
-           <div><span>04</span><strong>Open questions</strong><p>High-impact uncertainty blocks final recommendation language.</p></div>
-         </div>
-       </section>
+// ─── POSTER COMPONENT ─────────────────────────────────────────────────
+function Poster() {
+  const [layout, setLayout] = useState(DEFAULT_LAYOUT);
+  const [draggingId, setDraggingId] = useState(null);
+  const [fontScale, setFontScale] = useState(1);
+  const shellRef = useRef(null);
 
-   </main>
+  const handleDrop = useCallback((cardId, targetCol, targetIdx) => {
+    setLayout(prev => {
+      const cols = prev.columns.map(c => ({ ...c, cards: [...c.cards] }));
+      for (const col of cols) {
+        const idx = col.cards.indexOf(cardId);
+        if (idx !== -1) { col.cards.splice(idx, 1); break; }
+      }
+      const target = cols.find(c => c.id === targetCol);
+      if (target) {
+        const insertIdx = Math.min(targetIdx, target.cards.length);
+        target.cards.splice(insertIdx, 0, cardId);
+      }
+      return { ...prev, columns: cols };
+    });
+    setDraggingId(null);
+  }, []);
 
-   <!-- ============================================================
-        REFERENCES
-        ============================================================ -->
-   <section class="section" style="grid-column: 1 / -1;">
-     <div class="section-header">
-       <span class="section-pill">
-         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
- stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-         References
-       </span>
-       <h2 class="section-title">Academic & Technical Sources</h2>
-     </div>
+  const getConfig = useCallback(() => {
+    return JSON.stringify({ DEFAULT_LAYOUT: layout, DEFAULT_LOGOS }, null, 2);
+  }, [layout]);
 
-     <ol class="references-list">
-       <li><span class="ref-number">[1]</span> Agent Client Protocol (ACP) Specification, Zed Industries, 2024.
- <code>zed.dev/blog/agent-client-protocol</code></li>
-       <li><span class="ref-number">[2]</span> Model Context Protocol (MCP), Anthropic, 2024. <code>modelcontextprotocol.io</code></li>
-       <li><span class="ref-number">[3]</span> Yang et al., "FinGPT: Open-Source Financial Large Language Models," arXiv:2306.06031, 2023.</li>
-       <li><span class="ref-number">[4]</span> Lewis et al., "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks," NeurIPS 2020.</li>
-       <li><span class="ref-number">[5]</span> Wei et al., "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models," NeurIPS 2022.</li>
-       <li><span class="ref-number">[6]</span> Tauri 2 Documentation, <code>v2.tauri.app</code></li>
-       <li><span class="ref-number">[7]</span> Rust Programming Language, <code>doc.rust-lang.org/book</code></li>
-       <li><span class="ref-number">[8]</span> SEC EDGAR API Documentation, <code>sec.gov/edgar</code></li>
-       <li><span class="ref-number">[9]</span> Alpha Vantage API Documentation, <code>alphavantage.co</code></li>
-       <li><span class="ref-number">[10]</span> PMCP Crate Documentation, <code>docs.rs/pmcp</code></li>
-     </ol>
-   </section>
+  const getWaste = useCallback(() => {
+    if (!shellRef.current) return 0;
+    const cards = shellRef.current.querySelectorAll('.card');
+    const shellRect = shellRef.current.getBoundingClientRect();
+    let usedHeight = 0;
+    cards.forEach(c => { usedHeight += c.getBoundingClientRect().height; });
+    const total = shellRect.height;
+    return Math.max(0, ((total - usedHeight) / total * 100)).toFixed(1);
+  }, []);
 
-   <!-- ============================================================
-        FOOTER
-        ============================================================ -->
-   <footer class="footer">
-     <div class="footer-left">
-       <div class="footer-logo-icon" aria-hidden="true"></div>
-       <span class="footer-logo">Infi</span>
-       <span class="footer-copyright">© 2026</span>
-     </div>
-     <div class="footer-links">
-       <a href="https://github.com/khanhthanhdev/infi/blob/main/docs/README.md" class="footer-link">Docs</a>
-       <a href="https://github.com/khanhthanhdev/infi/releases" class="footer-link">Releases</a>
-       <a href="https://github.com/khanhthanhdev/infi" class="footer-link">GitHub</a>
-     </div>
-     <div class="footer-right">
-       MIT · Research tool, not financial advice.
-     </div>
-   </footer>
- </div>
+  useEffect(() => {
+    window.posterAPI = {
+      swapCards: (a, b) => {
+        setLayout(prev => {
+          const cols = prev.columns.map(c => ({ ...c, cards: [...c.cards] }));
+          let colA, idxA, colB, idxB;
+          for (const col of cols) {
+            const ia = col.cards.indexOf(a);
+            const ib = col.cards.indexOf(b);
+            if (ia !== -1) { colA = col; idxA = ia; }
+            if (ib !== -1) { colB = col; idxB = ib; }
+          }
+          if (colA && colB) {
+            colA.cards[idxA] = b;
+            colB.cards[idxB] = a;
+          }
+          return { ...prev, columns: cols };
+        });
+      },
+      moveCard: (cardId, targetCol, pos) => handleDrop(cardId, targetCol, pos),
+      setFontScale: (s) => { setFontScale(s); document.documentElement.style.setProperty('--font-scale', s); },
+      getWaste,
+      getLayout: () => layout,
+      getConfig,
+      resetLayout: () => setLayout(DEFAULT_LAYOUT),
+    };
+  }, [layout, handleDrop, getWaste, getConfig]);
 
- </body>
- </html>
+  const AGENTS = ['claude','codex','gemini','qwen','mistral','kimi','opencode'];
+  const AGENT_LABELS = { claude: 'Claude Code', codex: 'Codex', gemini: 'Gemini CLI' };
+
+  return (
+    <>
+      {/* Toolbar */}
+      <div className="poster-toolbar">
+        <strong style={{ fontSize: 14 }}>Infi Poster</strong>
+        <span style={{ opacity: 0.5 }}>|</span>
+        <button onClick={() => { const s = Math.max(0.5, fontScale - 0.1); setFontScale(s); document.documentElement.style.setProperty('--font-scale', s); }}>A−</button>
+        <button onClick={() => { const s = Math.min(2, fontScale + 0.1); setFontScale(s); document.documentElement.style.setProperty('--font-scale', s); }}>A+</button>
+        <span className="info">Scale: {(fontScale * 100).toFixed(0)}%</span>
+        <span style={{ opacity: 0.5 }}>|</span>
+        <button onClick={() => window.print()}>Preview</button>
+        <button onClick={() => {
+          const cfg = getConfig();
+          navigator.clipboard.writeText(cfg).then(() => alert('Config copied to clipboard!')).catch(() => {
+            const ta = document.createElement('textarea'); ta.value = cfg; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('Config copied!');
+          });
+        }}>Copy Config</button>
+        <button onClick={() => { setLayout(DEFAULT_LAYOUT); alert('Layout reset!'); }}>Reset</button>
+        <span className="spacer" />
+        <span className="info">Waste: {getWaste()}%</span>
+        <span className="info">A1 Portrait · 594 × 841 mm</span>
+      </div>
+
+      {/* Poster */}
+      <div className="poster-shell" ref={shellRef} style={{ marginTop: 44 }}>
+        {/* Header */}
+        <header className="poster-header">
+          <div>
+            <div className="header-logo">
+              <img src="../landing/assets/icons/icon.png" alt="Infi" />
+            </div>
+            <h1>Infi</h1>
+            <div className="subtitle">Source-Backed, Structured Investment Research Powered by AI Agents</div>
+            <div className="kicker">Empowering beginner investors (F0) by transforming complex financial data into simple, actionable insights — with every claim traceable to its source.</div>
+          </div>
+          <div className="header-right">
+            <div className="team-label">Team 15 — 5nance</div>
+            <div className="team-name">IDEA1011 · VinUniversity</div>
+            <div className="team-members">Nguyen Minh Nghia · Nguyen Tuan Lam · Nguyen Quy Tu<br/>Tran Khanh Thanh · Dang Tuan Minh</div>
+            <div className="qr-box">QR<br/>CODE</div>
+          </div>
+        </header>
+
+        {/* Agents row */}
+        <div className="agents-row">
+          <span className="label">Works with coding agents you already run</span>
+          {AGENTS.map(a => (
+            <span className="agent-chip" key={a}>
+              <img src={`${IMG.agents}${a}.svg`} alt={a} />
+              <span style={{ textTransform: 'capitalize' }}>{AGENT_LABELS[a] || a}</span>
+            </span>
+          ))}
+          <span style={{ color: 'var(--muted)', opacity: 0.5, fontSize: 'calc(9px * var(--font-scale))' }}>or a custom binary</span>
+        </div>
+
+        {/* Content grid — 2 columns */}
+        <div className="poster-grid">
+          {layout.columns.map(col => (
+            <Column
+              key={col.id}
+              colId={col.id}
+              cards={col.cards}
+              cardIds={CARD_REGISTRY}
+              onDrop={handleDrop}
+              onDragStart={setDraggingId}
+              onDragEnd={() => setDraggingId(null)}
+              draggingId={draggingId}
+            />
+          ))}
+        </div>
+
+        {/* Footer */}
+        <footer className="poster-footer">
+          <div>
+            <span className="logo">Infi</span>
+            <span style={{ marginLeft: 8 }}>© 2026</span>
+          </div>
+          <div>
+            <a href="https://github.com/khanhthanhdev/infi">GitHub</a>
+            <span style={{ margin: '0 8px' }}>·</span>
+            <a href="https://github.com/khanhthanhdev/infi/blob/main/docs/README.md">Docs</a>
+            <span style={{ margin: '0 8px' }}>·</span>
+            <a href="https://github.com/khanhthanhdev/infi/releases">Releases</a>
+          </div>
+          <div>IDEA1011 · VinUniversity · Team 15 — 5nance</div>
+        </footer>
+      </div>
+    </>
+  );
+}
+
+// ─── RENDER ────────────────────────────────────────────────────────────
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<Poster />);
+</script>
+</body>
+</html>

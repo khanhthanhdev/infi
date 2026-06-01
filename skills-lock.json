@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "excalidraw-diagram-generator": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/excalidraw-diagram-generator/SKILL.md",
+      "computedHash": "e24e3c4cab4b5a07bc1d1801db14868f3a1cd184f7f28f5dd2c4a2b234bf2f2d"
+    },
+    "posterskill-academic-posters": {
+      "source": "aradotso/trending-skills",
+      "sourceType": "github",
+      "skillPath": "skills/posterskill-academic-posters/SKILL.md",
+      "computedHash": "f4135805f3e92f5b1644540a2f3c648aa53264f5880e442e6b105b1544b2289d"
+    }
+  }
+}

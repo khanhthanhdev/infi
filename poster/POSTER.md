@@ -583,6 +583,421 @@ When Infi binary runs with `--analysis-mcp-server`, it exposes:
 
 ---
 
-*Document prepared for academic poster presentation. All technical details verified against Infi v0.1.6 codebase.*
+Here is the parsed content from the presentation slides, formatted in Markdown:
 
-*Last updated: May 2026*
+BIG IDEAS: AI AND KNOWLEDGE REVOLUTION 
+
+INFI: Invest with Intelligence 
+
+**Team 15 - 5nance** 
+
+* Nguyen Minh Nghia - V202502131 
+
+
+* Nguyen Tuan Lam - V202502497 
+
+
+* Nguyen Quy Tu - V202502163 
+
+
+* Tran Khanh Thanh - V202502198 
+
+
+* Dang Tuan Minh - V202502188 **Course:** IDEA1011 
+
+
+
+---
+
+Background Research & Motivation 
+
+Financial Market Boom 
+
+* Vietnam will have an additional 2.6 million securities accounts by 2025, far exceeding the target of 11 million accounts by 2030. 
+
+
+* As of December 31, 2025, the number of securities trading accounts held by individual investors in Vietnam reached over 11.8 million, equivalent to approximately 11% of the population. 
+
+
+* This is driven by digital trading accessibility and a rapid expansion of the retail investor base. 
+
+
+
+The Hidden Problem 
+
+* 
+**Low Financial Literacy:** 24% of adults in Vietnam are financially literate (rank 118/144) (S&P Global FinLit Survey). 
+
+
+* 
+**Retail Investor Dominance:** 90% of the daily trading value is created by retail investors in the stock market (Visa Financial Literacy Survey). 
+
+
+* 
+**Unprofitable Outcome:** An estimated 95% of retail traders fail to sustain profits over time (VinaCapital, 2024). 
+
+
+
+Why Current Tools Fail Beginner Investors 
+
+* 
+**Information Overload:** Complex interfaces and massive amounts of raw data. 
+
+
+* 
+**Lack of Interpretation:** Beginners don't know how to analyze the numbers provided. 
+
+
+* 
+**Not Actionable:** The data provided does not lead to clear decision-making. 
+
+
+
+> We want to empower beginner investors (F0) by transforming complex financial data into simple, actionable insights. 
+> 
+> 
+
+---
+
+Market Analysis 
+
+Market Size & Trends 
+
+* There are over 12 million active accounts (January 2026) with an annual growth rate of over 20%. 
+
+
+* Nearly 75% of stock investors in Vietnam are below 35 years old. 
+
+
+* 
+**Structure of Stock Investors by Age in Vietnam:** 18-24 years old (33%), 25-29 years old (19%), 30-34 years old (21%), 35-40 years old (13%), 40+ years old (14%) (Source: InfoQ Vietnam). 
+
+
+
+Customer's Pain Points 
+
+* 
+**Herd Behaviour & FOMO:** F0 investors often depend on unverified rumors and social media stock tips, leading to an estimated 80-90% of retail day traders losing money. 
+
+
+* 
+**Information Overload:** Financial statements and technical charts (such as RSI and MACD) can be complex and intimidating for beginners without a financial background. 
+
+
+* 
+**Fragmented Experience:** Users experience decision fatigue from frequently switching between financial news sites like CafeF and complex brokers. 
+
+
+* 
+**Lack of Pre-Trade Validation:** Beginners struggle to find reliable, objective sources to validate ideas, leading to a lack of confidence before investing real money. 
+
+
+
+The Hidden Gap 
+
+| Existing Stock Apps | Our Solution |
+| --- | --- |
+| Focus on transaction & execution 
+
+ | Focus on education & validation 
+
+ |
+| Complex technical charts & tools 
+
+ | Simplified insights & recommendation 
+
+ |
+| High barrier to entry for beginners 
+
+ | User-friendly for F0 investor 
+
+ |
+
+> We don't replace brokers. We empower the next generation of investors to use them effectively. 
+> 
+> 
+
+Customer Segment 
+
+* 
+**Geographic:** Major cities & high-digital urban centers. 
+
+
+* 
+**Demographic:** Gen Z & Millennials (18-35), stable income. 
+
+
+* 
+**Psychographic:** Digital-native, social-driven, prefer simplicity. 
+
+
+* 
+**Behavioral:** App-based trading, seeks automation, low research time. 
+
+
+
+Competitor Analysis 
+
+* **Our Product:** Simple and balances insight/execution. While others focus on 'How to trade', we empower users on 'How to understand'. 
+
+
+* **Insight-focused & Complex:** Vietstock, CafeF, FireAnt. These offer fragmented data and high noise-to-signal ratio without guidance. 
+
+
+* **Execution-focused & Complex:** SSI, VNDirect, TCBS. These have intimidating interfaces built for pros, creating high barriers for F0. 
+
+
+
+---
+
+Our Innovation 
+
+Product Overview 
+
+An AI-powered web platform that centralizes company financial histories, visualizes trading data, and provides predictive insights tailored specifically for novice investors. 
+
+**Unique Selling Propositions (USP):** 
+
+* 
+**AI Data Translator:** Uses AI to read complex financial charts and explains them in plain, jargon-free language. 
+
+
+* 
+**All-in-One Visual Hub:** Replaces cluttered spreadsheets with user-friendly dashboards for tracking past performance and providing AI-driven future insights. 
+
+
+* 
+**Real-time chatbot:** Respond to all human inquiries and note any uncertainties or suspicious information in the financial analysis. 
+
+
+
+---
+
+Technology Perspective 
+
+The platform is an AI-powered native desktop app prioritizing Verifiable Claims, an Agent Client Protocol with 6+ Agents choice, Structured Output, and a Privacy First approach. 
+
+| Category | Details |
+| --- | --- |
+| **Bundle size** | ~10 MB Bundle Size. Uses Agent Client Protocol to talk to any agent. 
+
+ |
+| **Tech Stack** | Tauri 2 with Rust Backend. Runs its own MCP: structured, cited output. 
+
+ |
+| **Storage** | Embedded SQLite Database. Every claim links to a verified source. Each metric gets an explain tooltip. 
+
+ |
+| **Agents** | Agents through ACP. Multiple platform build and release. 
+
+ |
+| **Privacy** | No Telemetric, data leak. Agent as Worker, Not Agent as Writer. 
+
+ |
+
+Tauri 2 Approach 
+
+* Uses the OS native webview (WebKit on MacOS, Webview2 on Windows). 
+
+
+* Rust backend for memory safety, compiles to a single binary. 
+
+
+* Vite + React SPA for frontend -> No Node runtime. 
+
+
+* 
+**Tiny Footprint:** Total Size ~10MB, 5MB RAM, < 1s startup. 
+
+
+
+ACP + MCP - The Core Engine 
+
+* **ACP (Agent Client Protocol):** Standardized protocol for communicating with an agent. Infi spawns an agent as a child process over stdio. Currently works with 7 built-in agents (Codex, Claude, Gemini, Qwen, Kimi, Mistral, OpenCode), but any ACP-compatible agent can plug in. 
+
+
+* 
+**MCP (Model Context Protocol):** Infi runs its own MCP (infi-analysis) which exposes 21 structured tools the agent must use to submit output and strictly follow input/output formats. 
+
+
+* **Key Insight:** The agent is a research worker, not a report writer. Infi controls the output structure through typed MCP tools and server-side validation gates (Evidence chain, Stance coherence, etc.). 
+
+
+
+Citation System & Explain Tooltips 
+
+* Every Claim has a source, cited source, linked metric, and reference metric in the stance block. 
+
+
+* 
+**Two-Pass System:** 
+
+
+* 
+**Pass 1 (Main Analysis):** Focuses on research depth & accuracy. 
+
+
+* 
+**Pass 2 (Explain Tooltips):** Focuses on accessibility & education by scanning for financial terms, launching a separate ACP agent to explain them, and rendering hover tooltips. 
+
+
+
+
+* Different models can be used for each pass, allowing optimal separation of concerns. 
+
+
+
+Data Pipeline & Architecture 
+
+* **Clean Architecture:**
+* 
+**Domain:** Pure Type definition, no framework. 
+
+
+* 
+**Infrastructure:** SQLITE, ACP, HTTP, OS keychain. 
+
+
+* 
+**Commands:** Tauri IPC (Frontend <-> Domain + Infra). 
+
+
+* 
+**Frontend:** React SPA + Vite. 
+
+
+
+
+* **Data Providers:** 12 total (5 free, 7 paid).
+* 
+**Free:** CAFE F, VietStock, SEC EDGAR, Yahoo Finance, Finviz, Tavily, Google search, Alpha. 
+
+
+* 
+**Paid:** Advantage, FMP, Finnhub, Polygon, NewsAPI. 
+
+
+
+
+* 
+**Pipeline Stats:** 21 MCP tools (15 research + 6 portfolio), uses validation logic, relies on a single-file zero-config database, and ensures all data stays local. 
+
+
+
+---
+
+Future Roadmap 
+
+| Features | Description |
+| --- | --- |
+| **Cloud Sandbox & Agent** | Host the analysis engine and MCP agent runtime in the cloud. 
+
+ |
+| **Vietnam Market Data** | Add source providers for Vietnam-specific market data (SSI, VNDirect, TCBS, etc.). 
+
+ |
+| **Automation Workflow** | Let users define scheduled or event-triggered workflows (e.g., "re-run this analysis weekly", "alert me if metric X crosses threshold Y"). 
+
+ |
+| **Mobile App** | Native or hybrid mobile app for on-the-go access to reports and sharing. 
+
+ |
+| **Share Report** | Allow users to share analysis reports via public/private links, PDF export, or team collaboration spaces. 
+
+ |
+| **Interactive Chat** | Enable a chat interface where users can ask follow-up questions about a completed analysis, drill into specific metrics, or request modifications. 
+
+ |
+| **More use cases** | Support use cases like earnings call analysis, macro/sector screening, risk scenario modeling, ESG scoring, tax-loss harvesting, etc. 
+
+ |
+
+---
+
+AI-Driven Investing 
+
+The Benefits 
+
+* 
+**Democratizing wealth management:** Putting high-level data synthesis directly into the hands of everyday retail investors. 
+
+
+* 
+**Objective, Agent-Driven Decisions:** The platform acts as an impartial agent that relies purely on data and algorithmic logic to ground the user in objective reality. 
+
+
+* 
+**Holistic Market Perspective:** Utilizing a diverse array of AI models acts like a committee of analysts for a well-rounded view. 
+
+
+* 
+**Educational Value:** Explaining fundamental analysis helps users understand market mechanics instead of just telling them to "buy" or "sell". 
+
+
+
+Challenges and Ethical Considerations 
+
+* 
+**The "Black Box" Trust Barrier:** Investors must trust the system; if the AI makes a poor projection and a user loses money, they will blame the platform. 
+
+
+* 
+**The Limits of Predictive Modeling:** No model can predict "black swan" events perfectly, so the AI will inevitably be wrong sometimes. 
+
+
+* 
+**Regulatory and Liability Risks:** Massive legal gray area between providing "AI-generated market analysis" and "regulated financial advice". 
+
+
+* 
+**Data Privacy Risks:** Financial AI relies on sensitive user data; any misuse would erode trust and create legal exposure. 
+
+
+
+---
+
+Conclusion 
+
+* 
+**Problem:** Beginners need financial understanding and validation, not just faster execution. 
+
+
+* 
+**Our solution:** An AI-powered hub that translates complex data into simple, actionable insights. 
+
+
+* 
+**Technology used:** A privacy-first, highly structured architecture where every AI claim is backed by verified sources. 
+
+
+* 
+**Future vision:** Democratizing wealth management to help users invest with confidence, not FOMO. 
+
+
+
+---
+
+INFI Team Background 
+
+* 
+**Nguyen Tuan Lam (R&D Manager - Computer Science):** Ensure timely task completion, research backgrounds & motivation, provide feature recommendations. 
+
+
+* 
+**Dang Tuan Minh (Market Researcher - Data Science):** Coordinate team communication, conduct market and customer research, present team innovations. 
+
+
+* 
+**Tran Khanh Thanh (Software Developer - Electrical Engineering):** Develop AI models, build the technical solution, improve system performance and functionality. 
+
+
+* 
+**Nguyen Minh Nghia (Market Analyst - Computer Science):** Conceptualize project ideas, analyze market demand, support technical development. 
+
+
+* 
+**Nguyen Quy Tu (Researcher Analyst - Data Science):** Analyze technical data, identify key challenges and possible solutions, create a future roadmap. 
+
+
+
+**Thank You for Your Attention - IDEA1011**
