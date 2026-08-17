@@ -404,14 +404,7 @@ struct PiAgent {
 impl PiAgent {
     fn new() -> Self {
         Self {
-            candidate: npx_candidate(
-                "pi",
-                "Pi",
-                "PI_ACP_BIN",
-                "pi-acp",
-                "pi-acp",
-                false,
-            ),
+            candidate: npx_candidate("pi", "Pi", "PI_ACP_BIN", "pi-acp", "pi-acp", false),
         }
     }
 }
@@ -719,7 +712,9 @@ mod tests {
     fn candidate_lookup_never_empty_and_has_stable_ids() {
         let candidates = list_agent_candidates();
         assert!(!candidates.is_empty());
-        for expected in ["codex", "claude", "gemini", "qwen", "kimi", "opencode", "pi"] {
+        for expected in [
+            "codex", "claude", "gemini", "qwen", "kimi", "opencode", "pi",
+        ] {
             assert!(
                 candidates.iter().any(|candidate| candidate.id == expected),
                 "missing built-in agent id {expected}",

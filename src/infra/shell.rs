@@ -240,8 +240,6 @@ fn should_load_shell_environment() -> bool {
     !std::io::stdout().is_terminal()
 }
 
-
-
 #[cfg(unix)]
 fn capture_login_shell_environment() -> Option<HashMap<String, String>> {
     let shell = system_shell_path()?;
