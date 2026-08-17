@@ -152,7 +152,6 @@ fn suppress_windows_console_std(_command: &mut std::process::Command) {}
 pub fn suppress_windows_console_tokio(_command: &mut tokio::process::Command) {
     #[cfg(target_os = "windows")]
     {
-        use std::os::windows::process::CommandExt;
         const CREATE_NO_WINDOW: u32 = 0x0800_0000;
         #[allow(clippy::used_underscore_binding)]
         _command.creation_flags(CREATE_NO_WINDOW);
@@ -239,8 +238,6 @@ fn should_load_shell_environment() -> bool {
     }
     !std::io::stdout().is_terminal()
 }
-
-
 
 #[cfg(unix)]
 fn capture_login_shell_environment() -> Option<HashMap<String, String>> {

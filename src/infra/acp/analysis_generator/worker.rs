@@ -164,8 +164,9 @@ async fn generate_with_acp_inner(input: GenerateAnalysisInput) -> Result<Generat
         {
             let is_batch = {
                 let p = std::path::Path::new(&agent_command);
-                p.extension()
-                    .is_some_and(|ext| ext.eq_ignore_ascii_case("cmd") || ext.eq_ignore_ascii_case("bat"))
+                p.extension().is_some_and(|ext| {
+                    ext.eq_ignore_ascii_case("cmd") || ext.eq_ignore_ascii_case("bat")
+                })
             };
             if is_batch {
                 let mut c = Command::new("cmd");
